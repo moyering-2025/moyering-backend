@@ -1,19 +1,22 @@
 package com.dev.moyering.entity;
-import java.sql.Date;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.dev.moyering.dto.common.CategoryDto;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 @Entity
 @Builder
 @NoArgsConstructor
+@Setter
+@Getter
 @AllArgsConstructor
 public class Category {
 
@@ -22,5 +25,10 @@ public class Category {
     private Integer categoryId;
     @Column
     private String categoryName;
-
+    public CategoryDto toDto() {
+    	return CategoryDto.builder()
+    			.categoryId(categoryId)
+    			.categoryName(categoryName)
+    			.build();
+    }
 }

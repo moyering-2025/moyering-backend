@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserDto {
-	private String userId;
+	private Integer userId;
 	private String id;
 	private String profile;
 	private String password;

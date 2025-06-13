@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+import com.dev.moyering.entity.common.User;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +26,7 @@ public class Host {
 	private Integer hostId;
 	@OneToOne
 	@JoinColumn(name="userId")
-	private Integer User;
+	private User User;
 	@Column
 	private String name;
 	@Column
