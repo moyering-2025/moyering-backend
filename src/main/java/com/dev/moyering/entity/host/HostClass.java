@@ -9,7 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.dev.moyering.dto.host.ClassDto;
+import com.dev.moyering.dto.host.HostClassDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Class {
+public class HostClass {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer classId;
@@ -63,8 +63,8 @@ public class Class {
 	@Column
 	private String refund;
 	
-	public ClassDto toDto() {
-		ClassDto dto = ClassDto.builder()
+	public HostClassDto toDto() {
+		HostClassDto dto = HostClassDto.builder()
 				.classId(classId)
 				.category1(category1)
 				.category2(category2)
