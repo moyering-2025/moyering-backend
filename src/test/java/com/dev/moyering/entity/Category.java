@@ -5,7 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import com.dev.moyering.dto.CategoryDto;
+import com.dev.moyering.dto.common.CategoryDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

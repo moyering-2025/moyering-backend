@@ -1,4 +1,4 @@
-package com.dev.moyering.entity;
+package com.dev.moyering.entity.common;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +11,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.DynamicInsert;
 
-import com.dev.moyering.dto.SubCategoryDto;
+import com.dev.moyering.dto.common.SubCategoryDto;
+import com.dev.moyering.entity.common.Category;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +29,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Setter
 @Getter
-public class subCategory {
+public class SubCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

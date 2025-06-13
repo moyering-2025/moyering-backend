@@ -1,7 +1,7 @@
-package com.dev.moyering.dto;
+package com.dev.moyering.dto.common;
 
-import com.dev.moyering.entity.Category;
-import com.dev.moyering.entity.subCategory;
+import com.dev.moyering.entity.common.Category;
+import com.dev.moyering.entity.common.SubCategory;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +18,8 @@ public class SubCategoryDto {
     private String subCategoryName;
     private Integer categoryId;//1차
     private String categoryName;//1차 카테고리
-    public subCategory toEntity() {
-    	return subCategory.builder()
+    public SubCategory toEntity() {
+    	return SubCategory.builder()
     			.subCategoryId(subCategoryId)
     			.subCategoryName(subCategoryName)
     			.firstCategory(

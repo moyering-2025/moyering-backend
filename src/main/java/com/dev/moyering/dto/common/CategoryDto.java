@@ -1,7 +1,6 @@
-package com.dev.moyering.dto;
+package com.dev.moyering.dto.common;
 
-import com.dev.moyering.entity.Category;
-import com.dev.moyering.entity.subCategory;
+import com.dev.moyering.entity.common.Category;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

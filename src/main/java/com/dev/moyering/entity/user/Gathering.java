@@ -1,4 +1,4 @@
-package com.dev.moyering.entity;
+package com.dev.moyering.entity.user;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -16,11 +16,14 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.dev.moyering.entity.common.SubCategory;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @Entity
 @Getter
 @Setter
@@ -77,7 +80,7 @@ public class Gathering {
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="subCategoryId")
-	private subCategory subCategory;
+	private SubCategory subCategory;
 
     @Column(precision = 10, scale = 7)
     private BigDecimal latitude;
