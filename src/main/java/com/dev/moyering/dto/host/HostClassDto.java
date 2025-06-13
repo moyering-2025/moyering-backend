@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.dev.moyering.entity.host.Class;
+import com.dev.moyering.entity.host.HostClass;
 import com.dev.moyering.entity.host.Host;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClassDto {
+public class HostClassDto {
 	private Integer classId;
 	private Integer hostId;
 	private String category1;
@@ -32,8 +32,8 @@ public class ClassDto {
 	private String material;
 	private String refund;
 	
-	public Class toEntity() {
-		Class entity = Class.builder()
+	public HostClass toEntity() {
+		HostClass entity = HostClass.builder()
 				.classId(classId)
 				.category1(category1)
 				.category2(category2)
