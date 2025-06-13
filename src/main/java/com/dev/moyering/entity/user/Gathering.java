@@ -15,8 +15,11 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
+import com.dev.moyering.dto.user.GatheringDto;
 import com.dev.moyering.entity.common.SubCategory;
+import com.dev.moyering.entity.common.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,16 +37,22 @@ public class Gathering {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "gathering_id", nullable = false)
+    @Column(nullable = false)
     private Integer gatheringId;
 
     @Column(nullable = false)
     private String title;
-    
+	
+	@ManyToOne(fetch=FetchType.EAGER)
+	@JoinColumn(name="userId")
+	private User user;
+
     @Column(columnDefinition = "LONGTEXT", nullable = false)
     @Lob
     private String gatheringContent;
 
+    @Column(nullable = false)
+    private String thumbnail;
     @Column(nullable = false)
     private Date meetingDate;
 
@@ -75,25 +84,47 @@ public class Gathering {
     @Column()
     private String tags;
 
-    @Column(nullable = false)
+    @Column
+	@CreationTimestamp
     private Date createDate;
 
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="subCategoryId")
 	private SubCategory subCategory;
-
     @Column(precision = 10, scale = 7)
-    private BigDecimal latitude;
+    private BigDecimal latitude;//위도
 
     @Column( precision = 10, scale = 7)
-    private BigDecimal longitude;
+    private BigDecimal longitude;//경도
 
     @Column()
-    private String intrOnln;
+    private String intrOnln;//한줄 소개
 
     @Column()
     private String status;
-
-    @Column(nullable = false)
-    private String thumbnail;
+    public GatheringDto toDto() {
+	    return GatheringDto.builder()
+	    		.gatheringId(gatheringId)
+	    		.title(title)
+	    		.userId(user.getUserId())
+	    		.gatheringContent(gatheringContent)
+	    		.thumbnail(thumbnail)
+	    		.meetingDate(meetingDate)
+	    		.startTime(startTime)
+	    		.endTime(endTime)
+	    		.address(address)
+	    		.detailAddress(detailAddress)
+	    		.minAttendees(minAttendees)
+	    		.maxAttendees(maxAttendees)
+	    		.applyDeadline(applyDeadline)
+	    		.preparationItems(preparationItems)
+	    		.tags(tags)
+	    		.createDate(createDate)
+	    		.subCategoryId(subCategory.getSubCategoryId())
+	    		.latitude(latitude)
+	    		.longitude(longitude)
+	    		.intrOnln(intrOnln)
+	    		.status(status)
+	    		.build();
+    }
 }
