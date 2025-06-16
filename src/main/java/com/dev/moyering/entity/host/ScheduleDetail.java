@@ -28,7 +28,7 @@ public class ScheduleDetail {
 	private Integer scheduleId;
 	@OneToOne
 	@JoinColumn(name = "classId")
-	private Class hostClass;
+	private HostClass hostClass;
 	@Column
 	private String name;
 	@Column
