@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Table(name="scrap", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id","post_id"})})
-public class scrap {
+public class Scrap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

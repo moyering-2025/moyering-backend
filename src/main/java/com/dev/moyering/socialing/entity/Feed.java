@@ -13,12 +13,14 @@ import javax.persistence.ManyToOne;
 
 import com.dev.moyering.common.entity.User;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.dev.moyering.socialing.dto.FeedDto;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Feed {
 
     @Id
@@ -26,7 +28,7 @@ public class Feed {
     @Column(nullable = false)
     private Integer feedId;
 
-    @Column
+    @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)
@@ -40,8 +42,8 @@ public class Feed {
 
     private LocalDateTime createDate;
 
-    @Column(nullable = false)
-    private byte deleted;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean isDeleted = false;
 
     private String tag1;
     private String tag2;
@@ -50,7 +52,28 @@ public class Feed {
     private String tag5;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    public FeedDto toDto(){
+       return FeedDto.builder()
+               .feedId(feedId)
+               .content(content)
+               .img1(img1)
+               .img2(img2)
+               .img3(img3)
+               .img4(img4)
+               .img5(img5)
+               .tag1(tag1)
+               .tag2(tag2)
+               .tag3(tag3)
+               .tag4(tag4)
+               .tag5(tag5)
+               .createDate(createDate)
+               .isDeleted(false)
+               .writerId(user.getId())
+               .writerProfile(user.getProfile())
+               .writerBadge(user.getUserBadgeId())
+               .build();
+    }
 }

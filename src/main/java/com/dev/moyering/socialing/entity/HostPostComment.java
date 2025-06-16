@@ -20,16 +20,15 @@ public class HostPostComment {
     @Column(nullable = false)
     private String content;
     private LocalDateTime createTime;
-    @Column(nullable = false)
-    @ColumnDefault("0")
-    private byte isDeleted;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean isDeleted = false;
 
     @Column(nullable = false)
     private int parentId;
     private int userId;
 
     @ManyToOne
-    @JoinColumn(name = "post_id",nullable = false)
+    @JoinColumn(name = "post_id", nullable = false)
     private HostPost post;
 
 }

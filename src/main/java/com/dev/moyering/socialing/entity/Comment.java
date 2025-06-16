@@ -11,12 +11,17 @@ import javax.persistence.ManyToOne;
 
 import com.dev.moyering.common.entity.User;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Getter
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Comment {
 
     @Id
@@ -31,6 +36,18 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(nullable = false)
+    private LocalDateTime createAt;
+
+    @Column(nullable = false)
+    private String content;
+
+    @Column
+    private Integer parentId;
+
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean isDeleted = false;
 
 
 }
