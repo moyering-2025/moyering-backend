@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.dev.moyering.common.entity.Category;
-import com.dev.moyering.entity.common.QCategory;
-import com.dev.moyering.entity.common.QSubCategory;
+import com.dev.moyering.common.entity.QCategory;
+import com.dev.moyering.common.entity.QSubCategory;
 import com.dev.moyering.common.entity.SubCategory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
