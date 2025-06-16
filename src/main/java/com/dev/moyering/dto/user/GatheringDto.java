@@ -65,7 +65,5 @@ public class GatheringDto {
     			.longitude(longitude)
     			.status(status)
     			.build();
-    			
     }
-    
 }
