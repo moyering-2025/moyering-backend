@@ -338,4 +338,4 @@ gradle-app.setting
 # querydsl
 src/main/generated/
 build/generated/
-src/main/resources/application-local.properties
+src/main/resources/application.properties
