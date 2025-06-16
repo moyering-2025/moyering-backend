@@ -1,5 +1,6 @@
 package com.dev.moyering.socialing.entity;
 
+
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;

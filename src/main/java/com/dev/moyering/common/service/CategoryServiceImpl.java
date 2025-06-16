@@ -15,24 +15,12 @@ import com.dev.moyering.common.repository.CategoryRepository;
 public class CategoryServiceImpl implements CategoryService{
 	@Autowired
 	private CategoryRepository categoryRepository;
-//	public List<CategoryDto> getFirstCategoryList() throws Exception {
-//		List<Category> firstCategoryList = categoryRepository.getFirstCategoryList();
-//		return firstCategoryList.stream().map(c->c.toDto()).collect(Collectors.toList());
-//	}
-//	public List<SubCategoryDto> getSecondCategoryList(Integer firstCategoryId) throws Exception {
-//		List<SubCategory> secondCategoryList = categoryRepository.getSecondCategoryList(firstCategoryId);
-//		return secondCategoryList.stream().map(sc->sc.toDto()).collect(Collectors.toList());
-//	}
-
-	@Override
 	public List<CategoryDto> getFirstCategoryList() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		List<Category> firstCategoryList = categoryRepository.getFirstCategoryList();
+		return firstCategoryList.stream().map(c->c.toDto()).collect(Collectors.toList());
 	}
-
-	@Override
 	public List<SubCategoryDto> getSecondCategoryList(Integer firstCategoryId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		List<SubCategory> secondCategoryList = categoryRepository.getSecondCategoryList(firstCategoryId);
+		return secondCategoryList.stream().map(sc->sc.toDto()).collect(Collectors.toList());
 	}
 }
