@@ -34,6 +34,7 @@ public class HostDto {
 	public Host toEntity() {
 		Host entity = Host.builder()
 				.hostId(hostId)
+				.userId(userId)
 				.name(name)
 				.profile(profile)
 				.tel(tel)
@@ -50,11 +51,6 @@ public class HostDto {
 				.accNum(accNum)
 				.idCard(idCard)
 				.build();
-		if(userId!=null) {
-			entity.setUser(User.builder()
-					.userId(userId)
-					.build());
-		}
 		return entity;
 	}
 }

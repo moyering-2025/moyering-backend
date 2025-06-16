@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+import com.dev.moyering.dto.host.HostDto;
 import com.dev.moyering.entity.common.User;
 
 import lombok.AllArgsConstructor;
@@ -24,9 +25,8 @@ public class Host {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer hostId;
-	@OneToOne
-	@JoinColumn(name="userId")
-	private User User;
+	@Column
+	private Integer userId;
 	@Column
 	private String name;
 	@Column
@@ -57,5 +57,29 @@ public class Host {
 	private String accNum;
 	@Column
 	private String idCard;
+	
+	HostDto toDto() {
+		HostDto dto = HostDto.builder()
+				.hostId(hostId)
+				.userId(userId)
+				.name(accName)
+				.profile(profile)
+				.tel(publicTel)
+				.publicTel(publicTel)
+				.email(email)
+				.intro(intro)
+				.tag1(tag1)
+				.tag2(tag2)
+				.tag3(tag3)
+				.tag4(tag4)
+				.tag5(tag5)
+				.bankName(bankName)
+				.accName(accName)
+				.accNum(accNum)
+				.idCard(idCard)
+				.build();
+		return dto;
+				
+	}
 
 }

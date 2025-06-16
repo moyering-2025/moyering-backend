@@ -25,7 +25,7 @@ public class ClassRegist {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer sudentId;
 	@Column
-	private Integer userId;
+	private Integer userId;//다대다
 	@Column
 	private Integer attCount;
 	@Column
