@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.dev.moyering.dto.host.InquiryDto;
+import com.dev.moyering.dto.host.ReviewDto;
 import com.dev.moyering.entity.common.User;
 
 import lombok.AllArgsConstructor;
@@ -23,24 +23,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Inquiry {
+public class Review {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Integer InquiryId;
+	private Integer reviewId;
 	@Column
 	private String className;
 	@Column
+	private String content;
+	@Column
 	private String studentName;
 	@Column
-	private Date inquiryDate;
+	private Integer state;
 	@Column
-	private String state;
+	private String revRegCotnent;
 	@Column
-	private String iqResContent;
-	@Column
-	private Date ResponseDate;
-	@Column
-	private String content;
+	private Date responseDate;
 	@ManyToOne
 	@JoinColumn(name="calendarId")
 	private ClassCalendar classCalendar;
@@ -51,15 +49,14 @@ public class Inquiry {
 	@JoinColumn(name="userId")
 	private User user;
 	
-	public InquiryDto toDto() {
-		InquiryDto dto = InquiryDto.builder()
-				.InquiryId(InquiryId)
+	ReviewDto toDto() {
+		ReviewDto dto = ReviewDto.builder()
+				.reviewId(reviewId)
 				.className(className)
-				.inquiryDate(inquiryDate)
-				.state(state)
-				.iqResContent(iqResContent)
-				.ResponseDate(ResponseDate)
 				.content(content)
+				.state(state)
+				.revRegCotnent(revRegCotnent)
+				.responseDate(responseDate)
 				.build();
 		if(classCalendar!=null) {
 			dto.setCalendarId(classCalendar.getCalendarId());
@@ -68,11 +65,10 @@ public class Inquiry {
 			dto.setHostId(host.getHostId());			
 		}
 		if(user!=null) {
-			dto.setUserId(user.getUserId());
-			dto.setStudentName(user.getName());
+			dto.setUserId(host.getHostId());
+			dto.setStudentName(host.getName());
 		}
 		return dto;
 	}
-	
 	
 }

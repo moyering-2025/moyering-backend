@@ -3,9 +3,8 @@ package com.dev.moyering.dto.host;
 import java.sql.Date;
 
 import com.dev.moyering.entity.common.User;
-import com.dev.moyering.entity.host.ClassCalendar;
 import com.dev.moyering.entity.host.Host;
-import com.dev.moyering.entity.host.Inquiry;
+import com.dev.moyering.entity.host.Review;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,33 +15,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InquiryDto {
-	private Integer InquiryId;
+public class ReviewDto {
+	private Integer reviewId;
 	private String className;
-	private String studentName;
-	private Date inquiryDate;
-	private String state;
-	private String iqResContent;
-	private Date ResponseDate;
 	private String content;
+	private Integer state;
+	private String revRegCotnent;
+	private Date responseDate;
 	private Integer calendarId;
 	private Integer hostId;
-	private Integer userId; 
+	private Integer userId;
+	private String studentName;
 	
-	public Inquiry toEntity() {
-		Inquiry entity = Inquiry.builder()
-				.InquiryId(InquiryId)
+	public Review toEntity() {
+		Review entity = Review.builder()
+				.reviewId(reviewId)
 				.className(className)
-				.inquiryDate(inquiryDate)
-				.state(state)
-				.iqResContent(iqResContent)
-				.ResponseDate(ResponseDate)
 				.content(content)
+				.state(state)
+				.revRegCotnent(revRegCotnent)
+				.responseDate(responseDate)
 				.build();
-		if(calendarId!=null) {
-			entity.setClassCalendar(ClassCalendar.builder()
-					.calendarId(calendarId).build());
-		}
 		if(hostId!=null) {
 			entity.setHost(Host.builder()
 					.hostId(hostId).build());
@@ -55,4 +48,6 @@ public class InquiryDto {
 		}
 		return entity;
 	}
+	
+	
 }
