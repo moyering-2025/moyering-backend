@@ -1,5 +1,8 @@
 package com.dev.moyering.dto.host;
 
+import com.dev.moyering.entity.host.Host;
+import com.dev.moyering.entity.host.HostClass;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
