@@ -1,5 +1,8 @@
 package com.dev.moyering.dto.host;
 
+import com.dev.moyering.entity.common.User;
+import com.dev.moyering.entity.host.Host;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,4 +30,31 @@ public class HostDto {
 	private String accName;
 	private String accNum;
 	private String idCard;
+	
+	public Host toEntity() {
+		Host entity = Host.builder()
+				.hostId(hostId)
+				.name(name)
+				.profile(profile)
+				.tel(tel)
+				.publicTel(publicTel)
+				.email(email)
+				.intro(intro)
+				.tag1(tag1)
+				.tag2(tag2)
+				.tag3(tag3)
+				.tag4(tag4)
+				.tag5(tag5)
+				.bankName(bankName)
+				.accName(accName)
+				.accNum(accNum)
+				.idCard(idCard)
+				.build();
+		if(userId!=null) {
+			entity.setUser(User.builder()
+					.userId(userId)
+					.build());
+		}
+		return entity;
+	}
 }
