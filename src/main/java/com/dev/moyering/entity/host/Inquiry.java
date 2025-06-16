@@ -1,14 +1,17 @@
 package com.dev.moyering.entity.host;
 
+import java.sql.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import com.dev.moyering.entity.common.User;
+import com.dev.moyering.dto.host.InquiryDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,42 +23,33 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Host {
+public class Inquiry {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Integer hostId;
+	private Integer InquiryId;
 	@OneToOne
-	@JoinColumn(name="userId")
-	private User User;
+	@JoinColumn(name="studentId")
+	private ClassRegist student;
 	@Column
-	private String name;
+	private String className;
 	@Column
-	private String profile;
+	private String studentName;
 	@Column
-	private String tel;
+	private Date inquiryDate;
 	@Column
-	private String publicTel;
+	private String state;
 	@Column
-	private String email;
+	private String iqResContent;
 	@Column
-	private String intro;
+	private Date ResponseDate;
+	@ManyToOne
+	@JoinColumn(name="calendarId")
+	private ClassCalendar classCalendar;
+	@OneToOne
+	@JoinColumn(name="hostId")
+	private Host host;
 	@Column
-	private String tag1;
-	@Column
-	private String tag2;
-	@Column
-	private String tag3;
-	@Column
-	private String tag4;
-	@Column
-	private String tag5;
-	@Column
-	private String bankName;
-	@Column
-	private String accName;
-	@Column
-	private String accNum;
-	@Column
-	private String idCard;
-
+	private String content;
+	
+	
 }
