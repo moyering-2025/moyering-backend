@@ -12,9 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Comment;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.dev.moyering.admin.dto.BannerDto;
 import com.dev.moyering.common.entity.User;
 
 import lombok.AllArgsConstructor;
@@ -34,8 +36,10 @@ public class Banner {
 	private Integer bannerId;
 	@Column
 	private String title;
-	@Column
-	private String status;
+	@Builder.Default
+	@Column(columnDefinition = "INT DEFAULT 1")
+	@Comment("1=게시, 0은 숨김")
+	private Integer status = 1;
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -44,5 +48,17 @@ public class Banner {
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="userId")
 	private User user;
-	
+
+	public BannerDto toDto() {
+		BannerDto dto = BannerDto.builder()
+				.bannerId(bannerId)
+				.title(title)
+				.status(status)
+				.createdAt(createdAt)
+				.bannerImg(bannerImg)
+				.build();
+		if (user!=null)
+			dto.setUserId(user.getUserId());
+		return dto;
+	}
 }
