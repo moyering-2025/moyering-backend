@@ -26,6 +26,7 @@ public class GatheringServiceImpl implements GatheringService {
 	private ModelMapper modelMapper;
 	@Override
 	public Integer writeGathering(GatheringDto gatheringDto, MultipartFile ifile) throws Exception {
+		System.out.println(gatheringDto);
 		return null;
 		// 게더링 등록
 	}
