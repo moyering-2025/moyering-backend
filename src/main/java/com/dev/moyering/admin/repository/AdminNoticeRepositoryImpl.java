@@ -10,7 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import java.util.List;
-import static com.dev.moyering.entity.admin.QNotice.notice;
+import static com.dev.moyering.admin.entity.QNotice.notice;
 
 @Repository
 @RequiredArgsConstructor // final 필드 생성자 자동 생성
