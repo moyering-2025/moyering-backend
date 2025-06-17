@@ -27,12 +27,14 @@ public class DmMessage {
 
     @Column(nullable = false)
     private String content;
-    private boolean isRead;
     private LocalDateTime sendAt;
 
+    @Column(nullable = false,columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean isRead = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id",nullable = false)
-    private DmRoom room;
+    @JoinColumn(name = "dmroom_id",nullable = false)
+    private DmRoom dmRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id",nullable = false)

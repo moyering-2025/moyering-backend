@@ -30,5 +30,5 @@ public class LikeList {
 
     @ManyToOne
     @JoinColumn(name = "post_id",nullable = false)
-    private Feed socialing;
+    private Feed feed;
 }
