@@ -5,6 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import com.dev.moyering.common.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,9 +25,11 @@ public class ClassRegist {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer sudentId;
 	@Column
-	private Integer userId;//다대다
-	@Column
 	private Integer attCount;
-	@Column
-	private Integer calendarId;//다대다이기 때문에 다르게 처리해야함
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
+    @ManyToOne
+    @JoinColumn(name = "calendarId")
+    private ClassCalendar calendar;
 }

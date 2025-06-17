@@ -1,11 +1,14 @@
 package com.dev.moyering.host.dto;
 
+import java.sql.Date;
+
+import com.dev.moyering.host.entity.Host;
+import com.dev.moyering.host.entity.HostClass;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.dev.moyering.host.entity.HostClass;
-import com.dev.moyering.host.entity.Host;
 
 @Data
 @NoArgsConstructor
@@ -31,6 +34,9 @@ public class HostClassDto {
 	private String detailDescription;
 	private String material;
 	private String refund;
+	
+	//공통 필드 추가
+	private Date startDate;
 	
 	public HostClass toEntity() {
 		HostClass entity = HostClass.builder()
