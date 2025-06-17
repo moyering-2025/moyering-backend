@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.QClassCalendar;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -36,5 +37,18 @@ public class ClassCalendarRepositoryImpl implements ClassCalendarRepositoryCusto
 				tuple -> tuple.get(calendar.hostClass.classId), 
 				tuple -> tuple.get(calendar.startDate.min())
 				));
+	}
+
+	@Override
+	public List<ClassCalendar> findTop4ByDistinctHostClass() throws Exception {
+		QClassCalendar cc = QClassCalendar.classCalendar;
+		
+		return jpaQueryFactory
+				.selectFrom(cc)
+				.where(cc.status.eq("모집중"))
+				.groupBy(cc.hostClass.classId)
+				.orderBy(cc.registeredCount.max().desc())
+				.limit(4)
+				.fetch();
 	}
 }

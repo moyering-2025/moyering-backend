@@ -26,7 +26,6 @@ public class HostClassServiceImpl implements HostClassService {
 	@Override
 	public List<HostClassDto> getRecommendHostClassesForUser(Integer userId) throws Exception {
 	    List<HostClass> result;
-
 		if (userId == null) {
 	        result = hostClassRepository.findRecommendClassesForUser(null);
 	    } else {
@@ -34,6 +33,8 @@ public class HostClassServiceImpl implements HostClassService {
 	                .orElseThrow(() -> new Exception("해당 사용자를 찾을 수 없습니다: id=" + userId));
 	        result = hostClassRepository.findRecommendClassesForUser(user);
 	    }
+		System.out.println(result+"rrr");
+		
 		
 		List<Integer> classIds = result.stream()
 		        .map(HostClass::getClassId)
