@@ -60,8 +60,7 @@ public class GatheringServiceImpl implements GatheringService {
 	}
 	@Override
 	public GatheringDto detailGathering(Integer gatheringId) throws Exception {
-		return null;
 		// 게더링 조회
-//		return gatheringRepository.selectGathering(gatheringId).toDto();
+		return gatheringRepository.selectGathering(gatheringId).toDto();
 	}	
 }

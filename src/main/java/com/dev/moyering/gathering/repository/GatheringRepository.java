@@ -1,5 +1,6 @@
 package com.dev.moyering.gathering.repository;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -67,9 +68,11 @@ public class GatheringRepository {
 	@Transactional
 	public void updateGathering(GatheringDto gatheringDto) throws Exception{
 		QGathering gathering = QGathering.gathering;
+		LocalTime startTime = LocalTime.parse(gatheringDto.getStartTime());
+		LocalTime endTime = LocalTime.parse(gatheringDto.getEndTime());
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
 				.set(gathering.title, gatheringDto.getTitle())
-				.set(gathering.thumbnail, gatheringDto.getThumbnail())
+				.set(gathering.thumbnail, gatheringDto.getThumbnailFileName())
 				.set(gathering.gatheringContent, gatheringDto.getGatheringContent())
 				.set(gathering.tags, gatheringDto.getAddress())
 				.set(gathering.subCategory.subCategoryId, gatheringDto.getSubCategoryId())
@@ -80,8 +83,8 @@ public class GatheringRepository {
 				.set(gathering.intrOnln, gatheringDto.getIntrOnln())//한줄 소개
 				.set(gathering.minAttendees, gatheringDto.getMinAttendees())
 				.set(gathering.maxAttendees, gatheringDto.getMaxAttendees())
-				.set(gathering.startTime, gatheringDto.getStartTime())
-				.set(gathering.endTime, gatheringDto.getEndTime())
+				.set(gathering.startTime, startTime)
+				.set(gathering.endTime, endTime)
 				.set(gathering.applyDeadline, gatheringDto.getApplyDeadline())
 				.where(gathering.gatheringId.eq(gatheringDto.getGatheringId()));
 		clause.execute();
