@@ -14,7 +14,7 @@ import static com.dev.moyering.admin.entity.QNotice.notice;
 
 @Repository
 @RequiredArgsConstructor // final 필드 생성자 자동 생성
-public class AdminNoticeRepositoryImpl implements AdminNoticeRepositoryCustom {
+public class NoticeRepositoryImpl implements NoticeRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -28,8 +28,8 @@ public class AdminNoticeRepositoryImpl implements AdminNoticeRepositoryCustom {
                         notice.noticeId,
                         notice.title,
                         notice.content,
-                        notice.createdAt,
-                        notice.updatedAt,
+//                        notice.createdAt,
+//                        notice.updatedAt,
                         notice.pinYn,
                         notice.isHidden
                 ))
@@ -38,8 +38,8 @@ public class AdminNoticeRepositoryImpl implements AdminNoticeRepositoryCustom {
                         searchNotice(searchKeyword) // 검색 기능 (검색 조건 메서드 호출)
                 )
                 .orderBy(
-                        notice.pinYn.desc(), // 고정글(true) 먼저 (내림차순)
-                        notice.createdAt.desc() // 그 다음 최신 작성일 순 (내림차순)
+                        notice.pinYn.desc() // 고정글(true) 먼저 (내림차순)
+//                        notice.createdAt.desc() // 그 다음 최신 작성일 순 (내림차순)
                 )
 
                 .offset(pageable.getOffset()) // 몇 번째 데이터부터 가져올지 (페이지 * 크기)

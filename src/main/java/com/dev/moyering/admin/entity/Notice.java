@@ -1,18 +1,16 @@
 package com.dev.moyering.admin.entity;
 
 import java.time.LocalDateTime;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+
+import com.dev.moyering.admin.dto.NoticeDto;
 import lombok.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA용 기본 생성자, 빈 객체 생성 차단
 @Entity
 @ToString
-public class Notice {
+public class Notice extends BaseEntity {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer noticeId;
@@ -21,14 +19,16 @@ public class Notice {
     @Column(nullable = false, length = 200)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Lob
     private String content;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    // BaseEntity 상속으로 대체
+//    @Column(nullable = false, updatable = false)
+//    private LocalDateTime createdAt;
+//
+//    @Column(nullable = false)
+//    private LocalDateTime updatedAt;
 
     @Column(nullable = false)
     private boolean pinYn;
@@ -43,24 +43,37 @@ public class Notice {
         this.content = content;
         this.pinYn = pinYn;
         this.isHidden = isHidden;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+//        this.createdAt = LocalDateTime.now();
+//        this.updatedAt = LocalDateTime.now();
+    }
+
+    // 엔티티 -> toDto
+    public NoticeDto toDto() {
+        return NoticeDto.builder()
+                .noticeId(this.noticeId)
+                .title(this.title)
+                .content(this.content)
+//                .createdAt(this.createdAt)
+//                .updatedAt(this.updatedAt)
+                .pinYn(this.pinYn)
+                .isHidden(this.isHidden)
+                .build();
     }
 
     // 공지사항 변경
     public void changeNotice(String title, String content){
         this.title = title;
         this.content = content;
-        this.updatedAt = LocalDateTime.now(); // 수정시간도 함께 업데이트
+//        this.updatedAt = LocalDateTime.now(); // 수정시간도 함께 업데이트
     }
 
     // 핀 상태 변경
     public void changePinStatus(boolean pinYn){
         this.pinYn = pinYn;
-        this.updatedAt = LocalDateTime.now();
+//        this.updatedAt = LocalDateTime.now();
     }
 
-    // 숨기기, 보이이 상태 변경
+    // 숨기기, 보이기 상태 변경
     public boolean isVisible(){
         return !this.isHidden; // 클릭하면 숨기기 -> 보이기, 보이기 -> 숨기기
     }
