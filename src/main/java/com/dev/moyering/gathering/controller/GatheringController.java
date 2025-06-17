@@ -1,13 +1,19 @@
 package com.dev.moyering.gathering.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dev.moyering.common.dto.UserDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.service.GatheringService;
 
@@ -17,17 +23,44 @@ public class GatheringController {
 	private GatheringService gatheringService;
 	
 	@PostMapping("/user/writeGathering")
-	public ResponseEntity<GatheringDto> write(GatheringDto gatheringDto, 
-			@RequestParam(name="thumbnail", required=false) MultipartFile thumbnail) {
+	public ResponseEntity<GatheringDto> write(@ModelAttribute GatheringDto gatheringDto, 
+			@RequestParam(name="thumbnail") MultipartFile thumbnail) {
 		try {
 			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
-//			Integer gatheringId = gatheringService.writeGathering(gatheringDto, thumbnail);
-//			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
-//			return new ResponseEntity<>(nGatheringDto, HttpStatus.OK);
+			Integer gatheringId = gatheringService.writeGathering(gatheringDto, thumbnail);
+			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
+			return new ResponseEntity<>(nGatheringDto, HttpStatus.OK);
+//			return new ResponseEntity<>(HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		return null;
 	}
+	@PostMapping("/user/modifyGathering")
+	public ResponseEntity<GatheringDto> modify(@ModelAttribute GatheringDto gatheringDto, 
+			@RequestParam(name="thumbnail") MultipartFile thumbnail) {
+		try {
+			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
+			gatheringService.modifyGathering(gatheringDto, thumbnail);
+			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringDto.getGatheringId());
+			return new ResponseEntity<>(nGatheringDto, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	@GetMapping("/detailGathering")
+	public ResponseEntity<Map<String,Object>> detail(@RequestParam("gatheringId") Integer gatheringId) {
+		try {
+			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
+			//호스트,신청 멤버 정보 추가
+			Map<String,Object> res = new HashMap<>();
+			res.put("gathering", nGatheringDto);
+			res.put("host", nGatheringDto);
+			return new ResponseEntity<>(res, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}	
 }

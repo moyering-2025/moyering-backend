@@ -58,7 +58,6 @@ public class Gathering {
 
     @Column(nullable = false)
     private LocalTime startTime;
-
     @Column()
     private LocalTime endTime;
 
@@ -108,10 +107,10 @@ public class Gathering {
 	    		.title(title)
 	    		.userId(user.getUserId())
 	    		.gatheringContent(gatheringContent)
-	    		.thumbnail(thumbnail)
+	    		.thumbnailFileName(thumbnail)
 	    		.meetingDate(meetingDate)
-	    		.startTime(startTime)
-	    		.endTime(endTime)
+	    		.startTime(startTime+"")
+	    		.endTime(endTime+"")
 	    		.address(address)
 	    		.detailAddress(detailAddress)
 	    		.minAttendees(minAttendees)

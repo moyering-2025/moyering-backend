@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import com.dev.moyering.common.entity.SubCategory;
 import com.dev.moyering.common.entity.User;
 import com.dev.moyering.gathering.entity.Gathering;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,10 +25,10 @@ public class GatheringDto {
     private String title;
     private Integer userId; // User 엔티티 대신 userId만 전달
     private String gatheringContent;
-    private String thumbnail;
+    private String thumbnailFileName;
     private Date meetingDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private String startTime;
+    private String endTime;
     private String address;
     private String detailAddress;
     private Integer minAttendees;
@@ -48,10 +49,10 @@ public class GatheringDto {
     			.title(title)
     			.user(User.builder().userId(userId).build())
     			.gatheringContent(gatheringContent)
-    			.thumbnail(thumbnail)
+    			.thumbnail(thumbnailFileName)
     			.meetingDate(meetingDate)
-    			.startTime(startTime)
-    			.endTime(endTime)
+    			.startTime(startTime != null ? LocalTime.parse(startTime) : null)
+    			.endTime(endTime != null ? LocalTime.parse(endTime) : null)
     			.address(address)
     			.detailAddress(detailAddress)
     			.minAttendees(minAttendees)
