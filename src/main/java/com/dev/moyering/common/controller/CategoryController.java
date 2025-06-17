@@ -46,4 +46,15 @@ public class CategoryController {
 	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	    }
 	}
+
+	// admin 카테고리 관리
+//	@GetMapping("/admin/category")
+//	public ResponseEntity<List<SubCategoryDto>> getAllCategoriesForAdmin() {
+//		try {
+//			List<SubCategoryDto> allCategories = categoryService.getFirstCategoryList();
+//			return new ResponseEntity<>(allCategories, HttpStatus.OK);
+//		} catch(Exception e) {
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
+//	}
 }

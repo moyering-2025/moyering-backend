@@ -6,4 +6,5 @@ import com.dev.moyering.host.dto.HostClassDto;
 
 public interface HostClassService {
 	List<HostClassDto> getRecommendHostClassesForUser(Integer userId) throws Exception;
+	void registClass(HostClassDto hostClassDto) throws Exception;
 }

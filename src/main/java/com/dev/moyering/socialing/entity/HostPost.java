@@ -27,7 +27,7 @@ public class HostPost {
     @Column(nullable = false)
     private int feedId;
 
-    @Column
+    @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)
@@ -41,8 +41,8 @@ public class HostPost {
 
     private LocalDateTime createDate;
 
-    @Column(nullable = false)
-    private byte deleted;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
+    private boolean isDeleted = false;
 
     private String tag1;
     private String tag2;
@@ -51,6 +51,8 @@ public class HostPost {
     private String tag5;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hostId",nullable = false)
+    @JoinColumn(name = "hostId", nullable = false)
     private Host host;
+
+
 }

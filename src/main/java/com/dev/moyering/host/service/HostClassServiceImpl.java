@@ -50,4 +50,10 @@ public class HostClassServiceImpl implements HostClassService {
                 .collect(Collectors.toList());
     }
 
+
+	@Override
+	public void registClass(HostClassDto hostClassDto) throws Exception {
+		hostClassRepository.save(hostClassDto.toEntity());
+	}
+	
 }
