@@ -1,4 +1,4 @@
 package com.dev.moyering.socialing.dto;
 
-public class test {
+public class DmMessage {
 }
