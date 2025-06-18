@@ -8,4 +8,5 @@ import org.springframework.data.domain.Pageable;
 public interface NoticeRepositoryCustom {
     // 목록 조회 및 검색
     Page<NoticeDto> findNoticesByKeyword(String searchKeyword, Pageable pageable);
+    NoticeDto findNoticeByNoticeId(Integer noticeId);
 }

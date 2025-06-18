@@ -28,18 +28,17 @@ public class NoticeRepositoryImpl implements NoticeRepositoryCustom {
                         notice.noticeId,
                         notice.title,
                         notice.content,
-//                        notice.createdAt,
-//                        notice.updatedAt,
                         notice.pinYn,
-                        notice.isHidden
+                        notice.isHidden,
+                        notice.createdAt
                 ))
                 .from(notice)
                 .where(
                         searchNotice(searchKeyword) // 검색 기능 (검색 조건 메서드 호출)
                 )
                 .orderBy(
-                        notice.pinYn.desc() // 고정글(true) 먼저 (내림차순)
-//                        notice.createdAt.desc() // 그 다음 최신 작성일 순 (내림차순)
+                        notice.pinYn.desc(), // 고정글(true) 먼저 (내림차순)
+                        notice.createdAt.desc() // 그 다음 최신 작성일 순 (내림차순)
                 )
 
                 .offset(pageable.getOffset()) // 몇 번째 데이터부터 가져올지 (페이지 * 크기)
@@ -53,10 +52,29 @@ public class NoticeRepositoryImpl implements NoticeRepositoryCustom {
                 .where(
                         searchNotice(searchKeyword) // 위 검색과 같은 검색 조건 적용
                 )
-                .fetchOne(); // 쿼리 실행하고 결과를 Long으로 받아오기
+                .fetchOne(); // 쿼리 실행하고 결과  받아오기
 
 //        Spring의 Page 객체로 변환해서 반환
-        return new PageImpl<>(content, pageable, total); // 실제 데이터 리스트, 페이징 정보(현재 페이지, 크기), 전체 데이터 개수 가져오기
+        return new PageImpl<>(content, pageable, total != null ? total : 0); // 실제 데이터 리스트, 페이징 정보(현재 페이지, 크기), 전체 데이터 개수 가져오기
+    }
+
+    @Override
+    public NoticeDto findNoticeByNoticeId(Integer noticeId) {
+        return queryFactory
+                .select(Projections.constructor(NoticeDto.class,
+                        notice.noticeId,
+                        notice.title,
+                        notice.content,
+                        notice.pinYn,
+                        notice.isHidden,
+                        notice.createdAt,
+                        notice.lastModifiedDate
+                        ))
+                .from(notice)
+                .where(
+                        notice.noticeId.eq(noticeId)
+                )
+                .fetchOne(); //단건조회
     }
 
     // 공지사항 제목, 내용 검색
@@ -68,4 +86,7 @@ public class NoticeRepositoryImpl implements NoticeRepositoryCustom {
         return notice.title.containsIgnoreCase(keyword)  // 제목에 검색어 포함 (대소문자 무시)
                 .or(notice.content.containsIgnoreCase(keyword)); // 또는 내용에 검색어 포함
     }
+
+
+    // 삭제는 리파지토리에서 구현 X => 서비스에서 notice.hide() => 화면에서만 삭제하기
 }
