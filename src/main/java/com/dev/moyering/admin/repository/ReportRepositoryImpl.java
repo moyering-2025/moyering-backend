@@ -35,7 +35,6 @@ public class ReportRepositoryImpl implements ReportRepositoryCustom {
                         report.title,
                         report.content,
                         report.createdAt,
-                        report.updatedDate,
                         report.processorId,
                         report.processedDate,
                         report.processStatus
