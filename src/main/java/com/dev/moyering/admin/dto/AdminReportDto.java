@@ -25,7 +25,7 @@ public class AdminReportDto {
     private Boolean isHidden; // 숨김 여부
 
     // DTO -> entity 변환
-    public AdminReportDto toEntity() {
+    public AdminReport toEntity() {
         return AdminReport.builder()
                 .reporterId(this.reporterId)
                 .targetOwnerId(this.targetOwnerId)

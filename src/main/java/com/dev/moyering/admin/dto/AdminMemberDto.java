@@ -4,14 +4,9 @@ import java.sql.Date;
 
 import com.dev.moyering.common.entity.User;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
 @Builder
 public class AdminMemberDto {
     private Integer userId; // auto_increment key

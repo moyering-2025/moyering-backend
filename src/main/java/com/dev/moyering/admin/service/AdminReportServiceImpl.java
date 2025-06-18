@@ -1,8 +1,9 @@
 package com.dev.moyering.admin.service;
 
-import com.dev.moyering.admin.dto.ReportDto;
-import com.dev.moyering.admin.repository.ReportRepository;
-import com.dev.moyering.admin.repository.ReportRepositoryCustom;
+import com.dev.moyering.admin.dto.AdminReportDto;
+import com.dev.moyering.admin.repository.AdminReportRepository;
+
+import com.dev.moyering.admin.repository.AdminReportRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Slf4j
 
-public class ReportServiceImpl implements ReportService {
-    private final ReportRepository reportRepository;
-    private final ReportRepositoryCustom reportRepositoryCustom;
+public class AdminReportServiceImpl implements AdminReportService {
+    private final AdminReportRepository reportRepository;
+    private final AdminReportRepositoryCustom reportRepositoryCustom;
 
 //    // 각 콘텐츠 타입별 서비스 주입
 //    private final PostService postService;
@@ -29,13 +30,13 @@ public class ReportServiceImpl implements ReportService {
 
 
     @Override
-    public Page<ReportDto> getReports(String keyword, String reportType, String processStatus, Pageable pageable) {
+    public Page<AdminReportDto> getReports(String keyword, String reportType, String processStatus, Pageable pageable) {
         // ReportRepositoryCustom의 구현체를 직접 주입받아 사용
         return reportRepositoryCustom.findReportsByKeyword(keyword, pageable);
     }
 
     @Override
-    public void processReport(Integer reportId, ReportDto request) {
+    public void processReport(Integer reportId, AdminReportDto request) {
 
     }
 

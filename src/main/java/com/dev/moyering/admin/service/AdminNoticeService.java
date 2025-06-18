@@ -5,7 +5,7 @@ import com.dev.moyering.admin.dto.AdminNoticeDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface NoticeService {
+public interface AdminNoticeService {
     Page<AdminNoticeDto> getNoticeList(String searchKeyword, Pageable pageable) throws Exception; // 리스트 조회
 
     AdminNoticeDto getNoticeById(Integer noticeId) throws Exception; // 단건 조회 (모달)

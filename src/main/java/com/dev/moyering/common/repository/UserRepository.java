@@ -6,4 +6,5 @@ import com.dev.moyering.common.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Integer>, UserRepositoryCustom{
 
+
 }

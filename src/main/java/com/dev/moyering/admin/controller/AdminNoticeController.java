@@ -1,6 +1,6 @@
 package com.dev.moyering.admin.controller;
 import com.dev.moyering.admin.dto.AdminNoticeDto;
-import com.dev.moyering.admin.service.NoticeServiceImpl;
+import com.dev.moyering.admin.service.AdminNoticeServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,7 +20,7 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "*")
 public class AdminNoticeController {
 
-    private final NoticeServiceImpl noticeService;
+    private final AdminNoticeServiceImpl noticeService;
 
     /**
      * 공지사항 등록
