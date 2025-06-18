@@ -8,4 +8,5 @@ public interface FeedService {
     List<FeedDto> getFeeds(String sortType, String userId) throws Exception;
 
 //    FeedDto getFeedDetail(Integer feedId, Integer userId) throws Exception;
+    FeedDto getFeedDetail(Integer feedId) throws Exception;
 }

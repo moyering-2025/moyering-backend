@@ -45,7 +45,7 @@ public class FeedServiceImpl implements FeedService {
 //        // 로그인 사용자의 좋아요 여부
 //        boolean likedByUser = false;
 //        if (userId != null) {
-//            likedByUser = likeRepository.existsByFeedFeedIdAndUserUserId(feedId, userId);
+//            likedByUser = likeRepository.existsByFeed_FeedIdAndUser_Id(feedId, userId);
 //        }
 //
 //        // DTO에 상세 정보 추가
@@ -57,4 +57,24 @@ public class FeedServiceImpl implements FeedService {
 //        return dto;
 //    }
 
+    // 피드 상세
+    @Override
+    public FeedDto getFeedDetail(Integer feedId) throws Exception {
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 피드입니다."));
+
+        // 기본 FeedDto 변환 (엔티티의 toDto 사용)
+        FeedDto dto = feed.toDto();
+
+        // 댓글 목록
+        List<CommentDto> comments = commentRepository.findByFeed_FeedIdOrderByCreateAtAsc(feedId)
+                .stream()
+                .map(Comment::toDto)  // CommentDto에 이 정적 메서드 필요
+                .collect(Collectors.toList());
+
+        // DTO에 상세 정보 추가
+        dto.setCreatedAt(feed.getCreateDate());
+        dto.setComments(comments);
+        return dto;
+    }
 }
