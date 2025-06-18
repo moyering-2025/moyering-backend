@@ -40,11 +40,10 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 	            user.getCategory1(), user.getCategory2(),
 	            user.getCategory3(), user.getCategory4(), user.getCategory5()
 	        ).filter(Objects::nonNull).collect(Collectors.toList());
-
+        	
 	        if (!preferences.isEmpty()) {
 	            builder.and(
-	                hostClass.category1.in(preferences)
-	                .or(hostClass.category2.in(preferences))
+	                hostClass.subCategory.subCategoryName.in(preferences)
 	            );
 	        }
 	    }
