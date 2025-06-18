@@ -1,13 +1,10 @@
 package com.dev.moyering.gathering.dto;
 
-import java.math.BigDecimal;
 import java.sql.Date;
-import java.time.LocalTime;
 
-import com.dev.moyering.common.entity.SubCategory;
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringApply;
+import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

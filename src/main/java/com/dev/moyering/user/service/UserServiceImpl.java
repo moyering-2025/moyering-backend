@@ -31,5 +31,10 @@ public class UserServiceImpl implements UserService {
 		// 저장
 		userRepository.save(user);
 	}
+	
+	public UserDto findUserByUserId(Integer userId) throws Exception{
+		User user = userRepository.findById(userId).orElseThrow(()->new Exception("멤버 조회 오류"));
+		return user.toDto();
+	}
 
 }

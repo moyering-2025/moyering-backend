@@ -1,17 +1,13 @@
 package com.dev.moyering.socialing.dto;
 
-import com.dev.moyering.common.entity.User;
+import java.time.LocalDateTime;
+
 import com.dev.moyering.socialing.entity.Comment;
 import com.dev.moyering.socialing.entity.Feed;
+import com.dev.moyering.user.entity.User;
+
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import java.time.LocalDateTime;
 
 @Getter
 @Builder
@@ -25,7 +21,7 @@ public class CommentDto {
 
     private Integer feedId;
     private Integer userId;
-    private String id;
+    private String username;
     private Integer userBadge;
 
     public Comment toEntity() {
@@ -35,7 +31,7 @@ public class CommentDto {
                 .parentId(parentId)
                 .isDeleted(false)
                 .createAt(createAt != null ? createAt : LocalDateTime.now())
-                .user(User.builder().userId(userId).id(id).userBadgeId(userBadge).build())
+                .user(User.builder().userId(userId).username(username).userBadgeId(userBadge).build())
                 .feed(Feed.builder().feedId(feedId).build())
                 .build();
         return entity;

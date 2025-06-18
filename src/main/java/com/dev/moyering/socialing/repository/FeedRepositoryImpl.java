@@ -1,11 +1,11 @@
 package com.dev.moyering.socialing.repository;
 
-import com.dev.moyering.common.entity.QUser;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.entity.QComment;
 import com.dev.moyering.socialing.entity.QFeed;
 import com.dev.moyering.socialing.entity.QFollow;
 import com.dev.moyering.socialing.entity.QLikeList;
+import com.dev.moyering.user.entity.QUser;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -37,7 +37,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                         feed.img1, feed.img2, feed.img3, feed.img4, feed.img5,
                         feed.tag1, feed.tag2, feed.tag3, feed.tag4, feed.tag5,
                         feed.isDeleted,
-                        user.id.as("writerId"),
+                        user.username.as("writerId"),
                         user.profile.as("writerProfile"),
                         user.userBadgeId.as("writerBadge"),
                         ExpressionUtils.as(
@@ -74,7 +74,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                         feed.img1, feed.img2, feed.img3, feed.img4, feed.img5,
                         feed.tag1, feed.tag2, feed.tag3, feed.tag4, feed.tag5,
                         feed.isDeleted,
-                        user.id.as("writerId"),
+                        user.username.as("writerId"),
                         user.profile.as("writerProfile"),
                         user.userBadgeId.as("writerBadge"),
                         comment.countDistinct().as("commentsCount"),
@@ -90,7 +90,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                                         ? feed.user.userId.in(
                                         JPAExpressions.select(follow.following.userId)
                                                 .from(follow)
-                                                .where(follow.follower.id.eq(userId))
+                                                .where(follow.follower.username.eq(userId))
                                 )
                                         : null
                         )

@@ -36,7 +36,7 @@ public class User {
 	@Column
 	private String name;
 	@Column
-	private String nickname;
+	private String nickName;
 	@Column
 	private String tel;
 	@Column

@@ -35,7 +35,7 @@ public class DmMessage {
     private LocalDateTime sendAt;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-    private boolean isRead = false;
+    private Boolean isRead;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dmRoomId", nullable = false)

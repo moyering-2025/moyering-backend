@@ -1,12 +1,8 @@
 package com.dev.moyering.socialing.dto;
 
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.socialing.entity.Feed;
-import com.dev.moyering.socialing.entity.HostPost;
 import com.dev.moyering.socialing.entity.LikeList;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import com.dev.moyering.user.entity.User;
 
 public class LikeListDto {
 

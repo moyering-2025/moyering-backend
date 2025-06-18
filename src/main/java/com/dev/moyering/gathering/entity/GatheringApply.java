@@ -13,8 +13,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
+import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
