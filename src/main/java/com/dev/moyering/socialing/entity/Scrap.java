@@ -13,6 +13,8 @@ import javax.persistence.UniqueConstraint;
 
 import com.dev.moyering.common.entity.User;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

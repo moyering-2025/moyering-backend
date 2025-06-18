@@ -1,12 +1,15 @@
 package com.dev.moyering.common.entity;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import com.dev.moyering.common.dto.UserDto;
 
@@ -32,6 +35,8 @@ public class User {
 	private String password;
 	@Column
 	private String name;
+	@Column
+	private String nickname;
 	@Column
 	private String tel;
 	@Column
@@ -107,4 +112,17 @@ public class User {
 		
 		return dto;
 	}
+	 @Transient
+	    public String getCategoryJsonString() {
+		 if(category1==null&&category2==null&&category3==null&&category4==null&&category5==null) {
+			 return null;
+		 }
+	        List<String> categories = new ArrayList<>();
+	        if (category1 != null && !category1.isBlank()) categories.add("'" + category1 + "'");
+	        if (category2 != null && !category2.isBlank()) categories.add("'" + category2 + "'");
+	        if (category3 != null && !category3.isBlank()) categories.add("'" + category3 + "'");
+	        if (category4 != null && !category4.isBlank()) categories.add("'" + category4 + "'");
+	        if (category5 != null && !category5.isBlank()) categories.add("'" + category5 + "'");
+	        return "[" + String.join(", ", categories) + "]";
+	    }
 }
