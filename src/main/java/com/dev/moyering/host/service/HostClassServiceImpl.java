@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.dev.moyering.common.entity.User;
-import com.dev.moyering.common.repository.UserRepository;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.HostClassRepository;
+import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 

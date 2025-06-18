@@ -1,7 +1,8 @@
 package com.dev.moyering.socialing.dto;
 
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.socialing.entity.Feed;
+import com.dev.moyering.user.entity.User;
+
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -46,7 +47,7 @@ public class FeedDto {
                 .tag5(tag5)
                 .createDate(createDate != null ? createDate : LocalDateTime.now())
                 .isDeleted(false)
-                .user(User.builder().id(writerId).profile(writerProfile).userBadgeId(writerBadge).build())
+                .user(User.builder().username(writerId).profile(writerProfile).userBadgeId(writerBadge).build())
                 .build();
         return entity;
     }

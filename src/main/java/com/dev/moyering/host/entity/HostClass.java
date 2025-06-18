@@ -39,6 +39,8 @@ public class HostClass {
 	@Column
 	private String addr;
 	@Column
+	private String detailAddr;
+	@Column
 	private double latitude;
 	@Column
 	private double longitude;
@@ -61,16 +63,26 @@ public class HostClass {
 	@Column
 	private String material;
 	@Column
-	private String refund;
+	private String caution;
+	@Column
+	private String incluision;
+	@Column
+	private String preparation;
+	@Column
+	private String keywords;
+	@Column
+	private String portfolio;
+	
 	
 	public HostClassDto toDto() {
 		HostClassDto dto = HostClassDto.builder()
 				.classId(classId)
 				.category1(category1)
 				.category2(category2)
-				.name(locName)
+				.name(name)
 				.locName(locName)
 				.addr(addr)
+				.detailAddr(detailAddr)
 				.latitude(latitude)
 				.longitude(longitude)
 				.recruitMin(recruitMin)
@@ -82,7 +94,11 @@ public class HostClass {
 				.img5(img5)
 				.detailDescription(detailDescription)
 				.material(material)
-				.refund(refund)
+				.caution(caution)
+				.incluision(incluision)
+				.preparation(preparation)
+				.keywords(keywords)
+				.portfolio(portfolio)
 				.build();
 		if(host!=null) {
 			dto.setHostId(host.getHostId());

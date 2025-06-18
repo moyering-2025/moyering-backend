@@ -11,9 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.dev.moyering.common.entity.User;
-
 import com.dev.moyering.socialing.dto.FeedDto;
+import com.dev.moyering.user.entity.User;
+
 import lombok.*;
 
 @Entity
@@ -71,7 +71,7 @@ public class Feed {
                .tag5(tag5)
                .createDate(createDate)
                .isDeleted(false)
-               .writerId(user.getId())
+               .writerId(user.getUsername())
                .writerProfile(user.getProfile())
                .writerBadge(user.getUserBadgeId())
                .build();

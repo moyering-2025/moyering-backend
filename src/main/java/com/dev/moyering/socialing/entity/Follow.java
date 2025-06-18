@@ -1,10 +1,11 @@
 package com.dev.moyering.socialing.entity;
 
-import com.dev.moyering.common.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import com.dev.moyering.user.entity.User;
 
 @Entity
 @Getter

@@ -22,6 +22,7 @@ public class HostClassDto {
 	private String name;
 	private String locName;
 	private String addr;
+	private String detailAddr;
 	private double latitude;
 	private double longitude;
 	private Integer recruitMin;
@@ -33,8 +34,11 @@ public class HostClassDto {
 	private String img5;
 	private String detailDescription;
 	private String material;
-	private String refund;
-	
+	private String caution;
+	private String incluision;
+	private String preparation;
+	private String keywords;
+	private String portfolio;
 	//공통 필드 추가
 	private Date startDate;
 	
@@ -46,6 +50,7 @@ public class HostClassDto {
 				.name(name)
 				.locName(locName)
 				.addr(addr)
+				.detailAddr(detailAddr)
 				.latitude(latitude)
 				.longitude(longitude)
 				.recruitMin(recruitMin)
@@ -57,7 +62,11 @@ public class HostClassDto {
 				.img5(img5)
 				.detailDescription(detailDescription)
 				.material(material)
-				.refund(refund)
+				.caution(caution)
+				.incluision(incluision)
+				.preparation(preparation)
+				.keywords(keywords)
+				.portfolio(portfolio)
 				.build();
 		if(hostId!=null) {
 			entity.setHost(Host.builder()

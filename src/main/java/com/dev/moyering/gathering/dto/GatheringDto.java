@@ -5,8 +5,8 @@ import java.sql.Date;
 import java.time.LocalTime;
 
 import com.dev.moyering.common.entity.SubCategory;
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.gathering.entity.Gathering;
+import com.dev.moyering.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;

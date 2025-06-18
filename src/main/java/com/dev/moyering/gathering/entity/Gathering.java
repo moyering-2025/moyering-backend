@@ -18,8 +18,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.dev.moyering.gathering.dto.GatheringDto;
+import com.dev.moyering.user.entity.User;
 import com.dev.moyering.common.entity.SubCategory;
-import com.dev.moyering.common.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
