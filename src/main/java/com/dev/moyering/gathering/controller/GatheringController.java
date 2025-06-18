@@ -13,14 +13,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dev.moyering.common.dto.UserDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
+import com.dev.moyering.gathering.service.GatheringApplyService;
 import com.dev.moyering.gathering.service.GatheringService;
+import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.service.UserService;
 
 @RestController 
 public class GatheringController {
 	@Autowired
 	private GatheringService gatheringService;
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private GatheringApplyService gatheringApplyService;
 	
 	@PostMapping("/user/writeGathering")
 	public ResponseEntity<GatheringDto> write(@ModelAttribute GatheringDto gatheringDto, 
@@ -28,9 +34,9 @@ public class GatheringController {
 		try {
 			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
 			Integer gatheringId = gatheringService.writeGathering(gatheringDto, thumbnail);
+			System.out.println("게더링 등록 성공 새 게더링 아이디 : " + gatheringId);
 			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
 			return new ResponseEntity<>(nGatheringDto, HttpStatus.OK);
-//			return new ResponseEntity<>(HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -56,7 +62,10 @@ public class GatheringController {
 			//호스트,신청 멤버 정보 추가
 			Map<String,Object> res = new HashMap<>();
 			res.put("gathering", nGatheringDto);
-			res.put("host", nGatheringDto);
+			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
+//			GatheringApplyDto gatheringApplyDto = gatheringApplyService.findApplyUserListByGatheringId(nGatheringDto.getGatheringId())
+			res.put("host", userDto);
+			res.put("host", userDto);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();

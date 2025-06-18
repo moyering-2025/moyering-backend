@@ -18,8 +18,8 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.dev.moyering.gathering.dto.GatheringDto;
+import com.dev.moyering.user.entity.User;
 import com.dev.moyering.common.entity.SubCategory;
-import com.dev.moyering.common.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,11 +53,13 @@ public class Gathering {
 
     @Column(nullable = false)
     private String thumbnail;
+    
     @Column(nullable = false)
     private Date meetingDate;
 
     @Column(nullable = false)
     private LocalTime startTime;
+    
     @Column()
     private LocalTime endTime;
 
@@ -66,6 +68,9 @@ public class Gathering {
 
     @Column()
     private String detailAddress;
+    
+    @Column()
+    private String locName;
 
     @Column(nullable = false)
 	@ColumnDefault("2")
@@ -101,29 +106,37 @@ public class Gathering {
 
     @Column()
     private String status;
+    
     public GatheringDto toDto() {
-	    return GatheringDto.builder()
-	    		.gatheringId(gatheringId)
-	    		.title(title)
-	    		.userId(user.getUserId())
-	    		.gatheringContent(gatheringContent)
-	    		.thumbnailFileName(thumbnail)
-	    		.meetingDate(meetingDate)
-	    		.startTime(startTime+"")
-	    		.endTime(endTime+"")
-	    		.address(address)
-	    		.detailAddress(detailAddress)
-	    		.minAttendees(minAttendees)
-	    		.maxAttendees(maxAttendees)
-	    		.applyDeadline(applyDeadline)
-	    		.preparationItems(preparationItems)
-	    		.tags(tags)
-	    		.createDate(createDate)
-	    		.subCategoryId(subCategory.getSubCategoryId())
-	    		.latitude(latitude)
-	    		.longitude(longitude)
-	    		.intrOnln(intrOnln)
-	    		.status(status)
-	    		.build();
+    	 GatheringDto.GatheringDtoBuilder builder = GatheringDto.builder()
+    		        .gatheringId(gatheringId)
+    		        .title(title)
+    		        .userId(user.getUserId())
+    		        .name(user.getName())
+    		        .profile(user.getProfile())
+    		        .intro(user.getIntro())
+    		        .gatheringContent(gatheringContent)
+    		        .thumbnailFileName(thumbnail)
+    		        .meetingDate(meetingDate)
+    		        .startTime(startTime + "")
+    		        .address(address)
+    		        .detailAddress(detailAddress)
+    		        .locName(locName)
+    		        .minAttendees(minAttendees)
+    		        .maxAttendees(maxAttendees)
+    		        .applyDeadline(applyDeadline)
+    		        .preparationItems(preparationItems)
+    		        .tags(tags)
+    		        .createDate(createDate)
+    		        .categoryId(subCategory.getFirstCategory().getCategoryId())
+    		        .subCategoryId(subCategory.getSubCategoryId())
+    		        .latitude(latitude)
+    		        .longitude(longitude)
+    		        .intrOnln(intrOnln)
+    		        .status(status);
+	    if (user.getCategoryJsonString()!=null) {
+	        builder.categorys(user.getCategoryJsonString());
+	    }
+	    return builder.build();
     }
 }

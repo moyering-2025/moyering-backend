@@ -2,7 +2,7 @@ package com.dev.moyering.socialing.entity;
 
 import javax.persistence.*;
 
-import com.dev.moyering.common.entity.User;
+import com.dev.moyering.user.entity.User;
 
 import com.dev.moyering.socialing.dto.CommentDto;
 import lombok.*;
@@ -55,7 +55,7 @@ public class Comment {
                 .isDeleted(isDeleted)
                 .createAt(createAt)
                 .userId(user.getUserId())
-                .id(user.getId())
+                .username(user.getUsername())
                 .userBadge(user.getUserBadgeId())
                 .feedId(feed.getFeedId())
                 .build();

@@ -1,14 +1,17 @@
-package com.dev.moyering.common.entity;
+package com.dev.moyering.user.entity;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
-import com.dev.moyering.common.dto.UserDto;
+import com.dev.moyering.user.dto.UserDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,13 +28,15 @@ public class User {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer userId;
 	@Column
-	private String id;
+	private String username;//아이디인데  security규약에 의해서 userName으로 했음.
 	@Column
 	private String profile;
 	@Column
 	private String password;
 	@Column
 	private String name;
+	@Column
+	private String nickName;
 	@Column
 	private String tel;
 	@Column
@@ -41,9 +46,9 @@ public class User {
 	@Column
 	private String detailAddr;
 	@Column
-	private double latitude;
+	private Double latitude;
 	@Column
-	private double longitude;
+	private Double longitude;
 	@Column
 	private String category1;
 	@Column
@@ -69,7 +74,7 @@ public class User {
 	@Column
 	private String provider;
 	@Column
-	private String proviederId;
+	private String providerId;
 	@Column
 	private Integer activeScore;
 	@Column
@@ -78,10 +83,11 @@ public class User {
 	public UserDto toDto() {
 		UserDto dto = UserDto.builder()
 				.userId(userId)
-				.id(id)
+				.username(username)
 				.profile(profile)
 				.password(password)
 				.name(name)
+				.nickName(nickName)
 				.tel(tel)
 				.birthday(birthday)
 				.addr(addr)
@@ -100,11 +106,24 @@ public class User {
 				.email(email)
 				.regDate(regDate)
 				.provider(provider)
-				.proviederId(proviederId)
+				.providerId(providerId)
 				.activeScore(activeScore)
 				.userBadgeId(userBadgeId)
 				.build();
 		
 		return dto;
 	}
+	 @Transient
+	    public String getCategoryJsonString() {
+		 if(category1==null&&category2==null&&category3==null&&category4==null&&category5==null) {
+			 return null;
+		 }
+	        List<String> categories = new ArrayList<>();
+	        if (category1 != null && !category1.isBlank()) categories.add("'" + category1 + "'");
+	        if (category2 != null && !category2.isBlank()) categories.add("'" + category2 + "'");
+	        if (category3 != null && !category3.isBlank()) categories.add("'" + category3 + "'");
+	        if (category4 != null && !category4.isBlank()) categories.add("'" + category4 + "'");
+	        if (category5 != null && !category5.isBlank()) categories.add("'" + category5 + "'");
+	        return "[" + String.join(", ", categories) + "]";
+	    }
 }

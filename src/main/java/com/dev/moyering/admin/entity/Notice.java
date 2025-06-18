@@ -1,10 +1,19 @@
 package com.dev.moyering.admin.entity;
 
-import java.time.LocalDateTime;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import com.dev.moyering.admin.dto.NoticeDto;
-import lombok.*;
+
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA용 기본 생성자, 빈 객체 생성 차단
@@ -15,6 +24,11 @@ public class Notice extends BaseEntity {
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer noticeId;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "author_id")
+//    private User author; // 작성자 (관리자)
+
+
     // NOTNULL, 길이 200자 이하
     @Column(nullable = false, length = 200)
     private String title;
@@ -22,13 +36,6 @@ public class Notice extends BaseEntity {
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     @Lob
     private String content;
-
-    // BaseEntity 상속으로 대체
-//    @Column(nullable = false, updatable = false)
-//    private LocalDateTime createdAt;
-//
-//    @Column(nullable = false)
-//    private LocalDateTime updatedAt;
 
     @Column(nullable = false)
     private boolean pinYn;
@@ -43,8 +50,7 @@ public class Notice extends BaseEntity {
         this.content = content;
         this.pinYn = pinYn;
         this.isHidden = isHidden;
-//        this.createdAt = LocalDateTime.now();
-//        this.updatedAt = LocalDateTime.now();
+// createdDate, lastModifiedDate는 BaseEntity에서 자동 처리
     }
 
     // 엔티티 -> toDto
@@ -53,29 +59,36 @@ public class Notice extends BaseEntity {
                 .noticeId(this.noticeId)
                 .title(this.title)
                 .content(this.content)
-//                .createdAt(this.createdAt)
-//                .updatedAt(this.updatedAt)
                 .pinYn(this.pinYn)
                 .isHidden(this.isHidden)
+                .createdAt(this.getCreatedAt())        // BaseEntity에서 가져옴
+                .updatedAt(this.getLastModifiedDate())
                 .build();
     }
 
-    // 공지사항 변경
+    // 공지사항 변경 (제목, 내용)
     public void changeNotice(String title, String content){
         this.title = title;
         this.content = content;
-//        this.updatedAt = LocalDateTime.now(); // 수정시간도 함께 업데이트
     }
 
-    // 핀 상태 변경
+    // 공지사항 메인 > 핀 상태 변경
     public void changePinStatus(boolean pinYn){
         this.pinYn = pinYn;
-//        this.updatedAt = LocalDateTime.now();
     }
 
-    // 숨기기, 보이기 상태 변경
-    public boolean isVisible(){
-        return !this.isHidden; // 클릭하면 숨기기 -> 보이기, 보이기 -> 숨기기
+    // 공지사항 메인 > 숨기기, 보이기 상태 변경
+    public void toggleVisibility() {
+        this.isHidden = !this.isHidden;
+    }
+
+    // 또는 명시적으로 숨기기/보이기 (삭제할 때 사용)
+    public void hide() {
+        this.isHidden = true;
+    }
+
+    public void show() {
+        this.isHidden = false;
     }
 
     // 핀 설정

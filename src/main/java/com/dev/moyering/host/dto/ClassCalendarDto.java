@@ -20,6 +20,7 @@ public class ClassCalendarDto {
 	private Date startDate;
 	private Date endDate;
 	private String status;
+	private Integer registeredCount;
 	
 	public ClassCalendar toEntity() {
 		ClassCalendar entity = ClassCalendar.builder()
@@ -27,6 +28,7 @@ public class ClassCalendarDto {
 				.startDate(startDate)
 				.endDate(endDate)
 				.status(status)
+				.registeredCount(registeredCount)
 				.build();
 		if(classId!=null) {
 			entity.setHostClass(HostClass.builder()

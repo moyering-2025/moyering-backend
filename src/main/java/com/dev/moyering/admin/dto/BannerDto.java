@@ -3,7 +3,7 @@ package com.dev.moyering.admin.dto;
 import java.time.LocalDateTime;
 
 import com.dev.moyering.admin.entity.Banner;
-import com.dev.moyering.common.entity.User;
+import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

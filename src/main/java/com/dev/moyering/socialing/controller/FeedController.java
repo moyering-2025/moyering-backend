@@ -16,7 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/socialing")
 public class FeedController {
-
+	
     private final FeedService feedService;
 
     @GetMapping("/feeds")
