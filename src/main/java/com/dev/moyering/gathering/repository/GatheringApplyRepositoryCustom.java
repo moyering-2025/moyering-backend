@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.entity.Gathering;
+import com.dev.moyering.gathering.entity.GatheringApply;
+import com.querydsl.core.Tuple;
 
 public interface GatheringApplyRepositoryCustom {
 	

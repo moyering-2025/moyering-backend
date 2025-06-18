@@ -87,6 +87,7 @@ public class User {
 				.profile(profile)
 				.password(password)
 				.name(name)
+				.nickname(nickname)
 				.tel(tel)
 				.birthday(birthday)
 				.addr(addr)
@@ -112,17 +113,4 @@ public class User {
 		
 		return dto;
 	}
-	 @Transient
-	    public String getCategoryJsonString() {
-		 if(category1==null&&category2==null&&category3==null&&category4==null&&category5==null) {
-			 return null;
-		 }
-	        List<String> categories = new ArrayList<>();
-	        if (category1 != null && !category1.isBlank()) categories.add("'" + category1 + "'");
-	        if (category2 != null && !category2.isBlank()) categories.add("'" + category2 + "'");
-	        if (category3 != null && !category3.isBlank()) categories.add("'" + category3 + "'");
-	        if (category4 != null && !category4.isBlank()) categories.add("'" + category4 + "'");
-	        if (category5 != null && !category5.isBlank()) categories.add("'" + category5 + "'");
-	        return "[" + String.join(", ", categories) + "]";
-	    }
 }

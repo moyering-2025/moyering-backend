@@ -1,7 +1,10 @@
 package com.dev.moyering.gathering.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import com.querydsl.core.Tuple;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +20,9 @@ import com.dev.moyering.common.dto.UserDto;
 import com.dev.moyering.common.service.UserService;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
+import com.dev.moyering.gathering.dto.GatheringInquiryDto;
 import com.dev.moyering.gathering.service.GatheringApplyService;
+import com.dev.moyering.gathering.service.GatheringInquiryService;
 import com.dev.moyering.gathering.service.GatheringService;
 
 @RestController 
@@ -28,6 +33,8 @@ public class GatheringController {
 	private UserService userService;
 	@Autowired
 	private GatheringApplyService gatheringApplyService;
+	@Autowired
+	private GatheringInquiryService gatheringInquiryService;
 	
 	@PostMapping("/user/writeGathering")
 	public ResponseEntity<GatheringDto> write(@ModelAttribute GatheringDto gatheringDto, 
@@ -64,13 +71,26 @@ public class GatheringController {
 			Map<String,Object> res = new HashMap<>();
 			res.put("gathering", nGatheringDto);
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
-//			GatheringApplyDto gatheringApplyDto = gatheringApplyService.findApplyUserListByGatheringId(nGatheringDto.getGatheringId())
+			List<GatheringApplyDto> member = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
 			res.put("host", userDto);
-			res.put("host", userDto);
+			res.put("member", member);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}	
+	@PostMapping("/user/writeGatheringInquiry")
+	public ResponseEntity<GatheringInquiryDto> writeGatheringInquiry(@ModelAttribute GatheringInquiryDto gatheringInquiryDto) {
+		try {
+			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringInquiryDto);
+			if(gatheringInquiryId!=null) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 }

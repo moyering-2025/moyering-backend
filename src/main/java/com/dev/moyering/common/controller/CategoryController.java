@@ -22,24 +22,24 @@ public class CategoryController {
 	@Autowired 
 	private CategoryService categoryService;
 
-	@GetMapping("/category1")
+	@GetMapping("/category")
 	public ResponseEntity<Map<String,Object>> getFirstCategoryList() {
 		try {
 			List<CategoryDto> firstCategoryList = categoryService.getFirstCategoryList();
 			Map<String, Object> res = new HashMap<>();
-			res.put("category1", firstCategoryList);
+			res.put("category", firstCategoryList);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	@GetMapping("/category2/{category1Id}")
-	public ResponseEntity<Map<String,Object>> getSecondCategoryList(@PathVariable("category1Id") Integer category1Id) {
+	@GetMapping("/subCategory/{categoryId}")
+	public ResponseEntity<Map<String,Object>> getSecondCategoryList(@PathVariable("categoryId") Integer categoryId) {
 	    try {
-	        List<SubCategoryDto> secondCategoryList = categoryService.getSecondCategoryList(category1Id);
+	        List<SubCategoryDto> secondCategoryList = categoryService.getSecondCategoryList(categoryId);
 	        Map<String, Object> res = new HashMap<>();
-	        res.put("category2", secondCategoryList);
+	        res.put("subCategory", secondCategoryList);
 	        return new ResponseEntity<>(res, HttpStatus.OK);
 	    } catch(Exception e) {
 	        e.printStackTrace();

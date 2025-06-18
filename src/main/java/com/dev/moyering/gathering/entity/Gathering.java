@@ -18,6 +18,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.dev.moyering.gathering.dto.GatheringDto;
+import com.dev.moyering.common.entity.Category;
 import com.dev.moyering.common.entity.SubCategory;
 import com.dev.moyering.common.entity.User;
 
@@ -95,6 +96,7 @@ public class Gathering {
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="subCategoryId")
 	private SubCategory subCategory;
+	
     @Column(precision = 10, scale = 7)
     private BigDecimal latitude;//위도
 
@@ -129,14 +131,13 @@ public class Gathering {
     		        .tags(tags)
     		        .createDate(createDate)
     		        .categoryId(subCategory.getFirstCategory().getCategoryId())
+    		        .categoryName(subCategory.getFirstCategory().getCategoryName())
     		        .subCategoryId(subCategory.getSubCategoryId())
+    		        .subCategoryName(subCategory.getSubCategoryName())
     		        .latitude(latitude)
     		        .longitude(longitude)
     		        .intrOnln(intrOnln)
     		        .status(status);
-	    if (user.getCategoryJsonString()!=null) {
-	        builder.categorys(user.getCategoryJsonString());
-	    }
 	    return builder.build();
     }
 }

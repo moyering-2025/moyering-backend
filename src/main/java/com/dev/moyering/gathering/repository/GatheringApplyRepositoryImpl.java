@@ -1,19 +1,21 @@
 package com.dev.moyering.gathering.repository;
 
-import java.sql.Date;
+import java.util.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.dev.moyering.common.entity.QUser;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
-import com.dev.moyering.gathering.entity.QGathering;
+import com.dev.moyering.gathering.entity.GatheringApply;
 import com.dev.moyering.gathering.entity.QGatheringApply;
-import com.querydsl.core.Tuple;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
+import com.querydsl.core.types.Projections;
 import lombok.RequiredArgsConstructor;
+import com.querydsl.core.Tuple;
 
 @RequiredArgsConstructor
 public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCustom {
@@ -23,23 +25,27 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 
 	@Override
 	public List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId) throws Exception {
-		QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
-//		List<Tuple> results = jpaQueryFactory
-//				.select(gatheringApply.user.name, calendar.startDate.min())
-//				.from(calendar)
-//				.where(
-//					calendar.hostClass.classId.in(classIds),
-//					calendar.status.eq("모집중"),
-//					calendar.startDate.goe(Date.valueOf(LocalDate.now()))
-//				)
-//				.groupBy(calendar.hostClass.classId)
-//				.fetch();
-//
-//		return results.stream()
-//				.collect(Collectors.toMap(
-//				tuple -> tuple.get(calendar.hostClass.classId), 
-//				tuple -> tuple.get(calendar.startDate.min())
-//				));
-		return null;
+	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+	    QUser user = QUser.user;
+	    
+	    return jpaQueryFactory
+	        .select(Projections.constructor(GatheringApplyDto.class,
+	            gatheringApply.gatheringApplyId,
+	            gatheringApply.gathering.gatheringId,
+	            user.userId,
+	            user.name,  // DTO에서는 name 필드를 사용
+	            user.profile,
+	            user.intro,
+	            gatheringApply.applyDate,
+	            gatheringApply.isApproved,
+	            gatheringApply.aspiration
+	        ))
+	        .from(gatheringApply)
+	        .join(user).on(gatheringApply.user.userId.eq(user.userId))
+	        .where(
+	            gatheringApply.gathering.gatheringId.eq(gatheringId),
+	            gatheringApply.isApproved.isTrue()
+	        )
+	        .fetch();
 	}
 }

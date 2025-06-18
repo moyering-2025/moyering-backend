@@ -19,6 +19,7 @@ public class UserDto {
 	private String profile;
 	private String password;
 	private String name;
+	private String nickname;
 	private String tel;
 	private Date birthday;
 	private String addr;
@@ -48,6 +49,7 @@ public class UserDto {
 				.profile(profile)
 				.password(password)
 				.name(name)
+				.nickname(nickname)
 				.tel(tel)
 				.birthday(birthday)
 				.addr(addr)
