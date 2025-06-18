@@ -5,8 +5,12 @@ import com.dev.moyering.socialing.entity.Feed;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
+@Setter
 @Builder
 public class FeedDto {
 
@@ -23,12 +27,17 @@ public class FeedDto {
     private String tag4;
     private String tag5;
     private boolean isDeleted;
-    private LocalDateTime createDate;
-    private String writerId; // 작성자 이름
-    private String writerProfile;  // 작성자 프로필
+    private String writerId;
+    private String writerProfile;
     private Integer writerBadge;
-    private Integer commentsCount;
-    private Integer likesCount;
+    private Long commentsCount;
+    private Long likesCount;
+
+    // 피드 상세 페이지용
+    private LocalDateTime createdAt;
+    private Boolean likedByUser;       // 로그인 유저가 좋아요 눌렀는지
+    private Boolean mine;              // 내 피드인지
+    private List<CommentDto> comments;
 
     public Feed toEntity() {
         Feed entity = Feed.builder()
@@ -44,7 +53,6 @@ public class FeedDto {
                 .tag3(tag3)
                 .tag4(tag4)
                 .tag5(tag5)
-                .createDate(createDate != null ? createDate : LocalDateTime.now())
                 .isDeleted(false)
                 .user(User.builder().id(writerId).profile(writerProfile).userBadgeId(writerBadge).build())
                 .build();

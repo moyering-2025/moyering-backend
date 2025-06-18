@@ -1,27 +1,36 @@
 package com.dev.moyering.socialing.entity;
 
 import com.dev.moyering.common.entity.User;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.dev.moyering.socialing.dto.FollowDto;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"follow_id", "following_id"}))
+@AllArgsConstructor
+@Builder
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"followerId", "followingId"}))
 public class Follow {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "follow_id", nullable = false)
+    @JoinColumn(name = "followerId", nullable = false)
     private User follower;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "following_id", nullable = false)
+    @JoinColumn(name = "followingId", nullable = false)
     private User following;
+
+    public FollowDto toDto() {
+        return FollowDto.builder()
+                .id(id)
+                .followerId(follower.getUserId())
+                .followingId(following.getUserId())
+                .build();
+    }
 }
