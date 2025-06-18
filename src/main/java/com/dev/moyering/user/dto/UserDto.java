@@ -1,8 +1,8 @@
-package com.dev.moyering.common.dto;
+package com.dev.moyering.user.dto;
 
 import java.sql.Date;
 
-import com.dev.moyering.common.entity.User;
+import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,16 +15,17 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserDto {
 	private Integer userId;
-	private String id;
+	private String username;//아이디인데  security규약에 의해서 userName으로 했음.
 	private String profile;
 	private String password;
 	private String name;
+	private String nickName;
 	private String tel;
 	private Date birthday;
 	private String addr;
 	private String detailAddr;
-	private double latitude;
-	private double longitude;
+	private Double latitude;
+	private Double longitude;
 	private String category1;
 	private String category2;
 	private String category3;
@@ -37,17 +38,18 @@ public class UserDto {
 	private String email;
 	private Date regDate;
 	private String provider;
-	private String proviederId;
+	private String providerId;
 	private Integer activeScore;
 	private Integer userBadgeId;
 
 	public User toEntity() {
 		User entity = User.builder()
 				.userId(userId)
-				.id(id)
+				.username(username)
 				.profile(profile)
 				.password(password)
 				.name(name)
+				.nickName(nickName)
 				.tel(tel)
 				.birthday(birthday)
 				.addr(addr)
@@ -66,7 +68,7 @@ public class UserDto {
 				.email(email)
 				.regDate(regDate)
 				.provider(provider)
-				.proviederId(proviederId)
+				.providerId(providerId)
 				.activeScore(activeScore)
 				.userBadgeId(userBadgeId)
 				.build();

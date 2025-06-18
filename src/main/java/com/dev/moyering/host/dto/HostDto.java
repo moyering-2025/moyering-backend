@@ -1,5 +1,7 @@
 package com.dev.moyering.host.dto;
 
+import javax.persistence.Column;
+
 import com.dev.moyering.host.entity.Host;
 
 import lombok.AllArgsConstructor;
@@ -29,6 +31,7 @@ public class HostDto {
 	private String accName;
 	private String accNum;
 	private String idCard;
+
 	
 	public Host toEntity() {
 		Host entity = Host.builder()

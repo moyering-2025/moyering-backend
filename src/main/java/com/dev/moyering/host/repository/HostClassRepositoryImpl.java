@@ -10,10 +10,10 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.QClassCalendar;
 import com.dev.moyering.host.entity.QHostClass;
+import com.dev.moyering.user.entity.User;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 

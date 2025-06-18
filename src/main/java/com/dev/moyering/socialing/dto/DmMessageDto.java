@@ -1,13 +1,13 @@
 package com.dev.moyering.socialing.dto;
 
-import com.dev.moyering.common.entity.User;
+import java.time.LocalDateTime;
+
 import com.dev.moyering.socialing.entity.DmMessage;
 import com.dev.moyering.socialing.entity.DmRoom;
+import com.dev.moyering.user.entity.User;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Getter
 @Builder

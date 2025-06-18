@@ -1,16 +1,11 @@
 package com.dev.moyering.gathering.repository;
 
-import java.sql.Date;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
-import com.dev.moyering.gathering.entity.QGathering;
 import com.dev.moyering.gathering.entity.QGatheringApply;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;

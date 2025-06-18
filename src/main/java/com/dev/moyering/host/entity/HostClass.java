@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 public class HostClass {
+
    @Id
    @GeneratedValue(strategy=GenerationType.IDENTITY)
    private Integer classId;

@@ -1,4 +1,4 @@
-package com.dev.moyering.common.repository;
+package com.dev.moyering.user.repository;
 
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;

@@ -1,4 +1,4 @@
-package com.dev.moyering.common.repository;
+package com.dev.moyering.user.repository;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;

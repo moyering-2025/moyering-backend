@@ -1,7 +1,8 @@
 package com.dev.moyering.socialing.dto;
 
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.socialing.entity.Follow;
+import com.dev.moyering.user.entity.User;
+
 import lombok.Builder;
 import lombok.Getter;
 @Getter

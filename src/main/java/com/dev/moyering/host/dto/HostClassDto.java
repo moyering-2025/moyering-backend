@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class HostClassDto {
+
    private Integer classId;
    private Integer hostId;
    private Integer subCategoryId;

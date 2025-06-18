@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 
 import javax.persistence.*;
 
-import com.dev.moyering.common.entity.User;
-
 import com.dev.moyering.socialing.dto.FeedDto;
+import com.dev.moyering.user.entity.User;
+
 import lombok.*;
 
 @Entity
@@ -38,7 +38,7 @@ public class Feed {
     private LocalDateTime updateDate;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-    private boolean isDeleted = false;
+    private Boolean isDeleted;
 
     @Column
     private String tag1;
@@ -75,8 +75,8 @@ public class Feed {
                .tag3(tag3)
                .tag4(tag4)
                .tag5(tag5)
+               .writerId(user.getUsername())
                .isDeleted(isDeleted)
-               .writerId(user.getId())
                .writerProfile(user.getProfile())
                .writerBadge(user.getUserBadgeId())
                .build();
