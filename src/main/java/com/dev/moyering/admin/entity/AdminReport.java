@@ -1,11 +1,8 @@
 package com.dev.moyering.admin.entity;
 
-import com.dev.moyering.admin.dto.NoticeDto;
-import com.dev.moyering.admin.dto.ReportDto;
+import com.dev.moyering.admin.dto.AdminReportDto;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -18,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class Report {
+public class AdminReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,8 +63,8 @@ public class Report {
 
     // 생성에 필요한 최소한의 정보
     @Builder
-    private Report(String reporterId, String targetId, String targetOwnerId,
-                   String title, String content, ReportType reportType) {
+    private AdminReport(String reporterId, String targetId, String targetOwnerId,
+                        String title, String content, ReportType reportType) {
         this.reporterId = reporterId;
         this.targetOwnerId = targetOwnerId;
         this.targetId = targetId;
@@ -79,8 +76,8 @@ public class Report {
     }
 
     // 엔티티 -> toDto
-    public ReportDto toDto() {
-        return ReportDto.builder()
+    public AdminReportDto toDto() {
+        return AdminReportDto.builder()
                 .reportId(this.reportId)
                 .reporterId(this.reporterId)
                 .reportType(this.reportType)

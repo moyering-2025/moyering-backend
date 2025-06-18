@@ -40,7 +40,7 @@ public class UserDto {
 	private String proviederId;
 	private Integer activeScore;
 	private Integer userBadgeId;
-	
+
 	public User toEntity() {
 		User entity = User.builder()
 				.userId(userId)

@@ -2,7 +2,6 @@ package com.dev.moyering.admin.dto;
 
 import java.time.LocalDateTime;
 
-import com.dev.moyering.admin.entity.Banner;
 import com.dev.moyering.common.entity.User;
 
 import lombok.AllArgsConstructor;
@@ -22,8 +21,8 @@ public class BannerDto {
     private String bannerImg;
 	private Integer userId;
 	
-	public Banner toEntity() {
-		Banner entity = Banner.builder()
+	public com.dev.moyering.admin.entity.Banner toEntity() {
+		com.dev.moyering.admin.entity.Banner entity = com.dev.moyering.admin.entity.Banner.builder()
 				.bannerId(bannerId)
 				.title(title)
 				.status(status)

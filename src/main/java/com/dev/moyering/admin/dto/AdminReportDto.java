@@ -1,6 +1,6 @@
 package com.dev.moyering.admin.dto;
 
-import com.dev.moyering.admin.entity.Report;
+import com.dev.moyering.admin.entity.AdminReport;
 import com.dev.moyering.admin.entity.ReportProcessStatus;
 import com.dev.moyering.admin.entity.ReportType;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class ReportDto {
+public class AdminReportDto {
     private Integer reportId;
     private String reporterId; // 신고자 id
     private String targetOwnerId; // 피신고자 id
@@ -25,8 +25,8 @@ public class ReportDto {
     private Boolean isHidden; // 숨김 여부
 
     // DTO -> entity 변환
-    public Report toEntity() {
-        return Report.builder()
+    public AdminReportDto toEntity() {
+        return AdminReport.builder()
                 .reporterId(this.reporterId)
                 .targetOwnerId(this.targetOwnerId)
                 .reportType(this.reportType)

@@ -10,7 +10,7 @@ import org.springframework.data.domain.PageRequest;
 
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
-import com.dev.moyering.gathering.entity.QGathering;
+//import com.dev.moyering.gathering.entity.QGathering;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 

@@ -1,20 +1,14 @@
 package com.dev.moyering.admin.service;
 
 import com.dev.moyering.admin.dto.ReportDto;
-import com.dev.moyering.admin.entity.Notice;
-import com.dev.moyering.admin.entity.Report;
-import com.dev.moyering.admin.entity.ReportProcessStatus;
 import com.dev.moyering.admin.repository.ReportRepository;
 import com.dev.moyering.admin.repository.ReportRepositoryCustom;
-import com.dev.moyering.admin.repository.ReportRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
