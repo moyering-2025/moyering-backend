@@ -13,12 +13,17 @@ import javax.persistence.ManyToOne;
 
 import com.dev.moyering.common.entity.User;
 
+import com.dev.moyering.socialing.dto.DmMessageDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class DmMessage {
 
     @Id
@@ -29,14 +34,25 @@ public class DmMessage {
     private String content;
     private LocalDateTime sendAt;
 
-    @Column(nullable = false,columnDefinition = "TINYINT(1) DEFAULT 0")
+    @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isRead = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dmroom_id",nullable = false)
+    @JoinColumn(name = "dmRoomId", nullable = false)
     private DmRoom dmRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id",nullable = false)
+    @JoinColumn(name = "senderId", nullable = false)
     private User senderId;
+
+    public DmMessageDto toDto() {
+        return DmMessageDto.builder()
+                .messageId(messageId)
+                .content(content)
+                .sendAt(LocalDateTime.now())
+                .isRead(false)
+                .dmRoomId(dmRoom.getRoomId())
+                .senderId(senderId.getUserId())
+                .build();
+    }
 }

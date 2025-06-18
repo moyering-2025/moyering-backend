@@ -14,7 +14,6 @@ public class HostPostComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
     private Integer commentId;
 
     @Column(nullable = false)
@@ -28,7 +27,7 @@ public class HostPostComment {
     private int userId;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "postId", nullable = false)
     private HostPost post;
 
 }

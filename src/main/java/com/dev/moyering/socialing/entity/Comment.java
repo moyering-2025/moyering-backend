@@ -1,20 +1,11 @@
 package com.dev.moyering.socialing.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import com.dev.moyering.common.entity.User;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.dev.moyering.socialing.dto.CommentDto;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Comment {
 
     @Id
@@ -30,11 +22,11 @@ public class Comment {
     private Integer commentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feed_id")
+    @JoinColumn(name = "feedId")
     private Feed feed;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private User user;
 
     @Column(nullable = false)
@@ -47,7 +39,25 @@ public class Comment {
     private Integer parentId;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-    private boolean isDeleted = false;
+    private boolean isDeleted;
 
-
+    @PrePersist
+    public void prePersist() {
+        if (createAt == null) {
+            this.createAt = LocalDateTime.now();
+        }
+    }
+    public CommentDto toDto() {
+        return CommentDto.builder()
+                .commentId(commentId)
+                .content(content)
+                .parentId(parentId)
+                .isDeleted(isDeleted)
+                .createAt(createAt)
+                .userId(user.getUserId())
+                .id(user.getId())
+                .userBadge(user.getUserBadgeId())
+                .feedId(feed.getFeedId())
+                .build();
+    }
 }

@@ -2,14 +2,7 @@ package com.dev.moyering.socialing.entity;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import com.dev.moyering.common.entity.User;
 
@@ -25,7 +18,6 @@ public class Feed {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
     private Integer feedId;
 
     @Column(nullable = false)
@@ -40,11 +32,15 @@ public class Feed {
     private String img4;
     private String img5;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
+    @Column
+    private LocalDateTime updateDate;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isDeleted = false;
 
+    @Column
     private String tag1;
     private String tag2;
     private String tag3;
@@ -52,8 +48,18 @@ public class Feed {
     private String tag5;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
+
+    @PrePersist
+    public void onCreate() {
+        this.createDate = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        this.updateDate = LocalDateTime.now();
+    }
 
     public FeedDto toDto(){
        return FeedDto.builder()
@@ -69,8 +75,7 @@ public class Feed {
                .tag3(tag3)
                .tag4(tag4)
                .tag5(tag5)
-               .createDate(createDate)
-               .isDeleted(false)
+               .isDeleted(isDeleted)
                .writerId(user.getId())
                .writerProfile(user.getProfile())
                .writerBadge(user.getUserBadgeId())
