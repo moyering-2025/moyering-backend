@@ -1,4 +1,4 @@
-package com.dev.moyering.common.repository;
+package com.dev.moyering.user.repository;
 
 public interface UserRepositoryCustom {
 

@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dev.moyering.admin.dto.BannerDto;
 import com.dev.moyering.admin.repository.BannerRepository;
 import com.dev.moyering.admin.service.BannerService;
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.service.GatheringService;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.service.ClassCalendarService;
 import com.dev.moyering.host.service.HostClassService;
+import com.dev.moyering.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
 

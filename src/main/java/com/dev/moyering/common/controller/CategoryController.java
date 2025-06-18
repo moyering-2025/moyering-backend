@@ -15,12 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dev.moyering.common.dto.CategoryDto;
 import com.dev.moyering.common.dto.SubCategoryDto;
 import com.dev.moyering.common.service.CategoryService;
+import com.dev.moyering.common.service.SubCategoryService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController 
+@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
 public class CategoryController {
-	@Autowired 
-	private CategoryService categoryService;
+	private final CategoryService categoryService;
+	private final SubCategoryService subCategoryService;
 
 	@GetMapping("/category")
 	public ResponseEntity<Map<String,Object>> getFirstCategoryList() {
@@ -57,4 +61,15 @@ public class CategoryController {
 //			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 //		}
 //	}
+	
+    @GetMapping("/categories/suball")
+    public ResponseEntity<List<SubCategoryDto>> getSubAll() {
+        try {
+            List<SubCategoryDto> result = subCategoryService.getSubCategoriesWithParent();
+            return ResponseEntity.ok(result);
+		} catch (Exception e) {
+			e.printStackTrace();
+	        return ResponseEntity.internalServerError().build();
+		}
+    }
 }

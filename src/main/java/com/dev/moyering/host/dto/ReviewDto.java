@@ -2,9 +2,9 @@ package com.dev.moyering.host.dto;
 
 import java.sql.Date;
 
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.entity.Review;
+import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

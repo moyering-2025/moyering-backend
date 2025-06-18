@@ -2,7 +2,7 @@ package com.dev.moyering.socialing.entity;
 
 import javax.persistence.*;
 
-import com.dev.moyering.common.entity.User;
+import com.dev.moyering.user.entity.User;
 
 import com.dev.moyering.socialing.dto.DmRoomDto;
 import lombok.AllArgsConstructor;
@@ -40,10 +40,10 @@ public class DmRoom {
         return DmRoomDto.builder()
                 .roomId(roomId)
                 .user1Id(user1.getUserId())
-                .user1Nickname(user1.getId())
+                .user1Nickname(user1.getUsername())
                 .user1Profile(user1.getProfile())
                 .user2Id(user2.getUserId())
-                .user2Nickname(user2.getId())
+                .user2Nickname(user2.getUsername())
                 .user2Profile(user2.getProfile())
                 .lastMessage(lastMessage)
                 .lastSendAt(lastSentAt)

@@ -10,11 +10,11 @@ import com.dev.moyering.common.dto.CategoryDto;
 import com.dev.moyering.common.dto.SubCategoryDto;
 import com.dev.moyering.common.entity.Category;
 import com.dev.moyering.common.entity.SubCategory;
-import com.dev.moyering.common.repository.CategoryRepository;
+import com.dev.moyering.common.repository.CategoryRepositoryImpl;
 @Service
 public class CategoryServiceImpl implements CategoryService{
 	@Autowired
-	private CategoryRepository categoryRepository;
+	private CategoryRepositoryImpl categoryRepository;
 	public List<CategoryDto> getFirstCategoryList() throws Exception {
 		List<Category> firstCategoryList = categoryRepository.getFirstCategoryList();
 		return firstCategoryList.stream().map(c->c.toDto()).collect(Collectors.toList());

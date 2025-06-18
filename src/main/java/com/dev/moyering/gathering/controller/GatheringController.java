@@ -16,14 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dev.moyering.common.dto.UserDto;
-import com.dev.moyering.common.service.UserService;
-import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.dto.GatheringInquiryDto;
 import com.dev.moyering.gathering.service.GatheringApplyService;
 import com.dev.moyering.gathering.service.GatheringInquiryService;
 import com.dev.moyering.gathering.service.GatheringService;
+import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.service.UserService;
 
 @RestController 
 public class GatheringController {

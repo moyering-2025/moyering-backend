@@ -9,10 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
-import com.dev.moyering.gathering.repository.GatheringRepositoryCustom;
 import com.dev.moyering.gathering.repository.GatheringRepository;
 import com.dev.moyering.util.PageInfo;
 
