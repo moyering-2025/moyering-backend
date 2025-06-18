@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name="scrap", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id","post_id"})})
+@Table(name="scrap", uniqueConstraints = {@UniqueConstraint(columnNames = {"userId","postId"})})
 public class Scrap {
 
     @Id
@@ -30,10 +30,10 @@ public class Scrap {
     private Integer scrapId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "postId", nullable = false)
     private Feed post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 }

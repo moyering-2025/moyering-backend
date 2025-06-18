@@ -1,6 +1,7 @@
 package com.dev.moyering.admin.service;
 
 import com.dev.moyering.admin.dto.ReportDto;
+import com.dev.moyering.admin.entity.Notice;
 import com.dev.moyering.admin.entity.Report;
 import com.dev.moyering.admin.entity.ReportProcessStatus;
 import com.dev.moyering.admin.repository.ReportRepository;
@@ -44,7 +45,7 @@ public class ReportServiceImpl implements ReportService {
 
     }
 
-    // 보이기, 숨기기 처리 상태
+
 
 //    @Override
 //    public void processReport(Integer reportId, ReportDto request) {

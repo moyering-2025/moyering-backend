@@ -38,6 +38,8 @@ public class ClassCalendar {
 	@Column
 	@Comment("클래스 일정 상태 (승인대기, 임시저장, 반려, 모집중,모집마감,개강,폐강,운영종료)")
 	private String status;
+	@Column(columnDefinition = "INT DEFAULT 0")
+	private Integer registeredCount;
 	
 	public ClassCalendarDto toDto() {
 		ClassCalendarDto dto = ClassCalendarDto.builder()
@@ -45,6 +47,7 @@ public class ClassCalendar {
 				.startDate(startDate)
 				.endDate(endDate)
 				.status(status)
+				.registeredCount(registeredCount)
 				.build();
 		if(hostClass!=null) {
 			dto.setClassId(hostClass.getClassId());

@@ -11,24 +11,27 @@ import javax.persistence.ManyToOne;
 
 import com.dev.moyering.user.entity.User;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LikeList {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer likeid;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",nullable = false)
+    @JoinColumn(name = "userId",nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "post_id",nullable = false)
+    @JoinColumn(name = "feedId",nullable = false)
     private Feed feed;
 }
