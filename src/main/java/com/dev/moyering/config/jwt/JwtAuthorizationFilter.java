@@ -43,6 +43,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	        chain.doFilter(request, response);
 	        return;
 	    }
+		//토큰이 없으면 비로그인 상태로 허용
+		String header = request.getHeader(JwtProperties.HEADER_STRING);
+		if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
+		    chain.doFilter(request, response); // ✅ 그냥 통과
+		    return;
+		}
 
 		String authentication = request.getHeader(JwtProperties.HEADER_STRING);
 		if(authentication==null) {
