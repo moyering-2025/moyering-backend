@@ -37,9 +37,9 @@ public class UserServiceImpl implements UserService {
 		return user.toDto();
 	}
 
-//	@Override
-//	public UserDto findUserByUsername(String username) throws Exception {
-//		return userRepository.findByUsername(username).orElseThrow(() -> new Exception("멤버 조회 오류"));
-//
-//	}
+	@Override
+	public User findUserByUsername(String username) throws Exception {
+		return userRepository.findByUsername(username).orElseThrow(() -> new Exception("멤버 조회 오류"));
+
+	}
 }

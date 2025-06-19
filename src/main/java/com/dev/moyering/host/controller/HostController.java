@@ -1,5 +1,8 @@
 package com.dev.moyering.host.controller;
 
+import java.sql.Date;
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,14 +38,14 @@ public class HostController {
 		}
 	}
 	
-	@PostMapping("/host/classRegist")
-	public ResponseEntity<Object> classRegist(HostClassDto hostClassDto){
+	@PostMapping("/host/classRegist/submit")
+	public ResponseEntity<Integer> classRegist(HostClassDto hostClassDto, Date[] dates){
 		try {
-			hostClassService.registClass(hostClassDto);
-			return new ResponseEntity(HttpStatus.OK);
+			Integer classId = hostClassService.registClass(hostClassDto, Arrays.asList(dates));
+			return new ResponseEntity<>(classId, HttpStatus.OK);
 		}catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 

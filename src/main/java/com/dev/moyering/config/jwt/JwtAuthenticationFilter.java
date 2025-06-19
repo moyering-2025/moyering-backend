@@ -3,6 +3,7 @@ package com.dev.moyering.config.jwt;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -14,13 +15,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.dev.moyering.auth.PrincipalDetails;
+import com.dev.moyering.host.entity.Host;
+import com.dev.moyering.host.repository.HostRepository;
 import com.dev.moyering.user.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+	private HostRepository hostRepository;
+	
+	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, HostRepository hostRepository) {
 		super(authenticationManager);
+		this.hostRepository=hostRepository;
 //		setFilterProcessesUrl("/admin/login");
 	}
 	
@@ -49,11 +55,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		response.setContentType("application/json; charset=utf-8");
 		
 		User user = principalDetails.getUser();
+		
 		Map<String, Object> userInfo = new HashMap<>();
-		userInfo.put("id", user.getUsername());
-		userInfo.put("username", user.getName());
+		userInfo.put("id", user.getUserId());
+		userInfo.put("username", user.getUsername());
+		userInfo.put("name", user.getName());
 		userInfo.put("email", user.getEmail());
 		userInfo.put("userType", user.getUserType());
+		if(user.getUserType().equals("ROLE_HT")) {
+			Optional<Host> ohost = hostRepository.findByUserId(user.getUserId());
+			if(ohost.isPresent()) {
+				userInfo.put("hostId", ohost.get().getHostId());
+			}
+		}
 		response.getWriter().write(objectMapper.writeValueAsString(userInfo));
 	}
 }

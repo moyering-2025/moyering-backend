@@ -38,23 +38,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		String uri = request.getRequestURI();
-		
-		if (!(uri.equals("/host") || uri.equals("/admin"))) {
-	        chain.doFilter(request, response);
-	        return;
-	    }
-		//토큰이 없으면 비로그인 상태로 허용
-		String header = request.getHeader(JwtProperties.HEADER_STRING);
-		if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
-		    chain.doFilter(request, response); // ✅ 그냥 통과
-		    return;
-		}
-
 		if (uri.equals("/api/login")) { // 관리자 로그인 제외
 			chain.doFilter(request, response);
 			return;
 		}
-
+		
+		if (!(uri.contains("/host") || uri.contains("/admin"))) {
+	        chain.doFilter(request, response);
+	        return;
+	    }
+		
 		String authentication = request.getHeader(JwtProperties.HEADER_STRING);
 		if(authentication==null) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"로그인 필요");
@@ -67,12 +60,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		
 		//access_token : header로부터 accessToken가져와 bear check
 		String accessToken = token.get("access_token");
+		System.out.println("=============");
+		System.out.println(accessToken);
 		if(!accessToken.startsWith(JwtProperties.TOKEN_PREFIX)) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인 필요");
 			return;
 		}
 		
 		accessToken = accessToken.replace(JwtProperties.TOKEN_PREFIX, "");
+		System.out.println(accessToken);
 		try {
 			//1. access token check
 			//1-1. 보안키, 만료시간 체크
