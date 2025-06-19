@@ -98,7 +98,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	}
   
   @Override
-	public List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){	
+  public List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){
 		QGathering gathering = QGathering.gathering;
 		List<Gathering> gatheringList = null;
 		if(word==null || word.trim().length()==0) {//검색어 없는 경우

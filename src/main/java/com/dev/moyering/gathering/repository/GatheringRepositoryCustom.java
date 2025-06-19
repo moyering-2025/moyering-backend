@@ -5,6 +5,7 @@ import java.util.List;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.user.entity.User;
+import org.springframework.data.domain.PageRequest;
 
 public interface GatheringRepositoryCustom {
 
@@ -12,4 +13,6 @@ public interface GatheringRepositoryCustom {
 
 	//메인 페이지에 추천 게더링 4개
 	List<Gathering> findRecommendGatherRingForUser(User user) throws Exception;
+
+    List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word);
 }
