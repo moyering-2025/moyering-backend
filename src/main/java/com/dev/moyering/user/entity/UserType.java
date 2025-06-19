@@ -6,9 +6,30 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum UserType {
-    ROLE_MG("관리자"), // 필터용
-    ROLE_MB("일반"),
-    ROLE_HT("강사");
+    MANAGER("ROLE_MG", "관리자"),
+    MEMBER("ROLE_MB", "일반"),
+    HOST("ROLE_HT", "강사");
 
+    private final String code;
     private final String displayName;
+
+    // 코드로 Enum 찾기
+    public static UserType fromCode(String code) {
+        for (UserType type : UserType.values()) {
+            if (type.getCode().equals(code)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("Unknown user type code: " + code);
+    }
+
+    // 화면용 텍스트로 Enum 찾기
+    public static UserType fromDisplayName(String displayName) {
+        for (UserType type : UserType.values()) {
+            if (type.getDisplayName().equals(displayName)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("Unknown user type display name: " + displayName);
+    }
 }
