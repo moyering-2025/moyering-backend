@@ -9,7 +9,7 @@ import javax.transaction.Transactional;
 
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
-import com.dev.moyering.common.entity.QUser;
+import com.dev.moyering.user.entity.QUser;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import jdk.jfr.Timestamp;
@@ -41,7 +41,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 				.select(Projections.constructor(AdminMemberDto.class,
 						user.userId, // 회원 번호
 						user.userType,
-						user.id, // 로그인 아이디
+						user.username, // 로그인 아이디
 						user.name,
 						user.email,
 						user.tel,
@@ -51,41 +51,37 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 				.from(user)
 				.where(
 						likeUsername(cond.getKeyword()),
-						eqUserType(cond.getUserType()),
-						betweenDate(cond.getFrom(), cond.getTo())
+						eqUserType(cond.getUserType())
+//						betweenDate(cond.getFrom(), cond.getTo())
 				)
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.fetch();
 	}
 
-	public Long countMembers (AdminMemberSearchCond cond) {
+	public Long countMembers(AdminMemberSearchCond cond) {
 		return jpaQueryFactory
 				.select(user.count())
 				.from(user)
 				.where( // 조건 객체 넣기
 						likeUsername(cond.getKeyword()),
-						eqUserType(cond.getUserType()),
-						betweenDate(cond.getFrom(), cond.getTo())
+						eqUserType(cond.getUserType())
+//						betweenDate(cond.getFrom(), cond.getTo())
 				)
 				.fetchOne();
 	}
 
 	// 관리자용 쿼리 조건 메서드 (키워드, 회원구분, 가입기간)
 	private BooleanExpression likeUsername(String keyword) {  // 키워드
-		return (keyword == null || keyword.isEmpty()) ? null :user.id.containsIgnoreCase(keyword);
+		return (keyword == null || keyword.isEmpty()) ? null : user.username.containsIgnoreCase(keyword);
 	}
+
 	private BooleanExpression eqUserType(String userType) {
 		return (userType == null || userType.isEmpty()) ? null : user.userType.eq(userType);
 	}
-
-	private BooleanExpression betweenDate(Date from, Date to) {
-		if (from == null || to == null) return null;
-
-		// Date → LocalDateTime으로 변환
-		LocalDateTime start = new Timestamp(from.getTime()).toLocalDateTime();
-		LocalDateTime end = new Timestamp(to.getTime()).toLocalDateTime().plusDays(1);
-
-		return user.regDate.between(from, to);
-	}
+//	private BooleanExpression betweenDate(Date from, Date to) {
+//		if (from == null || to == null) return null;
+//		return user.regDate.between(from, to);
+//	}
 }
+

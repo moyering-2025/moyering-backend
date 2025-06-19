@@ -31,10 +31,15 @@ public class UserServiceImpl implements UserService {
 		// 저장
 		userRepository.save(user);
 	}
-	
-	public UserDto findUserByUserId(Integer userId) throws Exception{
-		User user = userRepository.findById(userId).orElseThrow(()->new Exception("멤버 조회 오류"));
+
+	public UserDto findUserByUserId(Integer userId) throws Exception {
+		User user = userRepository.findById(userId).orElseThrow(() -> new Exception("멤버 조회 오류"));
 		return user.toDto();
 	}
 
+//	@Override
+//	public UserDto findUserByUsername(String username) throws Exception {
+//		return userRepository.findByUsername(username).orElseThrow(() -> new Exception("멤버 조회 오류"));
+//
+//	}
 }

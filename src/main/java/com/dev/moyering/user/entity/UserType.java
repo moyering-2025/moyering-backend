@@ -1,4 +1,4 @@
-package com.dev.moyering.common.entity;
+package com.dev.moyering.user.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

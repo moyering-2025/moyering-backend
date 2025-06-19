@@ -2,7 +2,7 @@ package com.dev.moyering.user.repository;
 
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
-import com.dev.moyering.common.entity.QUser;
+import com.dev.moyering.user.entity.QUser;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Pageable;
 

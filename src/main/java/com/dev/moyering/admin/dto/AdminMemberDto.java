@@ -2,7 +2,7 @@ package com.dev.moyering.admin.dto;
 
 import java.sql.Date;
 
-import com.dev.moyering.common.entity.User;
+import com.dev.moyering.user.entity.User;
 
 import lombok.*;
 
@@ -22,7 +22,7 @@ public class AdminMemberDto {
     public User toEntity() {
         return User.builder()
                 .userId(userId)
-                .id(username)
+                .username(username)
                 .name(name)
                 .tel(tel)
                 .useYn(useYn)

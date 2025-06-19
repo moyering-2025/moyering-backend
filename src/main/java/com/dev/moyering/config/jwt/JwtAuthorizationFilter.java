@@ -44,6 +44,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	        return;
 	    }
 
+		if (uri.equals("/api/login")) { // 관리자 로그인 제외
+			chain.doFilter(request, response);
+			return;
+		}
+
 		String authentication = request.getHeader(JwtProperties.HEADER_STRING);
 		if(authentication==null) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"로그인 필요");

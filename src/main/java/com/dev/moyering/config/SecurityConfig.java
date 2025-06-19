@@ -64,7 +64,10 @@ public class SecurityConfig {
 		
 		http.addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository))
 			.authorizeRequests()
+			.antMatchers("/api/login").permitAll() // 관리자 login
 			.antMatchers("/join").permitAll()
+
+
 			.antMatchers("/host/**").access("hasRole('HT')") //로그인 필수
 			.antMatchers("/admin/**").access("hasRole('MG')")//로그인 필수 && 권한이 ADMIN이거나 MANAGER 만 허용 
 			.anyRequest().permitAll();
