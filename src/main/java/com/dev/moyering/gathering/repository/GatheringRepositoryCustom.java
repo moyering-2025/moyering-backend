@@ -12,4 +12,6 @@ public interface GatheringRepositoryCustom {
 
 	//메인 페이지에 추천 게더링 4개
 	List<Gathering> findRecommendGatherRingForUser(User user) throws Exception;
+	
+	
 }
