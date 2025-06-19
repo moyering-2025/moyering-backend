@@ -12,6 +12,7 @@ import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
 import com.dev.moyering.user.entity.User;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
@@ -71,7 +72,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 				.set(gathering.gatheringContent, gatheringDto.getGatheringContent())
 				.set(gathering.tags, gatheringDto.getAddress())
 				.set(gathering.subCategory.subCategoryId, gatheringDto.getSubCategoryId())
-				.set(gathering.meetingDate, gatheringDto.getMeetingDate())
+				//.set(gathering.meetingDate, gatheringDto.getMeetingDate())
 				.set(gathering.address, gatheringDto.getAddress())
 				.set(gathering.detailAddress, gatheringDto.getDetailAddress())
 				.set(gathering.preparationItems, gatheringDto.getPreparationItems())
@@ -94,6 +95,10 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	}
 	@Override
 	public List<Gathering> findRecommendGatherRingForUser(User user) throws Exception {
+		QGathering gathering = QGathering.gathering;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		//builder.
 		return null;
 	}
 }

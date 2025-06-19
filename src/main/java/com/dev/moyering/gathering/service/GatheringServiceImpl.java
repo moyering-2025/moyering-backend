@@ -26,7 +26,6 @@ public class GatheringServiceImpl implements GatheringService {
 	@Override
 	public Integer writeGathering(GatheringDto gatheringDto, MultipartFile thumbnail) throws Exception {
 		// 게더링 등록
-//		System.out.println(gatheringDto);
 		if(thumbnail!=null && !thumbnail.isEmpty()) {
 			File upFile = new File(iuploadPath, thumbnail.getOriginalFilename());
 			thumbnail.transferTo(upFile);
@@ -64,9 +63,9 @@ public class GatheringServiceImpl implements GatheringService {
 	public Boolean toggleGatheringLike(Integer userId, Integer gatheringId) throws Exception {
 		// 좋아요 상태 변경
 		return null;
-//		Integer gatheringLikeNum = gatheringDslRepository.selectGatheringLike(userId, gatheringId); 
+//		Integer gatheringLikeNum = gatheringRepository.selectGatheringLike(userId, gatheringId); 
 //		if(gatheringLikeNum==null) {
-//			gatheringDslRepository.save(
+//			gatheringRepository.save(
 //					GatheringLike.builder()
 //					.User(User.builder().userId(userId).build())
 //					.gathering(Gathering.builder().gatheringId(gatheringId).build()).build());
