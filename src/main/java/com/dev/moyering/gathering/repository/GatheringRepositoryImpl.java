@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	@Autowired
 	private final JPAQueryFactory jpaQueryFactory;
-	
+	@Override
 	public Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word){	
 		QGathering gathering = QGathering.gathering;
 		if(word==null || word.trim().length()==0) {//검색어 없는 경우
@@ -66,25 +66,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		}
 		clause.execute();
 	}
-	/*
-	 * 
-	public Integer selectBoardLike(String id, Integer num) throws Exception {
-		QBoardLike boardLike = QBoardLike.boardLike;
-		return jpaQueryFactory.select(boardLike.num)
-					.from(boardLike)
-					.where(boardLike.memberId.eq(id).and(boardLike.articleNum.eq(num)))
-					.fetchOne();
-	}
-	*//*
-	 * 
-	public Integer selectBoardTotalLike( Integer num) throws Exception {
-		QBoardLike boardLike = QBoardLike.boardLike;
-		return jpaQueryFactory.select(boardLike.num)
-					.from(boardLike)
-					.where(boardLike.memberId.eq(id).and(boardLike.articleNum.eq(num)))
-					.fetchOne();
-	}
-	*/
+	@Override
 	public void updateGatheringStatus(Integer gatheringId, String status) throws Exception{
 		QGathering gathering = QGathering.gathering;
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
@@ -119,58 +101,4 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		}
 		return gatheringList;
 	}
-	/*
-	 * 
-	 * public List<ArticleDto> selectArticleListByPaging(PageRequest pageRequest, String type, String word) {
-		QArticle article = QArticle.article;
-		QMember member = QMember.member;
-		List<Tuple> tupleList = null;
-		
-		if(word==null || word.trim().length()==0) {
-			tupleList = jpaQueryFactory.select(article, member.name)
-						.from(article)
-						.leftJoin(member)
-						.on(article.writer.eq(member.id))
-						.orderBy(article.num.desc())
-						.offset(pageRequest.getOffset())
-						.limit(pageRequest.getPageSize())
-						.fetch();
-		} else {
-		
-			if (type.equals("title")) {
-				tupleList = jpaQueryFactory.select(article,member.name)
-						.from(article)
-						.leftJoin(member)
-						.on(article.writer.eq(member.id))
-						.where(article.title.contains(word))
-						.orderBy(article.num.desc()).offset(pageRequest.getOffset()).limit(pageRequest.getPageSize())
-						.fetch();
-			} else if (type.equals("content")) {
-				tupleList = jpaQueryFactory.select(article,member.name)
-						.from(article)
-						.leftJoin(member)
-						.on(article.writer.eq(member.id))
-						.where(article.content.contains(word))
-						.orderBy(article.num.desc()).offset(pageRequest.getOffset()).limit(pageRequest.getPageSize())
-						.fetch();
-
-			} else if (type.equals("writer")) {
-				tupleList = jpaQueryFactory.select(article,member.name)
-						.from(article)
-						.leftJoin(member)
-						.on(article.writer.eq(member.id))
-						.where(member.name.contains(word))
-						.orderBy(article.num.desc()).offset(pageRequest.getOffset()).limit(pageRequest.getPageSize())
-						.fetch();
-			}
-		}
-		return tupleList.stream()
-				.map(t-> {
-					Article a = t.get(0,Article.class);
-					String name = t.get(1,String.class);
-					ArticleDto articleDto = modelMapper.map(a, ArticleDto.class);
-					articleDto.setName(name);
-					return articleDto;
-				}).collect(Collectors.toList());
-	}*/
 }
