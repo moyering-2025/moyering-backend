@@ -3,10 +3,14 @@ package com.dev.moyering.socialing.dto;
 import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.user.entity.User;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -39,6 +43,9 @@ public class FeedDto {
     private Boolean likedByUser;       // 로그인 유저가 좋아요 눌렀는지
     private Boolean mine;              // 내 피드인지
     private List<CommentDto> comments;
+
+    // 작성자(other feed) img1 리스트 (썸네일)
+    private List<String> moreImg1List;
 
     public Feed toEntity() {
         Feed entity = Feed.builder()
