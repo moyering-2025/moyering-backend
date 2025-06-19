@@ -1,7 +1,8 @@
 package com.dev.moyering.gathering.entity;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
+import java.sql.Timestamp;
 import java.time.LocalTime;
 
 import javax.persistence.Column;
@@ -19,6 +20,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.user.entity.User;
+import com.dev.moyering.common.entity.Category;
 import com.dev.moyering.common.entity.SubCategory;
 
 import lombok.AllArgsConstructor;
@@ -80,7 +82,7 @@ public class Gathering {
     private Integer maxAttendees;
 
     @Column(nullable = false)
-    private Date applyDeadline;
+    private Timestamp applyDeadline;
 
     @Column()
     private String preparationItems;
@@ -95,6 +97,7 @@ public class Gathering {
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="subCategoryId")
 	private SubCategory subCategory;
+	
     @Column(precision = 10, scale = 7)
     private BigDecimal latitude;//위도
 
@@ -112,13 +115,14 @@ public class Gathering {
     		        .gatheringId(gatheringId)
     		        .title(title)
     		        .userId(user.getUserId())
-    		        .name(user.getName())
+    		        .nickName(user.getNickName())
     		        .profile(user.getProfile())
     		        .intro(user.getIntro())
     		        .gatheringContent(gatheringContent)
     		        .thumbnailFileName(thumbnail)
     		        .meetingDate(meetingDate)
     		        .startTime(startTime + "")
+    		        .endTime(endTime + "")
     		        .address(address)
     		        .detailAddress(detailAddress)
     		        .locName(locName)
@@ -128,15 +132,16 @@ public class Gathering {
     		        .preparationItems(preparationItems)
     		        .tags(tags)
     		        .createDate(createDate)
-    		        .categoryId(subCategory.getFirstCategory().getCategoryId())
     		        .subCategoryId(subCategory.getSubCategoryId())
+    		        .subCategoryName(subCategory.getSubCategoryName())
     		        .latitude(latitude)
     		        .longitude(longitude)
     		        .intrOnln(intrOnln)
     		        .status(status);
-	    if (user.getCategoryJsonString()!=null) {
-	        builder.categorys(user.getCategoryJsonString());
-	    }
+    	 if(subCategory.getFirstCategory()!=null) {
+    		 builder.categoryId(subCategory.getFirstCategory().getCategoryId());
+    		 builder.categoryName(subCategory.getFirstCategory().getCategoryName());
+    	 }
 	    return builder.build();
     }
 }
