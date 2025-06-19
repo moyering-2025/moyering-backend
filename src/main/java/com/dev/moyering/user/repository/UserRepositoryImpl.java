@@ -1,38 +1,19 @@
 package com.dev.moyering.user.repository;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
-
-import javax.transaction.Transactional;
-
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
-import com.dev.moyering.user.entity.QUser;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import jdk.jfr.Timestamp;
-import org.hibernate.usertype.UserType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-
-import com.dev.moyering.gathering.dto.GatheringDto;
-import com.dev.moyering.gathering.entity.Gathering;
-//import com.dev.moyering.gathering.entity.QGathering;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.querydsl.jpa.impl.JPAUpdateClause;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import static com.dev.moyering.user.entity.QUser.user;
 
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepositoryCustom {
-
-	@Autowired
 	private final JPAQueryFactory jpaQueryFactory;
-
-	QUser user = QUser.user;
 
 	// 관리자페이지 회원관리 내 키워드 검색 + 가입기간 필터 + 사용자 구분(전체, 일반, 강사) 필터 조회
 	@Override
@@ -51,8 +32,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 				.from(user)
 				.where(
 						likeUsername(cond.getKeyword()),
-						eqUserType(cond.getUserType())
-//						betweenDate(cond.getFrom(), cond.getTo())
+						eqUserType(cond.getUserType()),
+						betweenDate(cond.getFromDate(), cond.getToDate())
 				)
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
@@ -65,8 +46,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 				.from(user)
 				.where( // 조건 객체 넣기
 						likeUsername(cond.getKeyword()),
-						eqUserType(cond.getUserType())
-//						betweenDate(cond.getFrom(), cond.getTo())
+						eqUserType(cond.getUserType()),
+						betweenDate(cond.getFromDate(), cond.getToDate())
 				)
 				.fetchOne();
 	}
@@ -75,13 +56,11 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 	private BooleanExpression likeUsername(String keyword) {  // 키워드
 		return (keyword == null || keyword.isEmpty()) ? null : user.username.containsIgnoreCase(keyword);
 	}
-
 	private BooleanExpression eqUserType(String userType) {
 		return (userType == null || userType.isEmpty()) ? null : user.userType.eq(userType);
 	}
-//	private BooleanExpression betweenDate(Date from, Date to) {
-//		if (from == null || to == null) return null;
-//		return user.regDate.between(from, to);
-//	}
+	private BooleanExpression betweenDate(Date fromDate, Date toDate) {
+		if (fromDate == null || toDate == null) return null;
+		return user.regDate.between(fromDate, toDate);
+	}
 }
-

@@ -1,6 +1,6 @@
 package com.dev.moyering.config.jwt;
 
-import java.util.Date;
+import java.sql.Date;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

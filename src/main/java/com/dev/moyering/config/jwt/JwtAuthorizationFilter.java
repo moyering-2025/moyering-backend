@@ -24,15 +24,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 //인가 : 로그인 처리가 되어야만 하는 처리가 들어왔을때 실행
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
-	
-	private UserRepository userRepository;
-	
-	private JwtToken jwtToken = new JwtToken();
-	
-	public JwtAuthorizationFilter(AuthenticationManager authenticationManager,UserRepository userRepository) {
-		super(authenticationManager);
-		this.userRepository = userRepository;
-	}
+   
+   private UserRepository userRepository;
+   
+   private JwtToken jwtToken = new JwtToken();
+   
+   public JwtAuthorizationFilter(AuthenticationManager authenticationManager,UserRepository userRepository) {
+      super(authenticationManager);
+      this.userRepository = userRepository;
+   }
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -132,22 +132,23 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 				map.put("access_token", JwtProperties.TOKEN_PREFIX+reAccessToken);
 				map.put("refresh_token", JwtProperties.TOKEN_PREFIX+reRefreshToken);
 
-				PrincipalDetails principalDetails = new PrincipalDetails(ouser.get());
-				UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principalDetails, null,
-						principalDetails.getAuthorities());
-				SecurityContextHolder.getContext().setAuthentication(auth);
-				
-				String reToken = objectMapper.writeValueAsString(map);				
-				response.addHeader(JwtProperties.HEADER_STRING, reToken);				
-			} catch(Exception e2) {
-				e2.printStackTrace();
-				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인 필요");
-			}
-		}
-		
-		super.doFilterInternal(request, response, chain);
-	}
-	
-	
+
+            PrincipalDetails principalDetails = new PrincipalDetails(ouser.get());
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principalDetails, null,
+                  principalDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            
+            String reToken = objectMapper.writeValueAsString(map);            
+            response.addHeader(JwtProperties.HEADER_STRING, reToken);            
+         } catch(Exception e2) {
+            e2.printStackTrace();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인 필요");
+         }
+      }
+      
+      super.doFilterInternal(request, response, chain);
+   }
+   
+   
 
 }

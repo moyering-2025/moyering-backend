@@ -10,11 +10,10 @@ import java.util.List;
 
 public interface UserRepositoryCustom {
     // 관리자페이지 회원관리 검색
-    List<AdminMemberDto> searchMembers (AdminMemberSearchCond cond, Pageable pageable) throws Exception;
+    List<AdminMemberDto> searchMembers(AdminMemberSearchCond cond, Pageable pageable) throws Exception;
+
     // 검색 후 조회 건수
     Long countMembers(AdminMemberSearchCond cond);
-
-
-    }
+}
 
 

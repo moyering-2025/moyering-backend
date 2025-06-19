@@ -26,8 +26,8 @@ public class HostClassDto {
    private String locName;
    private String addr;
    private String detailAddr;
-   private double latitude;
-   private double longitude;
+   private Double latitude;
+   private Double longitude;
    private Integer recruitMin;
    private Integer recruitMax;
    private String imgName1;

@@ -42,9 +42,9 @@ public class HostClass {
    @Column
    private String detailAddr;
    @Column
-   private double latitude;
+   private Double latitude;
    @Column
-   private double longitude;
+   private Double longitude;
    @Column
    private Integer recruitMin;
    @Column
