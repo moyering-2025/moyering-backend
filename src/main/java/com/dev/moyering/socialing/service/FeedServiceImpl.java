@@ -7,6 +7,7 @@ import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.socialing.repository.CommentRepository;
 import com.dev.moyering.socialing.repository.FeedRepository;
 import com.dev.moyering.socialing.repository.LikeListRepository;
+import com.dev.moyering.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class FeedServiceImpl implements FeedService {
 
     private final FeedRepository feedRepository;
     private final CommentRepository commentRepository;
-    private final LikeListRepository likeRepository;
+    private final LikeListRepository likeListRepository;
 
     // 피드 전체
     @Override
@@ -27,34 +28,29 @@ public class FeedServiceImpl implements FeedService {
         return feedRepository.findFeeds(sortType, userId);
     }
 
-//    // 피드 상세
-//    @Override
-//    public FeedDto getFeedDetail(Integer feedId, Integer userId) throws Exception {
-//        Feed feed = feedRepository.findById(feedId)
-//                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 피드입니다."));
-//
-//        // 기본 FeedDto 변환 (엔티티의 toDto 사용)
-//        FeedDto dto = feed.toDto();
-//
-//        // 댓글 목록
-//        List<CommentDto> comments = commentRepository.findByFeed_FeedIdOrderByCreateAtAsc(feedId)
-//                .stream()
-//                .map(Comment::toDto)  // CommentDto에 이 정적 메서드 필요
-//                .collect(Collectors.toList());
-//
-//        // 로그인 사용자의 좋아요 여부
-//        boolean likedByUser = false;
-//        if (userId != null) {
-//            likedByUser = likeRepository.existsByFeedFeedIdAndUserUserId(feedId, userId);
-//        }
-//
-//        // DTO에 상세 정보 추가
-//        dto.setCreatedAt(feed.getCreateDate());
-//        dto.setComments(comments);
-//        dto.setLikedByUser(likedByUser);
-//        dto.setMine(userId != null && feed.getUser().getUserId().equals(userId));
-//
-//        return dto;
-//    }
+    //피드 상세 조회
+    @Override
+    public FeedDto getFeedById(Integer feedId) throws Exception {
+        Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new Exception("해당 피드가 존재하지 않습니다."));
+
+        User writer = feed.getUser();
+        return null;
+    }
+
+    @Override
+    public List<CommentDto> getCommentsByFeedId(Integer feedId) throws Exception {
+        return List.of();
+    }
+
+    @Override
+    public Long getLikeCountByFeedId(Integer feedId) throws Exception {
+        return 0L;
+    }
+
+    @Override
+    public boolean checkUserLikeFeed(Integer feedId, String userId) throws Exception {
+        return false;
+    }
+
 
 }

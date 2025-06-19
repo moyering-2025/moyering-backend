@@ -34,21 +34,26 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
       this.userRepository = userRepository;
    }
 
-   @Override
-   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-         throws IOException, ServletException {
-      String uri = request.getRequestURI();
-      
-      if (uri.equals("/join") || uri.equals("/login")) {
-           chain.doFilter(request, response);
-           return;
-       }
-      //토큰이 없으면 비로그인 상태로 허용
-      String header = request.getHeader(JwtProperties.HEADER_STRING);
-      if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
-          chain.doFilter(request, response); // ✅ 그냥 통과
-          return;
-      }
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		String uri = request.getRequestURI();
+		
+		if (uri.equals("/join") || uri.equals("/login")) {
+	        chain.doFilter(request, response);
+	        return;
+	    }
+		//토큰이 없으면 비로그인 상태로 허용
+		String header = request.getHeader(JwtProperties.HEADER_STRING);
+		if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
+		    chain.doFilter(request, response); // ✅ 그냥 통과
+		    return;
+		}
+
+		if (uri.equals("/api/login")) { // 관리자 로그인 제외
+			chain.doFilter(request, response);
+			return;
+		}
 
       String authentication = request.getHeader(JwtProperties.HEADER_STRING);
       if(authentication==null) {
