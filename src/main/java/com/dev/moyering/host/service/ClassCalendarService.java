@@ -6,4 +6,5 @@ import com.dev.moyering.host.dto.HostClassDto;
 
 public interface ClassCalendarService {
 	List<HostClassDto> getHotHostClasses() throws Exception;
+	List<HostClassDto> getRecommendHostClassesForUser2(Integer userId) throws Exception;	
 }

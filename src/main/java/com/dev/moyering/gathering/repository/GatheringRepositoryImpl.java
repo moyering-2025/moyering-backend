@@ -98,14 +98,35 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	            );
 	        }
 	    }
-		
-		return jpaQueryFactory
+		List<Gathering> preferred = jpaQueryFactory
 				.select(gathering)
 				.from(gathering)
 				.where(builder)
 				.orderBy(gathering.meetingDate.asc())
 				.limit(4)
 				.fetch();
+		
+		List<Integer> preferredIds = preferred.stream()
+			    .map(Gathering::getGatheringId)
+			    .collect(Collectors.toList());
+
+			// 2단계: 부족하면 나머지로 채우기
+			if (preferred.size() < 4) {
+			    List<Gathering> fallback = jpaQueryFactory
+			        .selectFrom(gathering)
+			        .where(
+			            gathering.status.eq("모집중")
+			                .and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())))
+			                .and(preferredIds.isEmpty() ? null : gathering.gatheringId.notIn(preferredIds))
+			        )
+			        .orderBy(gathering.meetingDate.asc())
+			        .limit(4 - preferred.size())
+			        .fetch();
+
+			    preferred.addAll(fallback);
+			}
+
+		return preferred;
 	}
   
   @Override

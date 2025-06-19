@@ -114,9 +114,7 @@ public class GatheringServiceImpl implements GatheringService {
 	        User user = userRepository.findById(userId)
 	                .orElseThrow(() -> new Exception("해당 사용자를 찾을 수 없습니다: id=" + userId));
 	        gathers = gatheringRepository.findRecommendGatherRingForUser(user);
-	    }
-		System.out.println("rrr"+gathers);
-		
+	    }		
 
         return gathers.stream()
         		.map(g -> {

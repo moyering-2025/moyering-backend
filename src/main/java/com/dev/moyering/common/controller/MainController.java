@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class MainController {
-	private final HostClassService hostClassService;
 	private final ClassCalendarService classCalendarService;
 	private final GatheringService gatheringService;
 	private final BannerService bannerService;
@@ -41,11 +40,11 @@ public class MainController {
 			if (principal != null) {
 				 userId = principal.getUser().getUserId();
 				System.out.println(userId+"idididididi");
-				classes = hostClassService.getRecommendHostClassesForUser(userId);
+				classes = classCalendarService.getRecommendHostClassesForUser2(userId);
 				gathers = gatheringService.getMainGathersForUser(userId);
 			} else {
 				System.out.println(userId+"2222idididididi");
-				classes = hostClassService.getRecommendHostClassesForUser(userId);
+				classes = classCalendarService.getRecommendHostClassesForUser2(userId);
 				gathers = gatheringService.getMainGathersForUser(userId);
 
 			}
