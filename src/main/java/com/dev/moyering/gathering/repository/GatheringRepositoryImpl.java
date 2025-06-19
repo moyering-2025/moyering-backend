@@ -97,28 +97,28 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		return null;
 	}
   
-  @Override
-  public List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){
-		QGathering gathering = QGathering.gathering;
-		List<Gathering> gatheringList = null;
-		if(word==null || word.trim().length()==0) {//검색어 없는 경우
-			gatheringList = jpaQueryFactory.selectFrom(gathering)
-					.where(gathering.user.userId.eq(loginId))//등록한 사람이 로그인 아이디와 일치하는 경우에만.
-					.orderBy(gathering.gatheringId.desc())
-					.offset(pageRequest.getOffset())
-					.limit(pageRequest.getPageSize())
-					.fetch();
-		} else { // 검색어 있는 경우
-		    gatheringList = jpaQueryFactory.selectFrom(gathering)
-		            .where(gathering.user.userId.eq(loginId)
-		                .and(gathering.title.contains(word))) // 제목에서 검색
-		            .orderBy(gathering.gatheringId.desc())
-		            .offset(pageRequest.getOffset())
-		            .limit(pageRequest.getPageSize())
-		            .fetch();
-		}
-		return gatheringList;
-	}
+//  @Override
+//	public List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){	
+//		QGathering gathering = QGathering.gathering;
+//		List<Gathering> gatheringList = null;
+//		if(word==null || word.trim().length()==0) {//검색어 없는 경우
+//			gatheringList = jpaQueryFactory.selectFrom(gathering)
+//					.where(gathering.user.userId.eq(loginId))//등록한 사람이 로그인 아이디와 일치하는 경우에만.
+//					.orderBy(gathering.gatheringId.desc())
+//					.offset(pageRequest.getOffset())
+//					.limit(pageRequest.getPageSize())
+//					.fetch();
+//		} else { // 검색어 있는 경우
+//		    gatheringList = jpaQueryFactory.selectFrom(gathering)
+//		            .where(gathering.user.userId.eq(loginId)
+//		                .and(gathering.title.contains(word))) // 제목에서 검색
+//		            .orderBy(gathering.gatheringId.desc())
+//		            .offset(pageRequest.getOffset())
+//		            .limit(pageRequest.getPageSize())
+//		            .fetch();
+//		}
+//		return gatheringList;
+//	}
 	/*
 	 * 
 	 * public List<ArticleDto> selectArticleListByPaging(PageRequest pageRequest, String type, String word) {
