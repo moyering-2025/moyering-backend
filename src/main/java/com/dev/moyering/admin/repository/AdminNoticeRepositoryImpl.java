@@ -1,6 +1,7 @@
 package com.dev.moyering.admin.repository;
 
-import com.dev.moyering.admin.dto.NoticeDto;
+import com.dev.moyering.admin.dto.AdminNoticeDto;
+import com.dev.moyering.admin.entity.AdminNotice;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,35 +11,35 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import java.util.List;
-import static com.dev.moyering.admin.entity.QNotice.notice;
+import static com.dev.moyering.admin.entity.QAdminNotice.adminNotice;
 
 @Repository
 @RequiredArgsConstructor // final 필드 생성자 자동 생성
-public class NoticeRepositoryImpl implements NoticeRepositoryCustom {
+public class AdminNoticeRepositoryImpl implements AdminNoticeRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<NoticeDto> findNoticesByKeyword(String searchKeyword, Pageable pageable) {
+    public Page<AdminNoticeDto> findNoticesByKeyword(String searchKeyword, Pageable pageable) {
 
         // 데이터 조회
-        List<NoticeDto> content = queryFactory
-                .select(Projections.constructor(NoticeDto.class,
-                        // NoticeDto의 생성자에 들어갈 컬럼 순서
-                        notice.noticeId,
-                        notice.title,
-                        notice.content,
-                        notice.pinYn,
-                        notice.isHidden,
-                        notice.createdAt
+        List<AdminNoticeDto> content = queryFactory
+                .select(Projections.constructor(AdminNoticeDto.class,
+                        // AdminNoticeDto의 생성자에 들어갈 컬럼 순서
+                        adminNotice.noticeId,
+                        adminNotice.title,
+                        adminNotice.content,
+                        adminNotice.pinYn,
+                        adminNotice.isHidden,
+                        adminNotice.createdAt
                 ))
-                .from(notice)
+                .from(adminNotice)
                 .where(
                         searchNotice(searchKeyword) // 검색 기능 (검색 조건 메서드 호출)
                 )
                 .orderBy(
-                        notice.pinYn.desc(), // 고정글(true) 먼저 (내림차순)
-                        notice.createdAt.desc() // 그 다음 최신 작성일 순 (내림차순)
+                        adminNotice.pinYn.desc(), // 고정글(true) 먼저 (내림차순)
+                        adminNotice.createdAt.desc() // 그 다음 최신 작성일 순 (내림차순)
                 )
 
                 .offset(pageable.getOffset()) // 몇 번째 데이터부터 가져올지 (페이지 * 크기)
@@ -47,8 +48,8 @@ public class NoticeRepositoryImpl implements NoticeRepositoryCustom {
 
         // 전체 데이터 개수 조회 (페이징 위함)
         Long total = queryFactory
-                .select(notice.count()) // COUNT(*) 쿼리: 전체 개수만 세기
-                .from(notice)
+                .select(adminNotice.count()) // COUNT(*) 쿼리: 전체 개수만 세기
+                .from(adminNotice)
                 .where(
                         searchNotice(searchKeyword) // 위 검색과 같은 검색 조건 적용
                 )
@@ -59,20 +60,20 @@ public class NoticeRepositoryImpl implements NoticeRepositoryCustom {
     }
 
     @Override
-    public NoticeDto findNoticeByNoticeId(Integer noticeId) {
+    public AdminNoticeDto findNoticeByNoticeId(Integer noticeId) {
         return queryFactory
-                .select(Projections.constructor(NoticeDto.class,
-                        notice.noticeId,
-                        notice.title,
-                        notice.content,
-                        notice.pinYn,
-                        notice.isHidden,
-                        notice.createdAt,
-                        notice.lastModifiedDate
+                .select(Projections.constructor(AdminNoticeDto.class,
+                        adminNotice.noticeId,
+                        adminNotice.title,
+                        adminNotice.content,
+                        adminNotice.pinYn,
+                        adminNotice.isHidden,
+                        adminNotice.createdAt,
+                        adminNotice.lastModifiedDate
                         ))
-                .from(notice)
+                .from(adminNotice)
                 .where(
-                        notice.noticeId.eq(noticeId)
+                        adminNotice.noticeId.eq(noticeId)
                 )
                 .fetchOne(); //단건조회
     }
@@ -83,8 +84,8 @@ public class NoticeRepositoryImpl implements NoticeRepositoryCustom {
             return null; //검색 없으면 전체 조회
         }
         // 검색어가 있으면 제목 또는 내용에 포함된 데이터 찾기
-        return notice.title.containsIgnoreCase(keyword)  // 제목에 검색어 포함 (대소문자 무시)
-                .or(notice.content.containsIgnoreCase(keyword)); // 또는 내용에 검색어 포함
+        return adminNotice.title.containsIgnoreCase(keyword)  // 제목에 검색어 포함 (대소문자 무시)
+                .or(adminNotice.content.containsIgnoreCase(keyword)); // 또는 내용에 검색어 포함
     }
 
 

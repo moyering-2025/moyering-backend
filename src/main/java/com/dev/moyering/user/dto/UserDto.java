@@ -41,7 +41,7 @@ public class UserDto {
 	private String providerId;
 	private Integer activeScore;
 	private Integer userBadgeId;
-	
+
 	public User toEntity() {
 		User entity = User.builder()
 				.userId(userId)

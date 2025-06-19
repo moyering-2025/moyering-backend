@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.user.entity.User;
 
 import lombok.Data;
@@ -27,6 +28,7 @@ public class PrincipalDetails implements UserDetails,OAuth2User {
 	public PrincipalDetails(User user) {
 		this.user = user;
 	}
+	
 	public PrincipalDetails(User user,Map<String,Object> attributes) {
 		this.user = user;
 		this.attributes=attributes;
@@ -35,7 +37,7 @@ public class PrincipalDetails implements UserDetails,OAuth2User {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		Collection<GrantedAuthority> collect = new ArrayList<>();
-		collect.add(()->"ROLE_"+user.getUserType());
+		collect.add(()->user.getUserType());
 		return collect;
 	}
 
@@ -46,7 +48,7 @@ public class PrincipalDetails implements UserDetails,OAuth2User {
 
 	@Override
 	public String getUsername() {//UserDetails인터페이스 용도
-		return user.getName();
+		return user.getUsername();
 	}
 
 	@Override

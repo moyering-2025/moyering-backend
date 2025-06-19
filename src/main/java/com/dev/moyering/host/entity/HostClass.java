@@ -42,9 +42,9 @@ public class HostClass {
    @Column
    private String detailAddr;
    @Column
-   private double latitude;
+   private Double latitude;
    @Column
-   private double longitude;
+   private Double longitude;
    @Column
    private Integer recruitMin;
    @Column
@@ -88,18 +88,18 @@ public class HostClass {
             .longitude(longitude)
             .recruitMin(recruitMin)
             .recruitMax(recruitMax)
-            .img1(img1)
-            .img2(img2)
-            .img3(img3)
-            .img4(img4)
-            .img5(img5)
+            .imgName1(img1)
+            .imgName2(img2)
+            .imgName3(img3)
+            .imgName4(img4)
+            .imgName5(img5)
             .detailDescription(detailDescription)
-            .material(material)
+            .materialName(material)
             .caution(caution)
             .incluision(incluision)
             .preparation(preparation)
             .keywords(keywords)
-            .portfolio(portfolio)
+            .portfolioName(portfolio)
             .price(price)
             .build();
       if(host!=null) {

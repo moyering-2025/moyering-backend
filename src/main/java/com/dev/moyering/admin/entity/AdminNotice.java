@@ -1,25 +1,15 @@
 package com.dev.moyering.admin.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
 
-import com.dev.moyering.admin.dto.NoticeDto;
-
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.dev.moyering.admin.dto.AdminNoticeDto;
+import lombok.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA용 기본 생성자, 빈 객체 생성 차단
 @Entity
 @ToString
-public class Notice extends BaseEntity {
+public class AdminNotice extends BaseEntity {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer noticeId;
@@ -40,12 +30,13 @@ public class Notice extends BaseEntity {
     @Column(nullable = false)
     private boolean pinYn;
 
+
     @Column(nullable = false)
     private boolean isHidden;
 
     // 변경 가능한 필드를 생성자 통해 변경
     @Builder
-    public Notice(String title, String content, boolean pinYn, boolean isHidden){
+    public AdminNotice(String title, String content, boolean pinYn, boolean isHidden){
         this.title = title;
         this.content = content;
         this.pinYn = pinYn;
@@ -54,8 +45,8 @@ public class Notice extends BaseEntity {
     }
 
     // 엔티티 -> toDto
-    public NoticeDto toDto() {
-        return NoticeDto.builder()
+    public AdminNoticeDto toDto() {
+        return AdminNoticeDto.builder()
                 .noticeId(this.noticeId)
                 .title(this.title)
                 .content(this.content)
@@ -77,10 +68,6 @@ public class Notice extends BaseEntity {
         this.pinYn = pinYn;
     }
 
-    // 공지사항 메인 > 숨기기, 보이기 상태 변경
-    public void toggleVisibility() {
-        this.isHidden = !this.isHidden;
-    }
 
     // 또는 명시적으로 숨기기/보이기 (삭제할 때 사용)
     public void hide() {

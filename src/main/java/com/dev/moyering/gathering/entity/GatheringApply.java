@@ -58,7 +58,7 @@ public class GatheringApply {
 	    		.gatheringApplyId(gatheringApplyId)
 	    		.gatheringId(gathering.getGatheringId())
 	    		.userId(user.getUserId())
-	    		.name(user.getName())
+	    		.nickName(user.getNickName())
 	    		.intro(user.getIntro())
 	    		.profile(user.getProfile())
 	    		.aspiration(aspiration)

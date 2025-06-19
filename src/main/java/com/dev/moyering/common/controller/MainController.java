@@ -35,19 +35,20 @@ public class MainController {
         List<HostClassDto> hotClasses;
         List<GatheringDto> gathers;
         List<BannerDto> banners;
-        
+        Integer userId=null;
 		try {
 			System.out.println(principal+"principalprincipalprincipal");
 			if (principal != null) {
-				Integer userId = principal.getUser().getUserId();
+				userId = principal.getUser().getUserId();
 				System.out.println(userId+"idididididi");
 				classes = hostClassService.getRecommendHostClassesForUser(userId);
+				gathers = gatheringService.getMainGathersForUser(userId);
 			} else {
 				classes = hostClassService.getRecommendHostClassesForUser(null);
+				gathers = gatheringService.getMainGathersForUser(null);
 			}
 			
 			hotClasses = classCalendarService.getHotHostClasses();
-			//gathers = gatheringService.getMainGathers(userId);
 			banners = bannerService.getMainBnanerList(1);
 			System.out.println(classes+"sss");
 			Map<String, Object> result = new HashMap<>();
