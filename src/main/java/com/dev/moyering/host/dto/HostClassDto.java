@@ -2,6 +2,8 @@ package com.dev.moyering.host.dto;
 
 import java.sql.Date;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.dev.moyering.common.entity.SubCategory;
 import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.entity.HostClass;
@@ -28,23 +30,32 @@ public class HostClassDto {
    private Double longitude;
    private Integer recruitMin;
    private Integer recruitMax;
-   private String img1;
-   private String img2;
-   private String img3;
-   private String img4;
-   private String img5;
+   private String imgName1;
+   private String imgName2;
+   private String imgName3;
+   private String imgName4;
+   private String imgName5;
    private String detailDescription;
-   private String material;
+   private String materialName;
    private String caution;
    private String incluision;
    private String preparation;
    private String keywords;
-   private String portfolio;
+   private String portfolioName;
    private Integer price;
    //공통 필드 추가
    private Date startDate;
    private String category1;
    private String category2;
+   
+   private MultipartFile img1;
+   private MultipartFile img2;
+   private MultipartFile img3;
+   private MultipartFile img4;
+   private MultipartFile img5;
+   
+   private MultipartFile portfolio;
+   private MultipartFile  material;
    
    public HostClass toEntity() {
       HostClass entity = HostClass.builder()
@@ -57,18 +68,18 @@ public class HostClassDto {
             .longitude(longitude)
             .recruitMin(recruitMin)
             .recruitMax(recruitMax)
-            .img1(img1)
-            .img2(img2)
-            .img3(img3)
-            .img4(img4)
-            .img5(img5)
+            .img1(imgName1)
+            .img2(imgName2)
+            .img3(imgName3)
+            .img4(imgName4)
+            .img5(imgName5)
             .detailDescription(detailDescription)
-            .material(material)
+            .material(materialName)
             .caution(caution)
             .incluision(incluision)
             .preparation(preparation)
             .keywords(keywords)
-            .portfolio(portfolio)
+            .portfolio(portfolioName)
             .price(price)
             .build();
       if(hostId!=null) {

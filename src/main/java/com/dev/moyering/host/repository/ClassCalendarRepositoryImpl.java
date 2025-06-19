@@ -1,5 +1,6 @@
 package com.dev.moyering.host.repository;
 
+import java.sql.Timestamp;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,7 @@ import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.QClassCalendar;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +30,7 @@ public class ClassCalendarRepositoryImpl implements ClassCalendarRepositoryCusto
 					calendar.hostClass.classId.in(classIds),
 					calendar.status.eq("모집중"),
 					calendar.startDate.goe(Date.valueOf(LocalDate.now()))
+
 				)
 				.groupBy(calendar.hostClass.classId)
 				.fetch();

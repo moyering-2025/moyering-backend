@@ -1,6 +1,6 @@
 package com.dev.moyering.user.dto;
 
-import java.sql.Date;
+import java.util.Date;
 
 import com.dev.moyering.user.entity.User;
 

@@ -1,13 +1,22 @@
 package com.dev.moyering.user.service;
 
+import com.dev.moyering.admin.dto.AdminMemberDto;
+import com.dev.moyering.admin.dto.AdminMemberSearchCond;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -37,9 +46,60 @@ public class UserServiceImpl implements UserService {
 		return user.toDto();
 	}
 
-//	@Override
-//	public UserDto findUserByUsername(String username) throws Exception {
-//		return userRepository.findByUsername(username).orElseThrow(() -> new Exception("멤버 조회 오류"));
-//
-//	}
+	@Override
+	public User findUserByUsername(String username) throws Exception {
+		return userRepository.findByUsername(username).orElseThrow(() -> new Exception("멤버 조회 오류"));
+
+	}
+	// 관리자페이지 > 회원 관리 (검색 조회)
+	@Override
+	public Page<AdminMemberDto> getMemberList(AdminMemberSearchCond cond, Pageable pageable) throws Exception {
+		log.info("getMemberList 호출 - cond : {}, pageable : {}", cond, pageable);
+		try {
+			List<AdminMemberDto> content = userRepository.searchMembers(cond, pageable);
+			log.info("조회된 content 개수 : {}", content.size());
+
+			Long total = userRepository.countMembers(cond); // 페이지 계산
+			log.info("전체 개수: {}", total);
+
+			return new PageImpl<>(content, pageable, total); // 내용, 페이지 수, 총 몇건인지
+		} catch(Exception e){
+			log.error("getMemberList 에러 상세 : ", e);
+			throw e;
+		}
+
+	}
+
+	// 관리자 페이지 > 회원 관리 > 상태 변경 (계정 활성화 / 비활성화)
+	@Transactional
+	@Override
+	public void updateMemberStatus(Integer userId, String status) {
+		log.info("회원 상태 변경 요청 - ID : {}, 변경할 상태 : {}", userId, status);
+		try {
+			// 1. 회원 존재 여부 확인 (UserDto -> User)
+			User user = userRepository.findById(userId)
+					.orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다 : " + userId));
+
+			// 2. 회원 상태와 동일한지 확인 (활성화 -> 비활성화, 비활성화 -> 활성화)
+			if (status.equals(user.getUseYn())) {
+				log.warn("현재 상태와 동일한 상태로 변경 시도 - ID : {}, 상태 : {}", userId, status);
+				return ; // 동일한 상태면 변경하지 않음
+			}
+
+			// 3. 상태 변경
+			user.setUseYn(status);
+
+			// 4. DB 저장
+			userRepository.save(user); // 리파지토리는 엔티티만 처리
+			log.info("회원 상태 변경 완료 - ID : {}, 이전 상태 : {}, 변경된 상태 : {}", userId, status, user);
+
+		} catch (Exception e){
+			log.error("회원상태 변경 실패 : {}", e.getMessage());
+		}
+	}
+
+	@Override
+	public AdminMemberDto getMemberDetail(Integer userId) {
+		return null;
+	}
 }

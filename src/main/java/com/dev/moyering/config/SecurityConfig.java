@@ -18,6 +18,7 @@ import com.dev.moyering.config.jwt.JwtAuthenticationFilter;
 import com.dev.moyering.config.jwt.JwtAuthorizationFilter;
 import com.dev.moyering.config.oauth.OAuth2SuccessHandler;
 import com.dev.moyering.config.oauth.PrincipalOAuth2UserService;
+import com.dev.moyering.host.repository.HostRepository;
 import com.dev.moyering.user.repository.UserRepository;
 
 @Configuration // IoC 빈(bean) 등록
@@ -37,6 +38,9 @@ public class SecurityConfig {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private HostRepository hostRepository;
+
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
 			throws Exception {
@@ -53,7 +57,7 @@ public class SecurityConfig {
 		
 		http.formLogin().disable()  //로그인 폼 비활성화
 			.httpBasic().disable() //httpBasic은 header에 username,password를 암호화하지 않은 상태로 주고받는다. 이를 사용하지 않겠다는 것.
-			.addFilterAt(new JwtAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
+			.addFilterAt(new JwtAuthenticationFilter(authenticationManager,hostRepository), UsernamePasswordAuthenticationFilter.class);
 			
 //		http.oauth2Login()
 //			.authorizationEndpoint().baseUri("/oauth2/authorization") //front로그인 uri
@@ -64,12 +68,10 @@ public class SecurityConfig {
 		
 		http.addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository))
 			.authorizeRequests()
-			.antMatchers("/api/login").permitAll() // 관리자 login
-			.antMatchers("/join").permitAll()
-
-
-			.antMatchers("/host/**").access("hasRole('HT')") //로그인 필수
-			.antMatchers("/admin/**").access("hasRole('MG')")//로그인 필수 && 권한이 ADMIN이거나 MANAGER 만 허용 
+			.antMatchers("/user/**").authenticated() //로그인 필수
+			.antMatchers("/host/**").access("hasRole('ROLE_HT') or hasRole('ROLE_MG')") //로그인 필수
+//			.antMatchers("/api/login/","/api/verify").permitAll()
+			.antMatchers("/admin/**").access("hasRole('ROLE_MG')")//로그인 필수 && 권한이 ADMIN이거나 MANAGER 만 허용 
 			.anyRequest().permitAll();
 		
 		return http.build();

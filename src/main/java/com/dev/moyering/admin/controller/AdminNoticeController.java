@@ -182,7 +182,5 @@ public class AdminNoticeController {
             log.error("공지사항 조회 실패: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
     }
-
 }
