@@ -21,7 +21,7 @@ public class GatheringApplyDto {
     private Integer gatheringApplyId;
     private Integer gatheringId;
     private Integer userId; // User 엔티티 대신 userId만 전달
-    private String name;
+    private String nickName;
     private String profile;
     private String intro;
     private Date applyDate;   
