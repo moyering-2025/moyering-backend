@@ -87,5 +87,14 @@ public class GatheringServiceImpl implements GatheringService {
 		// 게더링 조회
 		Gathering gathering = gatheringRepository.findById(gatheringId).orElseThrow(()->new Exception("조회 중 오류"));
 		return gathering.toDto();
+	}
+	@Override
+	public List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception {
+		//메인페이지에 취향에 맞는 게더링 4개 가져오기
+		List<Gathering> gathers;
+		if (userId == null) {
+			gathers = gatheringRepository.findRecommendGatherRingForUser(null);
+		}
+		return null;
 	}	
 }
