@@ -3,7 +3,7 @@ package com.dev.moyering.admin.dto;
 
 import lombok.Builder;
 import lombok.Getter;
-import java.util.Date;
+import java.sql.Date;
 
 @Builder
 @Getter

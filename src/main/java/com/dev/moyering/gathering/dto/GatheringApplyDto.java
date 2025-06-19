@@ -1,6 +1,6 @@
 package com.dev.moyering.gathering.dto;
 
-import java.util.Date;
+import java.sql.Date;
 
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringApply;

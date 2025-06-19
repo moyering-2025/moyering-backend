@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.user.entity.User;
+import org.springframework.data.domain.PageRequest;
 
 public interface GatheringRepositoryCustom {
 

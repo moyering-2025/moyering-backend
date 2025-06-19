@@ -1,6 +1,6 @@
 package com.dev.moyering.user.repository;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
