@@ -100,6 +100,19 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public List<String> findTop3Img1ByUserId(Integer userId) {
+        QFeed f = QFeed.feed;
+        return jpaQueryFactory
+                .select(f.img1)
+                .from(f)
+                .where(f.user.userId.eq(userId)
+                        .and(f.isDeleted.isFalse()))
+                .orderBy(f.createDate.desc())
+                .limit(3)
+                .fetch();
+    }
+
     /**
      * 정렬 기준에 따라 OrderSpecifier를 반환
      */
