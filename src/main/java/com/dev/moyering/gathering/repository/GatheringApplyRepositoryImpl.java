@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.dev.moyering.common.entity.QUser;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.entity.GatheringApply;
 import com.dev.moyering.gathering.entity.QGatheringApply;
+import com.dev.moyering.user.entity.QUser;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.core.types.Projections;
@@ -26,13 +26,13 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	public List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId) throws Exception {
 	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
 	    QUser user = QUser.user;
-	    
+		
 	    return jpaQueryFactory
 	        .select(Projections.constructor(GatheringApplyDto.class,
 	            gatheringApply.gatheringApplyId,
 	            gatheringApply.gathering.gatheringId,
 	            user.userId,
-	            user.name,  // DTO에서는 name 필드를 사용
+	            user.nickName,  // DTO에서는 name 필드를 사용
 	            user.profile,
 	            user.intro,
 	            gatheringApply.applyDate,
@@ -46,5 +46,16 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	            gatheringApply.isApproved.isTrue()
 	        )
 	        .fetch();
+	}
+
+	@Override
+	public void updateMemberApproval(Integer gatheringId, Integer userId, boolean isApproved) throws Exception {
+		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+		
+	}
+
+	@Override
+	public void applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception {
+		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
 	}
 }

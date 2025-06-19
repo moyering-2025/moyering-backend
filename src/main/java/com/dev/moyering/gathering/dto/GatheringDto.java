@@ -25,7 +25,7 @@ public class GatheringDto {
     private String title;
     
     private Integer userId;// User 엔티티 대신 userId만 전달
-    private String name;
+    private String nickName;
     private String profile;
     private String intro;
     

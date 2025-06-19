@@ -22,7 +22,6 @@ import java.util.List;
 public class FeedRepositoryImpl implements FeedRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
-
     @Override
     public List<FeedDto> findAllWithCounts() {
         QFeed feed = QFeed.feed;

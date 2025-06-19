@@ -114,7 +114,7 @@ public class Gathering {
     		        .gatheringId(gatheringId)
     		        .title(title)
     		        .userId(user.getUserId())
-    		        .name(user.getName())
+    		        .nickName(user.getNickName())
     		        .profile(user.getProfile())
     		        .intro(user.getIntro())
     		        .gatheringContent(gatheringContent)

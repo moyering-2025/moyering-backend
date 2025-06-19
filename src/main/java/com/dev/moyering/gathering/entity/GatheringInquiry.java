@@ -13,8 +13,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.gathering.dto.GatheringInquiryDto;
+import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,7 +62,7 @@ public class GatheringInquiry {
    			 .inquiryContent(inquiryContent)
    			 .gatheringId(gathering.getGatheringId())
    			 .title(gathering.getTitle())
-   			 .nickname(user.getNickname())
+   			 .nickName(user.getNickName())
    			 .profile(user.getProfile())
    			 .inquiryDate(inquiryDate);
 	    if (responseDate != null && responseContent != null) {

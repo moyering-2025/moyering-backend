@@ -3,9 +3,9 @@ package com.dev.moyering.gathering.dto;
 import java.util.Date;
 
 
-import com.dev.moyering.common.entity.User;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringInquiry;
+import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +25,7 @@ public class GatheringInquiryDto {
     private String title;
     
     private Integer userId;// User 엔티티 대신 userId만 전달    
-    private String nickname;
+    private String nickName;
     private String profile;
     
     private String inquiryContent;
