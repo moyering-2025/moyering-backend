@@ -21,7 +21,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> getComments(Integer feedId) {
-
+    return null;
     }
 
     @Transactional
