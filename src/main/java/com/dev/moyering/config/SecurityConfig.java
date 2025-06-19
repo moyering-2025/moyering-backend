@@ -64,9 +64,9 @@ public class SecurityConfig {
 		
 		http.addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository))
 			.authorizeRequests()
-			.antMatchers("/join").permitAll()
-			.antMatchers("/host/**").access("hasRole('HT')") //로그인 필수
-			.antMatchers("/admin/**").access("hasRole('MG')")//로그인 필수 && 권한이 ADMIN이거나 MANAGER 만 허용 
+			.antMatchers("/user/**").authenticated() //로그인 필수
+			.antMatchers("/host/**").access("hasRole('ROLE_HT') or hasRole('ROLE_MG')") //로그인 필수
+			.antMatchers("/admin/**").access("hasRole('ROLE_MG')")//로그인 필수 && 권한이 ADMIN이거나 MANAGER 만 허용 
 			.anyRequest().permitAll();
 		
 		return http.build();

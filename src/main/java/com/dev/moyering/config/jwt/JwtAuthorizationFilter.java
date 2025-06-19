@@ -39,7 +39,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			throws IOException, ServletException {
 		String uri = request.getRequestURI();
 		
-		if (uri.equals("/join") || uri.equals("/login")) {
+		if (!(uri.equals("/host") || uri.equals("/admin"))) {
 	        chain.doFilter(request, response);
 	        return;
 	    }
