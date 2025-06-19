@@ -36,7 +36,7 @@ public class GatheringInquiry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer inquiryId;
 
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="gatheringId")
 	private Gathering gathering;
 	
@@ -59,9 +59,12 @@ public class GatheringInquiry {
 
     public GatheringInquiryDto toDto() {
     	GatheringInquiryDto.GatheringInquiryDtoBuilder builder = GatheringInquiryDto.builder()
-   			 .inquiryContent(inquiryContent)
+   			 .inquiryId(inquiryId)
    			 .gatheringId(gathering.getGatheringId())
    			 .title(gathering.getTitle())
+   			 .meetingDate(gathering.getMeetingDate())
+   			 .inquiryContent(inquiryContent)
+   			 .userId(user.getUserId())
    			 .nickName(user.getNickName())
    			 .profile(user.getProfile())
    			 .inquiryDate(inquiryDate);

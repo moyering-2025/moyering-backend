@@ -31,6 +31,7 @@ public class GatheringInquiryDto {
     private String inquiryContent;
 	private Date inquiryDate;
 	private Date responseDate;
+	private Date meetingDate;
 	private String responseContent;
 	private String responseState;
     

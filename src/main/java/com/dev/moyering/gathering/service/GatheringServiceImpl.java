@@ -26,7 +26,6 @@ public class GatheringServiceImpl implements GatheringService {
 	@Override
 	public Integer writeGathering(GatheringDto gatheringDto, MultipartFile thumbnail) throws Exception {
 		// 게더링 등록
-//		System.out.println(gatheringDto);
 		if(thumbnail!=null && !thumbnail.isEmpty()) {
 			File upFile = new File(iuploadPath, thumbnail.getOriginalFilename());
 			thumbnail.transferTo(upFile);

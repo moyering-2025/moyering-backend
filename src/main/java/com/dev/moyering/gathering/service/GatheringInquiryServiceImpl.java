@@ -23,6 +23,7 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	}
 	public List<GatheringInquiryDto> gatheringInquiryListBygatheringId(Integer gatheringId) throws Exception {
 		List<GatheringInquiryDto> gatheringInquiryList = null;
+		System.out.println("gatheringId : "+gatheringId);
 		gatheringInquiryList = gatheringInquiryRepository.gatheringInquiryListBygatheringId(gatheringId);
 		return gatheringInquiryList;
 	}

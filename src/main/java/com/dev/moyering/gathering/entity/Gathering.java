@@ -1,7 +1,8 @@
 package com.dev.moyering.gathering.entity;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
+import java.sql.Timestamp;
 import java.time.LocalTime;
 
 import javax.persistence.Column;
@@ -81,7 +82,7 @@ public class Gathering {
     private Integer maxAttendees;
 
     @Column(nullable = false)
-    private Date applyDeadline;
+    private Timestamp applyDeadline;
 
     @Column()
     private String preparationItems;
@@ -121,6 +122,7 @@ public class Gathering {
     		        .thumbnailFileName(thumbnail)
     		        .meetingDate(meetingDate)
     		        .startTime(startTime + "")
+    		        .endTime(endTime + "")
     		        .address(address)
     		        .detailAddress(detailAddress)
     		        .locName(locName)
@@ -130,14 +132,16 @@ public class Gathering {
     		        .preparationItems(preparationItems)
     		        .tags(tags)
     		        .createDate(createDate)
-    		        .categoryId(subCategory.getFirstCategory().getCategoryId())
-    		        .categoryName(subCategory.getFirstCategory().getCategoryName())
     		        .subCategoryId(subCategory.getSubCategoryId())
     		        .subCategoryName(subCategory.getSubCategoryName())
     		        .latitude(latitude)
     		        .longitude(longitude)
     		        .intrOnln(intrOnln)
     		        .status(status);
+    	 if(subCategory.getFirstCategory()!=null) {
+    		 builder.categoryId(subCategory.getFirstCategory().getCategoryId());
+    		 builder.categoryName(subCategory.getFirstCategory().getCategoryName());
+    	 }
 	    return builder.build();
     }
 }

@@ -1,7 +1,8 @@
 package com.dev.moyering.gathering.dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
+import java.sql.Timestamp;
 import java.time.LocalTime;
 
 import com.dev.moyering.common.entity.SubCategory;
@@ -39,7 +40,7 @@ public class GatheringDto {
     private String locName;
     private Integer minAttendees;
     private Integer maxAttendees;
-    private Date applyDeadline;
+    private Timestamp applyDeadline;
     private String preparationItems;
     private String tags;
     private Date createDate;    

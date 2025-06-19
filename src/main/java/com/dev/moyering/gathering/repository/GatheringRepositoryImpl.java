@@ -47,7 +47,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
 				.set(gathering.title, gatheringDto.getTitle())
 				.set(gathering.gatheringContent, gatheringDto.getGatheringContent())
-				.set(gathering.tags, gatheringDto.getAddress())
+				.set(gathering.tags, gatheringDto.getTags())
 				.set(gathering.subCategory.subCategoryId, gatheringDto.getSubCategoryId())
 				.set(gathering.meetingDate, gatheringDto.getMeetingDate())
 				.set(gathering.address, gatheringDto.getAddress())
