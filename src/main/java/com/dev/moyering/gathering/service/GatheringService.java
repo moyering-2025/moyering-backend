@@ -18,4 +18,6 @@ public interface GatheringService {
 
 	List<GatheringDto> myGatheringApplyList(Integer userId, PageInfo pageInfo, String word) throws Exception;
 	
+	//메인페이지 게더링
+	List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception;
 }

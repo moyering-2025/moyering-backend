@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
+import com.dev.moyering.user.entity.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
@@ -91,6 +92,12 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 				.where(gathering.gatheringId.eq(gatheringId));
 		clause.execute();
 	}
+	@Override
+	public List<Gathering> findRecommendGatherRingForUser(User user) throws Exception {
+		return null;
+	}
+  
+  @Override
 	public List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){	
 		QGathering gathering = QGathering.gathering;
 		List<Gathering> gatheringList = null;
