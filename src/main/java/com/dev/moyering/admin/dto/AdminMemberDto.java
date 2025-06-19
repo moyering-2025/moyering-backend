@@ -1,12 +1,14 @@
 package com.dev.moyering.admin.dto;
 
-import java.sql.Date;
+import java.util.Date;
 
 import com.dev.moyering.user.entity.User;
 
 import lombok.*;
 
 @Getter
+@NoArgsConstructor
+//@AllArgsConstructor // queryDSL의 Projections.constructor로 대체
 @Builder
 public class AdminMemberDto {
     private Integer userId; // auto_increment key
@@ -18,17 +20,31 @@ public class AdminMemberDto {
     private Date regDate; // 가입일
     private String useYn; // 사용여부
 
+    // 매핑용 생성자
+    public AdminMemberDto(Integer userId, String userType, String username,
+                          String name, String email, String tel,
+                          Date regDate, String useYn) {
+        this.userId = userId;
+        this.userType = userType;
+        this.username = username;
+        this.name = name;
+        this.email = email;
+        this.tel = tel;
+        this.regDate = regDate;
+        this.useYn = useYn;
+    }
+
 
     public User toEntity() {
         return User.builder()
                 .userId(userId)
+                .userType(userType)
                 .username(username)
                 .name(name)
-                .tel(tel)
-                .useYn(useYn)
-                .userType(userType)
                 .email(email)
+                .tel(tel)
                 .regDate(regDate)
+                .useYn(useYn)
                 .build();
     }
 }

@@ -1,7 +1,7 @@
 package com.dev.moyering.gathering.dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import java.time.LocalTime;
 
 import com.dev.moyering.common.entity.SubCategory;

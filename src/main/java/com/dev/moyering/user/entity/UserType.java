@@ -6,10 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum UserType {
-    ALL("전체"), // 필터용
-    HOST("강사"),
-    USER("일반사용자"),
-    MGR("관리자");
+    ROLE_MG("관리자"), // 필터용
+    ROLE_MB("일반"),
+    ROLE_HT("강사");
 
     private final String displayName;
 }
