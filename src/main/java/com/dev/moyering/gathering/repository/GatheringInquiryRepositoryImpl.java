@@ -12,11 +12,10 @@ import com.dev.moyering.gathering.dto.GatheringInquiryDto;
 import com.dev.moyering.gathering.entity.GatheringInquiry;
 import com.dev.moyering.gathering.entity.QGatheringInquiry;
 import com.dev.moyering.user.entity.QUser;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
