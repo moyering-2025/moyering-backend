@@ -1,7 +1,12 @@
 package com.dev.moyering.gathering.repository;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
@@ -12,6 +17,7 @@ import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
 import com.dev.moyering.user.entity.User;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
@@ -66,25 +72,6 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		}
 		clause.execute();
 	}
-	/*
-	 * 
-	public Integer selectBoardLike(String id, Integer num) throws Exception {
-		QBoardLike boardLike = QBoardLike.boardLike;
-		return jpaQueryFactory.select(boardLike.num)
-					.from(boardLike)
-					.where(boardLike.memberId.eq(id).and(boardLike.articleNum.eq(num)))
-					.fetchOne();
-	}
-	*//*
-	 * 
-	public Integer selectBoardTotalLike( Integer num) throws Exception {
-		QBoardLike boardLike = QBoardLike.boardLike;
-		return jpaQueryFactory.select(boardLike.num)
-					.from(boardLike)
-					.where(boardLike.memberId.eq(id).and(boardLike.articleNum.eq(num)))
-					.fetchOne();
-	}
-	*/
 	public void updateGatheringStatus(Integer gatheringId, String status) throws Exception{
 		QGathering gathering = QGathering.gathering;
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
@@ -94,83 +81,74 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	}
 	@Override
 	public List<Gathering> findRecommendGatherRingForUser(User user) throws Exception {
-		return null;
+		QGathering gathering = QGathering.gathering;
+		BooleanBuilder builder = new BooleanBuilder();
+	    builder.and(gathering.status.eq("모집중"));
+		builder.and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())));
+		
+		if (user != null) {
+	        List<String> preferences = Stream.of(
+	            user.getCategory1(), user.getCategory2(),
+	            user.getCategory3(), user.getCategory4(), user.getCategory5()
+	        ).filter(Objects::nonNull).collect(Collectors.toList());
+        	
+	        if (!preferences.isEmpty()) {
+	            builder.and(
+            		gathering.subCategory.subCategoryName.in(preferences)
+	            );
+	        }
+	    }
+		List<Gathering> preferred = jpaQueryFactory
+				.select(gathering)
+				.from(gathering)
+				.where(builder)
+				.orderBy(gathering.meetingDate.asc())
+				.limit(4)
+				.fetch();
+		
+		List<Integer> preferredIds = preferred.stream()
+			    .map(Gathering::getGatheringId)
+			    .collect(Collectors.toList());
+
+			// 2단계: 부족하면 나머지로 채우기
+			if (preferred.size() < 4) {
+			    List<Gathering> fallback = jpaQueryFactory
+			        .selectFrom(gathering)
+			        .where(
+			            gathering.status.eq("모집중")
+			                .and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())))
+			                .and(preferredIds.isEmpty() ? null : gathering.gatheringId.notIn(preferredIds))
+			        )
+			        .orderBy(gathering.meetingDate.asc())
+			        .limit(4 - preferred.size())
+			        .fetch();
+
+			    preferred.addAll(fallback);
+			}
+
+		return preferred;
 	}
   
-//  @Override
-//	public List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){	
-//		QGathering gathering = QGathering.gathering;
-//		List<Gathering> gatheringList = null;
-//		if(word==null || word.trim().length()==0) {//검색어 없는 경우
-//			gatheringList = jpaQueryFactory.selectFrom(gathering)
-//					.where(gathering.user.userId.eq(loginId))//등록한 사람이 로그인 아이디와 일치하는 경우에만.
-//					.orderBy(gathering.gatheringId.desc())
-//					.offset(pageRequest.getOffset())
-//					.limit(pageRequest.getPageSize())
-//					.fetch();
-//		} else { // 검색어 있는 경우
-//		    gatheringList = jpaQueryFactory.selectFrom(gathering)
-//		            .where(gathering.user.userId.eq(loginId)
-//		                .and(gathering.title.contains(word))) // 제목에서 검색
-//		            .orderBy(gathering.gatheringId.desc())
-//		            .offset(pageRequest.getOffset())
-//		            .limit(pageRequest.getPageSize())
-//		            .fetch();
-//		}
-//		return gatheringList;
-//	}
-	/*
-	 * 
-	 * public List<ArticleDto> selectArticleListByPaging(PageRequest pageRequest, String type, String word) {
-		QArticle article = QArticle.article;
-		QMember member = QMember.member;
-		List<Tuple> tupleList = null;
-		
-		if(word==null || word.trim().length()==0) {
-			tupleList = jpaQueryFactory.select(article, member.name)
-						.from(article)
-						.leftJoin(member)
-						.on(article.writer.eq(member.id))
-						.orderBy(article.num.desc())
-						.offset(pageRequest.getOffset())
-						.limit(pageRequest.getPageSize())
-						.fetch();
-		} else {
-		
-			if (type.equals("title")) {
-				tupleList = jpaQueryFactory.select(article,member.name)
-						.from(article)
-						.leftJoin(member)
-						.on(article.writer.eq(member.id))
-						.where(article.title.contains(word))
-						.orderBy(article.num.desc()).offset(pageRequest.getOffset()).limit(pageRequest.getPageSize())
-						.fetch();
-			} else if (type.equals("content")) {
-				tupleList = jpaQueryFactory.select(article,member.name)
-						.from(article)
-						.leftJoin(member)
-						.on(article.writer.eq(member.id))
-						.where(article.content.contains(word))
-						.orderBy(article.num.desc()).offset(pageRequest.getOffset()).limit(pageRequest.getPageSize())
-						.fetch();
-
-			} else if (type.equals("writer")) {
-				tupleList = jpaQueryFactory.select(article,member.name)
-						.from(article)
-						.leftJoin(member)
-						.on(article.writer.eq(member.id))
-						.where(member.name.contains(word))
-						.orderBy(article.num.desc()).offset(pageRequest.getOffset()).limit(pageRequest.getPageSize())
-						.fetch();
-			}
+  @Override
+	public List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){	
+		QGathering gathering = QGathering.gathering;
+		List<Gathering> gatheringList = null;
+		if(word==null || word.trim().length()==0) {//검색어 없는 경우
+			gatheringList = jpaQueryFactory.selectFrom(gathering)
+					.where(gathering.user.userId.eq(loginId))//등록한 사람이 로그인 아이디와 일치하는 경우에만.
+					.orderBy(gathering.gatheringId.desc())
+					.offset(pageRequest.getOffset())
+					.limit(pageRequest.getPageSize())
+					.fetch();
+		} else { // 검색어 있는 경우
+		    gatheringList = jpaQueryFactory.selectFrom(gathering)
+		            .where(gathering.user.userId.eq(loginId)
+		                .and(gathering.title.contains(word))) // 제목에서 검색
+		            .orderBy(gathering.gatheringId.desc())
+		            .offset(pageRequest.getOffset())
+		            .limit(pageRequest.getPageSize())
+		            .fetch();
 		}
-		return tupleList.stream()
-				.map(t-> {
-					Article a = t.get(0,Article.class);
-					String name = t.get(1,String.class);
-					ArticleDto articleDto = modelMapper.map(a, ArticleDto.class);
-					articleDto.setName(name);
-					return articleDto;
-				}).collect(Collectors.toList());
-	}*/
+		return gatheringList;
+	}
 }
