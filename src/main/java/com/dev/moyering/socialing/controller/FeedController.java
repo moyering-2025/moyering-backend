@@ -68,16 +68,18 @@ public class FeedController {
 //        return ResponseEntity.ok(response);
 //    }
 
-    @GetMapping("/feed/{id}")
+    @GetMapping("/feed")
     public ResponseEntity<FeedDto> getFeedDetail(
-            @PathVariable Integer id,
+            @RequestParam Integer feedId,
             @AuthenticationPrincipal PrincipalDetails principal) {
 
+        System.out.println(feedId);
         Integer currentUserId = principal != null
                 ? principal.getUser().getUserId()
                 : null;
 
-        FeedDto dto = feedService.getFeedDetail(id, currentUserId);
+        FeedDto dto = feedService.getFeedDetail(feedId, currentUserId);
+        System.out.println(dto);
         return ResponseEntity.ok(dto);
     }
 }

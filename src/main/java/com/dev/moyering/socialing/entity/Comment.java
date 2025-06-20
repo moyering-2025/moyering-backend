@@ -55,7 +55,7 @@ public class Comment {
                 .isDeleted(isDeleted)
                 .createAt(createAt)
                 .userId(user.getUserId())
-                .username(user.getUsername())
+                .writerId(user.getNickName())
                 .userBadge(user.getUserBadgeId())
                 .feedId(feed.getFeedId())
                 .build();

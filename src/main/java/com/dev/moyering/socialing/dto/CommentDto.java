@@ -24,7 +24,7 @@ public class CommentDto {
 
     private Integer feedId;
     private Integer userId;
-    private String username;
+    private String writerId;
     private Integer userBadge;
 
     private List<CommentDto> replies;
@@ -36,7 +36,7 @@ public class CommentDto {
                 .parentId(parentId)
                 .isDeleted(false)
                 .createAt(createAt != null ? createAt : LocalDateTime.now())
-                .user(User.builder().userId(userId).username(username).userBadgeId(userBadge).build())
+                .user(User.builder().userId(userId).nickName(writerId).userBadgeId(userBadge).build())
                 .feed(Feed.builder().feedId(feedId).build())
                 .build();
         return entity;

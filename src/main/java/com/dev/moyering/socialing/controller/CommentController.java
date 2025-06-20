@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/socialing")
+@RequestMapping("/user/socialing")
 public class CommentController {
 
     private final CommentService commentService;
@@ -37,10 +37,9 @@ public class CommentController {
         }
     }
 
-    @PostMapping("/feed/{feedId}/comment")
+    @PostMapping("/feed/comment")
     public ResponseEntity<CommentDto> postComment(
-            @PathVariable Integer feedId,
-            @RequestBody CommentRequest request,
+            @RequestBody CommentDto commentDto,
             @AuthenticationPrincipal PrincipalDetails principal) {
 
         if (principal == null) {
@@ -49,19 +48,13 @@ public class CommentController {
 
         Integer userId = principal.getUser().getUserId();
         try {
-            CommentDto saved = commentService.addComment(feedId, userId,
-                    request.getContent(), request.getParentId());
+            CommentDto saved = commentService.addComment(commentDto.getFeedId(), userId,
+                    commentDto.getContent(), commentDto.getParentId());
             return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-    }
-
-    @Data()
-    public static class CommentRequest {
-        private String content;
-        private Integer parentId;  // null 이면 최상위 댓글, 값이 있으면 대댓글
     }
 }

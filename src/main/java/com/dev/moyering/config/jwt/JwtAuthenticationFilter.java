@@ -62,6 +62,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		userInfo.put("name", user.getName());
 		userInfo.put("email", user.getEmail());
 		userInfo.put("userType", user.getUserType());
+		userInfo.put("nickName", user.getNickName());
 		if(user.getUserType().equals("ROLE_HT")) {
 			Optional<Host> ohost = hostRepository.findByUserId(user.getUserId());
 			if(ohost.isPresent()) {
