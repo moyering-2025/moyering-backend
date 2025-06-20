@@ -9,4 +9,5 @@ public interface CommentService {
     List<CommentDto> getComments(Integer feedId);
     void saveComment(CommentDto commentDto) throws Exception;
     void deleteComment(Integer commentId, Integer userId) throws Exception;
+    CommentDto addComment(Integer feedId, Integer userId,String content,Integer parentId) throws Exception;
 }
