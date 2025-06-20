@@ -1,6 +1,7 @@
 package com.dev.moyering.socialing.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.dev.moyering.socialing.entity.Comment;
 import com.dev.moyering.socialing.entity.Feed;
@@ -8,8 +9,10 @@ import com.dev.moyering.user.entity.User;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 public class CommentDto {
 
@@ -23,6 +26,8 @@ public class CommentDto {
     private Integer userId;
     private String username;
     private Integer userBadge;
+
+    private List<CommentDto> replies;
 
     public Comment toEntity() {
         Comment entity = Comment.builder()

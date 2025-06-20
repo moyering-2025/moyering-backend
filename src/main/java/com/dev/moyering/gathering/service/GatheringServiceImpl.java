@@ -1,8 +1,10 @@
 package com.dev.moyering.gathering.service;
 
 import java.io.File;
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,12 +12,24 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dev.moyering.common.repository.SubCategoryRepository;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.repository.GatheringRepository;
+import com.dev.moyering.host.dto.HostClassDto;
+import com.dev.moyering.host.entity.HostClass;
+import com.dev.moyering.host.repository.ClassCalendarRepository;
+import com.dev.moyering.host.repository.HostClassRepository;
+import com.dev.moyering.host.repository.HostRepository;
+import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.repository.UserRepository;
 import com.dev.moyering.util.PageInfo;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class GatheringServiceImpl implements GatheringService {
 	@Value("${iupload.path}")
 	private String iuploadPath;
@@ -24,6 +38,8 @@ public class GatheringServiceImpl implements GatheringService {
 	private String duploadPath;
 	@Autowired
 	public GatheringRepository gatheringRepository;
+	private final UserRepository userRepository;
+	
 	@Override
 	public Integer writeGathering(GatheringDto gatheringDto, MultipartFile thumbnail) throws Exception {
 		// 게더링 등록
@@ -96,7 +112,17 @@ public class GatheringServiceImpl implements GatheringService {
 		List<Gathering> gathers;
 		if (userId == null) {
 			gathers = gatheringRepository.findRecommendGatherRingForUser(null);
-		}
-		return null;
+		}else {
+	        User user = userRepository.findById(userId)
+	                .orElseThrow(() -> new Exception("해당 사용자를 찾을 수 없습니다: id=" + userId));
+	        gathers = gatheringRepository.findRecommendGatherRingForUser(user);
+	    }		
+
+        return gathers.stream()
+        		.map(g -> {
+                    GatheringDto dto = g.toDto();
+                    return dto;
+                })
+                .collect(Collectors.toList());
 	}	
 }
