@@ -42,8 +42,8 @@ public class ScheduleDetail {
 		ScheduleDetailDto dto = ScheduleDetailDto.builder()
 				.scheduleId(scheduleId)
 				.name(name)
-				.startTime(startTime)
-				.endTime(endTime)
+				.startTime(startTime.toString())
+				.endTime(endTime.toString())
 				.content(content)
 				.build();
 		if (hostClass != null) {
