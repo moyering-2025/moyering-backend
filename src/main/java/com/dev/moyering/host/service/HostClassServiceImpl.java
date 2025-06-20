@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.dev.moyering.common.repository.SubCategoryRepository;
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.ClassSearchResponseDto;
+import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.HostClass;
@@ -188,6 +189,22 @@ public class HostClassServiceImpl implements HostClassService {
 	            .totalPages((int) Math.ceil((double) total / dto.getSize()))
 	            .totalElements(total)
 	            .build();
+	}
+
+
+	@Override
+	public Map<Integer, List<ClassCalendarDto>> getHostClassesWithCalendars(Integer hostId) throws Exception {
+		try {
+			Map<Integer, List<ClassCalendarDto>> hostClasses = hostClassRepository.findHostClassWithCalendar(hostId);
+			for(Map.Entry<Integer,List<ClassCalendarDto>> entry : hostClasses.entrySet()) {
+				List<ClassCalendarDto> calendars = entry.getValue();
+			}
+			return hostClasses;
+		}catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 	
 }
