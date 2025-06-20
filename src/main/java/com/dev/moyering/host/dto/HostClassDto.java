@@ -45,6 +45,7 @@ public class HostClassDto {
    private Integer price;
    //공통 필드 추가
    private Date startDate;
+   private String status;
    private String category1;
    private String category2;
    

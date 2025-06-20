@@ -1,6 +1,6 @@
 package com.dev.moyering.host.entity;
 
-import java.sql.Timestamp;
+import java.time.LocalTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,9 +32,9 @@ public class ScheduleDetail {
 	@Column
 	private String name;
 	@Column
-	private Timestamp startTime;
+	private LocalTime startTime;
 	@Column
-	private Timestamp endTime;
+	private LocalTime endTime;
 	@Column
 	private String content;
 

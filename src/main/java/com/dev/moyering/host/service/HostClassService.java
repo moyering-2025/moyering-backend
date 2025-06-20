@@ -14,4 +14,5 @@ public interface HostClassService {
 	Integer registClass(HostClassDto hostClassDto, List<Date> dates) throws Exception;
 	ClassSearchResponseDto searchClasses(ClassSearchRequestDto dto) throws Exception;
 	Map<Integer,List<ClassCalendarDto>> getHostClassesWithCalendars(Integer hostId) throws Exception;
+	List<HostClassDto> selectHostClassByHostId(Integer hostId) throws Exception;
 }

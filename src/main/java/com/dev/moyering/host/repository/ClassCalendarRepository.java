@@ -1,10 +1,14 @@
 package com.dev.moyering.host.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 
 public interface ClassCalendarRepository extends JpaRepository<ClassCalendar, Integer>, ClassCalendarRepositoryCustom {
+	List<ClassCalendar> findByHostClassClassIdIn(Set<Integer> classIds) throws Exception;
+	
 }

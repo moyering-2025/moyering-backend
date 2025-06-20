@@ -85,5 +85,6 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		}
 		return resultMap;
 	}
+
 	
 }
