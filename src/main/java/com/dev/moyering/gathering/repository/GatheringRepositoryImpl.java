@@ -1,7 +1,12 @@
 package com.dev.moyering.gathering.repository;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
@@ -12,6 +17,7 @@ import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
 import com.dev.moyering.user.entity.User;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
@@ -75,7 +81,52 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	}
 	@Override
 	public List<Gathering> findRecommendGatherRingForUser(User user) throws Exception {
-		return null;
+		QGathering gathering = QGathering.gathering;
+		BooleanBuilder builder = new BooleanBuilder();
+	    builder.and(gathering.status.eq("모집중"));
+		builder.and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())));
+		
+		if (user != null) {
+	        List<String> preferences = Stream.of(
+	            user.getCategory1(), user.getCategory2(),
+	            user.getCategory3(), user.getCategory4(), user.getCategory5()
+	        ).filter(Objects::nonNull).collect(Collectors.toList());
+        	
+	        if (!preferences.isEmpty()) {
+	            builder.and(
+            		gathering.subCategory.subCategoryName.in(preferences)
+	            );
+	        }
+	    }
+		List<Gathering> preferred = jpaQueryFactory
+				.select(gathering)
+				.from(gathering)
+				.where(builder)
+				.orderBy(gathering.meetingDate.asc())
+				.limit(4)
+				.fetch();
+		
+		List<Integer> preferredIds = preferred.stream()
+			    .map(Gathering::getGatheringId)
+			    .collect(Collectors.toList());
+
+			// 2단계: 부족하면 나머지로 채우기
+			if (preferred.size() < 4) {
+			    List<Gathering> fallback = jpaQueryFactory
+			        .selectFrom(gathering)
+			        .where(
+			            gathering.status.eq("모집중")
+			                .and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())))
+			                .and(preferredIds.isEmpty() ? null : gathering.gatheringId.notIn(preferredIds))
+			        )
+			        .orderBy(gathering.meetingDate.asc())
+			        .limit(4 - preferred.size())
+			        .fetch();
+
+			    preferred.addAll(fallback);
+			}
+
+		return preferred;
 	}
   
   @Override

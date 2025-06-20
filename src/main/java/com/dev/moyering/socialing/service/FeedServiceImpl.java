@@ -11,7 +11,9 @@ import com.dev.moyering.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,4 +55,49 @@ public class FeedServiceImpl implements FeedService {
     }
 
 
+    @Override
+    @Transactional
+    public FeedDto getFeedDetail(Integer feedId, Integer currentUserId) {
+        // 1) Feed 조회
+        Feed feed = feedRepository
+                .findByFeedIdAndIsDeletedFalse(feedId)
+                .orElseThrow(() -> new NoSuchElementException("Feed not found: " + feedId));
+
+        // 2) FeedDto 기본 매핑
+        FeedDto dto = feed.toDto();
+        dto.setCreatedAt(feed.getCreateDate());
+        dto.setMine(currentUserId != null &&
+                feed.getUser().getUserId().equals(currentUserId));
+
+        // 3) 좋아요/댓글 수, likedByUser
+        dto.setLikesCount(likeListRepository.countByFeedFeedId(feedId));
+        dto.setLikedByUser(currentUserId != null &&
+                likeListRepository.existsByFeedFeedIdAndUserUserId(feedId, currentUserId)
+        );
+        dto.setCommentsCount(commentRepository.countByFeedFeedIdAndIsDeletedFalse(feedId));
+
+        // 4) 댓글 + 대댓글 구성
+        List<CommentDto> commentDtos = commentRepository
+                .findByFeedFeedIdAndParentIdIsNullAndIsDeletedFalseOrderByCreateAtAsc(feedId)
+                .stream()
+                .map(parent -> {
+                    CommentDto pd = parent.toDto();
+                    List<CommentDto> replies = commentRepository
+                            .findByParentIdAndIsDeletedFalseOrderByCreateAtAsc(parent.getCommentId())
+                            .stream()
+                            .map(Comment::toDto)
+                            .collect(Collectors.toList());
+                    pd.setReplies(replies);
+                    return pd;
+                })
+                .collect(Collectors.toList());
+        dto.setComments(commentDtos);
+
+        // 5) 더 많은 게시물 썸네일(img1)
+        Integer writerId = feed.getUser().getUserId();
+        List<String> thumbs = feedRepository.findTop3Img1ByUserId(writerId);
+        dto.setMoreImg1List(thumbs);
+
+        return dto;
+    }
 }
