@@ -1,17 +1,25 @@
 package com.dev.moyering.gathering.repository;
 
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
+import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
+import com.dev.moyering.gathering.entity.GatheringApply;
 import com.dev.moyering.gathering.entity.QGathering;
+import com.dev.moyering.gathering.entity.QGatheringApply;
+import com.dev.moyering.user.entity.QUser;
 import com.dev.moyering.user.entity.User;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
@@ -101,4 +109,78 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		}
 		return gatheringList;
 	}
+  
+  public List<GatheringDto> selectMyGatheringListByPaging(
+      PageRequest pageRequest, Integer userId, String searchTitle) {
+      
+      QGathering gathering = QGathering.gathering;
+      QUser user = QUser.user;
+      
+      List<Tuple> tupleList = null;
+      
+      if(searchTitle == null || searchTitle.trim().length() == 0) {
+          tupleList = jpaQueryFactory.select(gathering, user.nickName, user.profile, user.intro)
+                      .from(gathering)
+                      .leftJoin(user)
+                      .on(gathering.user.userId.eq(user.userId))
+                      .where(gathering.user.userId.eq(userId))
+                      .orderBy(gathering.createDate.desc())
+                      .offset(pageRequest.getOffset())
+                      .limit(pageRequest.getPageSize())
+                      .fetch();
+      } else {
+          tupleList = jpaQueryFactory.select(gathering, user.nickName, user.profile, user.intro)
+                      .from(gathering)
+                      .leftJoin(user)
+                      .on(gathering.user.userId.eq(user.userId))
+                      .where(gathering.user.userId.eq(userId)
+                             .and(gathering.title.contains(searchTitle)))
+                      .orderBy(gathering.createDate.desc())
+                      .offset(pageRequest.getOffset())
+                      .limit(pageRequest.getPageSize())
+                      .fetch();
+      }
+      
+      return tupleList.stream()
+              .map(t -> {
+                  Gathering g = t.get(0, Gathering.class);
+                  String nickName = t.get(1, String.class);
+                  String profile = t.get(2, String.class);
+                  String intro = t.get(3, String.class);
+                  
+                  GatheringDto gatheringDto = g.toDto();
+                  gatheringDto.setNickName(nickName);
+                  gatheringDto.setProfile(profile);
+                  gatheringDto.setIntro(intro);
+                  
+                  return gatheringDto;
+              }).collect(Collectors.toList());
+  }
+  @Override
+  public Map<String, Object> selectGatheringWithApplicationsByUserIdAndPaging(
+	    PageRequest pageRequest, Integer userId, String searchTitle) {
+	    // 게더링 목록 조회
+	    List<GatheringDto> gatheringList = selectMyGatheringListByPaging(pageRequest, userId, searchTitle);
+	    
+	    // 각 게더링별 지원내역 조회
+	    Map<Integer, List<GatheringApplyDto>> applicationMap = new HashMap<>();
+	    for(GatheringDto gathering : gatheringList) {
+	        List<GatheringApplyDto> applications;
+			try {
+				GatheringApplyRepositoryImpl gatheringApplyRepository = new GatheringApplyRepositoryImpl(jpaQueryFactory);
+				applications = gatheringApplyRepository.selectApplicationsByGatheringId(gathering.getGatheringId());
+				applicationMap.put(gathering.getGatheringId(), applications);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
+	    
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("gatheringList", gatheringList);
+	    result.put("applicationMap", applicationMap);
+	    
+	    return result;
+	}
+  
 }

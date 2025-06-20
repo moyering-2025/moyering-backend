@@ -2,6 +2,7 @@ package com.dev.moyering.gathering.service;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,11 +48,11 @@ public class GatheringServiceImpl implements GatheringService {
 	}
 	
 	@Override
-	public List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word) throws Exception {
+	public Map<String, Object> myGatheringList(Integer userId, PageInfo pageInfo, String word) throws Exception {
 		// 내가 등록한 게더링 목록 + 페이지네이션, 제목으로 검색 
 		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
-		
-		return null;
+		return gatheringRepository.selectGatheringWithApplicationsByUserIdAndPaging(pageRequest, userId, word);
+//		 null;
 	}
 	@Override
 	public Boolean getGatheringLike(Integer userId, Integer gatheringId) throws Exception {
@@ -87,6 +88,8 @@ public class GatheringServiceImpl implements GatheringService {
 		Gathering gathering = gatheringRepository.findById(gatheringId).orElseThrow(()->new Exception("조회 중 오류"));
 		return gathering.toDto();
 	}
+	List<Gathering> gathers;
+	
 	@Override
 	public List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception {
 		//메인페이지에 취향에 맞는 게더링 4개 가져오기

@@ -3,6 +3,7 @@ package com.dev.moyering.gathering.repository;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -58,4 +59,29 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	public void applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception {
 		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
 	}
+	public Long countApprovedApplicationsByGatheringId(Integer gatheringId) {
+		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+	    return jpaQueryFactory
+	       .select(gatheringApply.count())
+	       .from(gatheringApply)
+    		.where(
+				gatheringApply.gathering.gatheringId.eq(gatheringId),
+	            gatheringApply.isApproved.isTrue()
+	        )
+            .fetchOne();
+	}
+//	@Override
+	public List<GatheringApplyDto> selectApplicationsByGatheringId(Integer gatheringId) throws Exception {
+	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+	    
+	    List<GatheringApply> applications = jpaQueryFactory.selectFrom(gatheringApply)
+	            .where(gatheringApply.gathering.gatheringId.eq(gatheringId))
+	            .orderBy(gatheringApply.applyDate.desc())
+	            .fetch();
+	    
+	    return applications.stream()
+	            .map(GatheringApply::toDto)
+	            .collect(Collectors.toList());
+	}
+
 }

@@ -28,31 +28,18 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 	
 	public List<GatheringInquiryDto> gatheringInquiryListBygatheringId(Integer gatheringId) throws Exception {
 	    QGatheringInquiry gatheringInquiry = QGatheringInquiry.gatheringInquiry;
-	    QUser user = QUser.user;
 	    
-	    List<Tuple> tupleList = jpaQueryFactory.select(
-	            gatheringInquiry,
-	            user.userId,  
-	            user.nickName
-	        )
-	        .from(gatheringInquiry)
-	        .leftJoin(user).on(gatheringInquiry.user.userId.eq(user.userId))
+	    List<GatheringInquiry> inquiryList = jpaQueryFactory
+	        .selectFrom(gatheringInquiry)
+	        .leftJoin(gatheringInquiry.user).fetchJoin()  // User 정보를 함께 조회
+	        .leftJoin(gatheringInquiry.gathering).fetchJoin()  // Gathering 정보를 함께 조회
 	        .where(gatheringInquiry.gathering.gatheringId.eq(gatheringId))
 	        .orderBy(gatheringInquiry.inquiryId.desc())
-	        .fetch(); 
+	        .fetch();
 	        
-	    return tupleList.stream()
-	        .map(t -> {
-	            GatheringInquiry gi = t.get(0, GatheringInquiry.class);
-	            Integer userId = t.get(1, Integer.class);
-	            String nickName = t.get(2, String.class);
-	            
-	            // ModelMapper로 기본 매핑 후 수동으로 필요한 필드 설정
-	            GatheringInquiryDto dto = modelMapper.map(gi, GatheringInquiryDto.class);
-	            dto.setUserId(userId);    
-	            dto.setNickName(nickName);  
-	            return dto;
-	        }).collect(Collectors.toList());
+	    return inquiryList.stream()
+	        .map(GatheringInquiry::toDto)  // 엔티티의 toDto() 메소드 활용
+	        .collect(Collectors.toList());
 	}
 	@Transactional
 	public void responseToGatheringInquiry (GatheringInquiryDto gatheringInquiryDto) throws Exception{

@@ -27,6 +27,7 @@ import com.dev.moyering.gathering.service.GatheringService;
 import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.service.UserService;
+import com.dev.moyering.util.PageInfo;
 
 @RestController 
 public class GatheringController {
@@ -51,7 +52,6 @@ public class GatheringController {
 			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
 			Integer gatheringId = gatheringService.writeGathering(gatheringDto, thumbnail);
 			System.out.println("게더링 등록 성공 새 게더링 아이디 : " + gatheringId);
-//			Integer nGatheringId = gatheringService.detailGathering(gatheringId);
 			return new ResponseEntity<>(gatheringId, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -110,7 +110,15 @@ public class GatheringController {
 			//호스트,신청 멤버 정보 추가
 			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
 			res.put("gathering", gatheringInquiryList);
-			res.put("nGatheringDto", nGatheringDto);
+			res.put("gatheringTitle", nGatheringDto.getTitle());
+			res.put("gatheringThumbnailFileName", nGatheringDto.getThumbnailFileName());
+			res.put("gatheringMeetingDate", nGatheringDto.getMeetingDate());
+			res.put("gatheringStartTime", nGatheringDto.getStartTime());
+			res.put("gatheringEndTime", nGatheringDto.getEndTime());
+			res.put("gatheringAddress", nGatheringDto.getAddress());
+			res.put("gatheringDetailAddress", nGatheringDto.getDetailAddress());
+			res.put("gatheringTags", nGatheringDto.getTags());
+			res.put("gatheringIntrOnln", nGatheringDto.getIntrOnln());
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -145,6 +153,7 @@ public class GatheringController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	
 	@PostMapping("/user/responseToGatheringInquiry")
 	public ResponseEntity<GatheringInquiryDto> responseToGatheringInquiry(@ModelAttribute GatheringInquiryDto gatheringInquiryDto) {
 		return null;

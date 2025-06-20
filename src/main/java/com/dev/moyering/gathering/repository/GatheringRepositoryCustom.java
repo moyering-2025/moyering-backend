@@ -1,6 +1,7 @@
 package com.dev.moyering.gathering.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.PageRequest;
 
@@ -18,5 +19,7 @@ public interface GatheringRepositoryCustom {
 	List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word);
 	public Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word);
 	void updateGatheringStatus(Integer gatheringId, String status) throws Exception;
+
+	Map<String, Object> selectGatheringWithApplicationsByUserIdAndPaging(PageRequest pageRequest, Integer userId, String searchTitle);
 
 }
