@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class MainController {
-	private final HostClassService hostClassService;
 	private final ClassCalendarService classCalendarService;
 	private final GatheringService gatheringService;
 	private final BannerService bannerService;
@@ -35,26 +34,28 @@ public class MainController {
         List<HostClassDto> hotClasses;
         List<GatheringDto> gathers;
         List<BannerDto> banners;
-        Integer userId=null;
+        Integer userId=1;
 		try {
 			System.out.println(principal+"principalprincipalprincipal");
 			if (principal != null) {
-				userId = principal.getUser().getUserId();
+				 userId = principal.getUser().getUserId();
 				System.out.println(userId+"idididididi");
-				classes = hostClassService.getRecommendHostClassesForUser(userId);
+				classes = classCalendarService.getRecommendHostClassesForUser2(userId);
 				gathers = gatheringService.getMainGathersForUser(userId);
 			} else {
-				classes = hostClassService.getRecommendHostClassesForUser(null);
-				gathers = gatheringService.getMainGathersForUser(null);
+				System.out.println(userId+"2222idididididi");
+				classes = classCalendarService.getRecommendHostClassesForUser2(userId);
+				gathers = gatheringService.getMainGathersForUser(userId);
+
 			}
 			
 			hotClasses = classCalendarService.getHotHostClasses();
 			banners = bannerService.getMainBnanerList(1);
-			System.out.println(classes+"sss");
+			System.out.println(gathers+"sss");
 			Map<String, Object> result = new HashMap<>();
 			result.put("classes", classes);
 			result.put("hotClasses", hotClasses);
-			result.put("gathers", hotClasses);
+			result.put("gathers", gathers);
 			result.put("banners", banners);
 
 	        return ResponseEntity.ok(result);

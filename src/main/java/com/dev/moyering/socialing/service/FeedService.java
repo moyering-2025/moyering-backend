@@ -16,4 +16,6 @@ public interface FeedService {
 
     boolean checkUserLikeFeed(Integer feedId,String userId) throws Exception;
 
+    FeedDto getFeedDetail(Integer feedId, Integer currentUserId);
+
 }
