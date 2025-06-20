@@ -139,7 +139,7 @@ public class HostClassServiceImpl implements HostClassService {
 	        builder.and(calendar.startDate.goe(Date.valueOf(dto.getStartDate())));
 	    }
 	    if (dto.getEndDate() != null) {
-	        builder.and(calendar.endDate.loe(Date.valueOf(dto.getEndDate())));
+	        builder.and(calendar.startDate.loe(Date.valueOf(dto.getEndDate())));
 	    }
 	    if (dto.getPriceMin() != null) {
 	        builder.and(hostClass.price.goe(dto.getPriceMin()));
@@ -147,7 +147,9 @@ public class HostClassServiceImpl implements HostClassService {
 	    if (dto.getPriceMax() != null) {
 	        builder.and(hostClass.price.loe(dto.getPriceMax()));
 	    }
-	    
+		if (dto.getName() != null) {
+			 builder.and(hostClass.name.contains(dto.getName()));
+		}
 	    // 가장 빠른 모집중 일정 1건만 JOIN된 클래스만 조회
 	    List<HostClass> result = jpaQueryFactory
 	            .select(calendar.hostClass)
