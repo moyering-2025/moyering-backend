@@ -49,7 +49,7 @@ public class AdminMemberDto {
                 .build();
     }
 
-    // userType 변환
+    // Enum type인 userType 코드를 변환
     private String convertUserTypeToDisplayText(String userTypeCode) {
         if (userTypeCode == null) {
             return "알 수 없음";
