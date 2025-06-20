@@ -156,7 +156,7 @@ public class HostClassServiceImpl implements HostClassService {
 	            .from(calendar)
 	            .join(calendar.hostClass, hostClass)
 	            .where(builder)
-	            .groupBy(calendar.hostClass.classId)
+	            .groupBy(hostClass.classId)
 	            .orderBy(calendar.startDate.min().asc())
 	            .offset(pageable.getOffset())
 	            .limit(pageable.getPageSize())

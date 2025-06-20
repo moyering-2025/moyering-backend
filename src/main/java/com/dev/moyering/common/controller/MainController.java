@@ -37,20 +37,14 @@ public class MainController {
         List<HostClassDto> hotClasses;
         List<GatheringDto> gathers;
         List<BannerDto> banners;
-        Integer userId=1;
+        Integer userId=null;
 		try {
-			System.out.println(principal+"principalprincipalprincipal");
 			if (principal != null) {
 				 userId = principal.getUser().getUserId();
-				System.out.println(userId+"idididididi");
-				classes = classCalendarService.getRecommendHostClassesForUser2(userId);
-				gathers = gatheringService.getMainGathersForUser(userId);
-			} else {
-				System.out.println(userId+"2222idididididi");
-				classes = classCalendarService.getRecommendHostClassesForUser2(userId);
-				gathers = gatheringService.getMainGathersForUser(userId);
-
 			}
+			
+			classes = classCalendarService.getRecommendHostClassesForUser2(userId);
+			gathers = gatheringService.getMainGathersForUser(userId);
 			
 			hotClasses = classCalendarService.getHotHostClasses();
 			banners = bannerService.getMainBnanerList(1);
@@ -60,7 +54,7 @@ public class MainController {
 			result.put("hotClasses", hotClasses);
 			result.put("gathers", gathers);
 			result.put("banners", banners);
-
+			System.out.println("resulr"+result);
 	        return ResponseEntity.ok(result);
 		} catch (Exception e) {
 			e.printStackTrace();

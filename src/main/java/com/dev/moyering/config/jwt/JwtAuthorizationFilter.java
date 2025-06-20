@@ -42,8 +42,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			chain.doFilter(request, response);
 			return;
 		}
-		
-		if (!(uri.contains("/host") || uri.contains("/admin"))) {
+		if(uri.contains("/main")) {
+			if(request.getHeader(JwtProperties.HEADER_STRING)== null) {
+				System.out.println("여기로온거니");
+		        chain.doFilter(request, response);
+		        return;
+			}
+		}
+		if (!(uri.contains("/host") || uri.contains("/admin") ||  uri.contains("/main") ||  uri.contains("/user"))) {
 	        chain.doFilter(request, response);
 	        return;
 	    }
