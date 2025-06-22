@@ -38,4 +38,10 @@ public class HostServiceImpl implements HostService {
 		return hostId;
 	}
 
+	@Override
+	public Host findByUserId(Integer userId) throws Exception {
+		Host host = hostRepository.findByUserId(userId).get();
+		return host;
+	}
+
 }

@@ -46,6 +46,7 @@ public class HostClassDto {
    //공통 필드 추가
    private Date startDate;
    private String status;
+   private Integer calendarId;
    private String category1;
    private String category2;
    

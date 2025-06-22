@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,15 +57,7 @@ public class HostController {
 	
 	@GetMapping("/host/HostclassList")
 	public ResponseEntity<List<HostClassDto>> hostClassList(@RequestParam Integer hostId){
-//		try {
-//			System.out.println("hostid : " + hostId);
-//			Map<Integer,List<ClassCalendarDto>> results = hostClassService.getHostClassesWithCalendars(hostId);
-//			System.out.println("결과"+results);
-//			return new ResponseEntity<>(results,HttpStatus.OK);
-//		}catch (Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(null,HttpStatus.OK);
-//		}
+//		
 		try {
 			List<HostClassDto> hostClasses = hostClassService.selectHostClassByHostId(hostId);
 			System.out.println(hostClasses);
@@ -76,12 +69,18 @@ public class HostController {
 		
 	}
 	
-//	@GetMapping("/host/hostClassDetail")
-//	public ResponseEntity<hostClass> hostClassDetail(@RequestParam Integer hostId){
-//		
-//		
-//		return 
-//	}
+	@GetMapping("/host/hostClassDetail")
+	public ResponseEntity<HostClassDto> hostClassDetail(@RequestParam Integer classId,
+			@RequestParam Integer calendarId,
+														@RequestParam Integer hostId){
+		try {
+			HostClassDto dto = hostClassService.getClassDetail(classId, calendarId, hostId);
+			return new ResponseEntity<>(dto,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 	
 

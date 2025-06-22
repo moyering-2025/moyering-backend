@@ -13,8 +13,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.ClassSearchResponseDto;
@@ -226,6 +228,7 @@ public class HostClassServiceImpl implements HostClassService {
 	            // 일정 정보 추가
 	            classWithCalendar.setStartDate(calendar.getStartDate());
 	            classWithCalendar.setStatus(calendar.getStatus());
+	            classWithCalendar.setCalendarId(calendar.getCalendarId());
 
 	            result.add(classWithCalendar); // 중복된 클래스를 여러 번 추가
 	        }
@@ -233,6 +236,29 @@ public class HostClassServiceImpl implements HostClassService {
 
 	    return result; // 여러 일정을 포함한 클래스 리스트 반환
 	}
+
+	@Override
+	public HostClassDto getClassDetail(Integer classId, Integer calendarId, Integer hostId) {
+		 // 1. 클래스 조회 (host 검증 포함)
+        HostClass hostClass = hostClassRepository.findByClassIdAndHost_HostId(classId, hostId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 클래스에 접근할 수 없습니다."));
+
+        // 2. 일정 조회 (classId 일치 여부 확인)
+        ClassCalendar calendar = classCalendarRepository.findByCalendarIdAndHostClass_ClassId(calendarId, classId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 정보가 클래스와 일치하지 않습니다."));
+
+     // 3. HostClass → HostClassDto
+        HostClassDto dto = hostClass.toDto();
+
+        // 4. 일정 정보 추가 주입
+        dto.setCalendarId(calendar.getCalendarId());
+        dto.setStartDate(calendar.getStartDate());
+        dto.setStatus(calendar.getStatus());
+
+        return dto;
+	}
+
+	
 
 
 
