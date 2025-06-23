@@ -189,18 +189,6 @@ public class HostClassServiceImpl implements HostClassService {
 		        .collect(Collectors.toList());
 	    Map<Integer, Date> startDateMap = classCalendarRepository.findEarliestStartDatesByClassIds(classIds);
 
-		// 가장 빠른 모집중 일정 1건만 JOIN된 클래스만 조회
-		List<HostClass> result = jpaQueryFactory.select(calendar.hostClass).from(calendar)
-				.join(calendar.hostClass, hostClass).where(builder).groupBy(calendar.hostClass.classId)
-				.orderBy(calendar.startDate.min().asc()).offset(pageable.getOffset()).limit(pageable.getPageSize())
-				.fetch();
-		// 총 개수 (distinct count!)
-		Long total = jpaQueryFactory.select(calendar.hostClass.classId.countDistinct()).from(calendar).where(builder)
-				.fetchOne();
-
-		// 날짜만 얻어오기
-		List<Integer> classIds = result.stream().map(HostClass::getClassId).collect(Collectors.toList());
-		Map<Integer, Date> startDateMap = classCalendarRepository.findEarliestStartDatesByClassIds(classIds);
 
 		// DTO로 변환
 		List<HostClassDto> dtoList = result.stream().map(h -> {
