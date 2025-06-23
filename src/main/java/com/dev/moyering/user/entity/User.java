@@ -42,6 +42,7 @@ public class User {
 	@Column
 	private String tel;
 	@Column
+	
 	private Date birthday;
 	@Column
 	private String addr;

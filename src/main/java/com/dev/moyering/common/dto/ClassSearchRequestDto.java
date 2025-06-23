@@ -13,6 +13,7 @@ public class ClassSearchRequestDto {
     private LocalDate endDate;
     private Integer priceMin;
     private Integer priceMax;
+    private String name;
     private int page = 0; // 기본값 0
     private int size = 12; // 페이지당 항목 수
 }

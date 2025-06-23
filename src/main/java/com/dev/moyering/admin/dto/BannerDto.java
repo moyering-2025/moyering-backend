@@ -15,17 +15,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class BannerDto {
-	private Integer bannerId;
-	private String title;
-	private Integer status;
-    private LocalDateTime createdAt;
-    private String bannerImg;
-	private Integer userId;
+	private Integer bannerId; // 배너아이디
+	private String bannerImg; // 배너이미지
+	private LocalDateTime createdAt; // 등록일자
+	private String title; // 제목
+	private String content;
+	private Integer status; // 상태 (보이기 : 1, 숨기기 : 0)
+
+	private Integer userId; // 등록아이디
 	
 	public com.dev.moyering.admin.entity.Banner toEntity() {
 		com.dev.moyering.admin.entity.Banner entity = com.dev.moyering.admin.entity.Banner.builder()
 				.bannerId(bannerId)
 				.title(title)
+				.content(content)
 				.status(status)
 				.build();
 		if (userId !=null) {

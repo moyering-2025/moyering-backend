@@ -37,13 +37,21 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+
 		String uri = request.getRequestURI();
+		System.out.println(uri);
 		if (uri.equals("/api/login")) { // 관리자 로그인 제외
 			chain.doFilter(request, response);
 			return;
 		}
-		
-		if (!(uri.contains("/host") || uri.contains("/admin")||uri.contains("/user"))) {
+		if(uri.contains("/main")) {
+			if(request.getHeader(JwtProperties.HEADER_STRING)== null) {
+				System.out.println("여기로온거니");
+		        chain.doFilter(request, response);
+		        return;
+			}
+		}
+		if (!(uri.contains("/host") || uri.contains("/admin") ||  uri.contains("/main") ||  uri.contains("/user"))) {
 	        chain.doFilter(request, response);
 	        return;
 	    }
@@ -68,7 +76,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		}
 		
 		accessToken = accessToken.replace(JwtProperties.TOKEN_PREFIX, "");
-		System.out.println(accessToken);
+
 		try {
 			//1. access token check
 			//1-1. 보안키, 만료시간 체크
@@ -148,4 +156,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
       
       super.doFilterInternal(request, response, chain);
    }
+   
+   
+
 }

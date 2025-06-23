@@ -2,28 +2,33 @@ package com.dev.moyering.gathering.service;
 
 import java.io.File;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dev.moyering.common.repository.SubCategoryRepository;
+import com.dev.moyering.common.dto.GatheringSearchRequestDto;
+import com.dev.moyering.common.dto.GatheringSearchResponseDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
+import com.dev.moyering.gathering.entity.QGathering;
+import com.dev.moyering.common.repository.SubCategoryRepository;
+import com.dev.moyering.gathering.dto.GatheringApplyDto;
+import com.dev.moyering.gathering.dto.GatheringDto;
+import com.dev.moyering.gathering.entity.Gathering;
+import com.dev.moyering.gathering.repository.GatheringApplyRepository;
 import com.dev.moyering.gathering.repository.GatheringRepository;
-import com.dev.moyering.host.dto.HostClassDto;
-import com.dev.moyering.host.entity.HostClass;
-import com.dev.moyering.host.repository.ClassCalendarRepository;
-import com.dev.moyering.host.repository.HostClassRepository;
-import com.dev.moyering.host.repository.HostRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
 import com.dev.moyering.util.PageInfo;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -38,7 +43,11 @@ public class GatheringServiceImpl implements GatheringService {
 	private String duploadPath;
 	@Autowired
 	public GatheringRepository gatheringRepository;
+	@Autowired
+	public GatheringApplyRepository gatheringApplyRepository;
+	@Autowired
 	private final UserRepository userRepository;
+	private final JPAQueryFactory jpaQueryFactory;
 	
 	@Override
 	public Integer writeGathering(GatheringDto gatheringDto, MultipartFile thumbnail) throws Exception {
@@ -67,31 +76,10 @@ public class GatheringServiceImpl implements GatheringService {
 	public List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word) throws Exception {
 		// 내가 등록한 게더링 목록 + 페이지네이션, 제목으로 검색 
 		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
-		
-		return null;
+		return gatheringRepository.selectMyGatheringList(pageRequest, userId, word);
 	}
-	@Override
-	public Boolean getGatheringLike(Integer userId, Integer gatheringId) throws Exception {
-		//좋아요 여부 조회
-//		return gatheringDslRepository.selectGatheringLike(userId, gatheringId)!=null;
-		return null;
-	}
-	@Override
-	public Boolean toggleGatheringLike(Integer userId, Integer gatheringId) throws Exception {
-		// 좋아요 상태 변경
-		return null;
-//		Integer gatheringLikeNum = gatheringRepository.selectGatheringLike(userId, gatheringId); 
-//		if(gatheringLikeNum==null) {
-//			gatheringRepository.save(
-//					GatheringLike.builder()
-//					.User(User.builder().userId(userId).build())
-//					.gathering(Gathering.builder().gatheringId(gatheringId).build()).build());
-//			return true;
-//		} else {
-//			gatheringDslRepository.deleteGatheringLike(gatheringLikeNum);
-//			return false;
-//		}
-	}
+	
+
 	@Override
 	public List<GatheringDto> myGatheringApplyList(Integer userId, PageInfo pageInfo, String word) throws Exception {
 		// 내가 지원한 게더링 목록 + 페이지네이션, 제목으로 검색 
@@ -104,6 +92,7 @@ public class GatheringServiceImpl implements GatheringService {
 		Gathering gathering = gatheringRepository.findById(gatheringId).orElseThrow(()->new Exception("조회 중 오류"));
 		return gathering.toDto();
 	}
+	
 	@Override
 	public List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception {
 		//메인페이지에 취향에 맞는 게더링 4개 가져오기
@@ -122,5 +111,67 @@ public class GatheringServiceImpl implements GatheringService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+	}
+	@Override
+	public GatheringSearchResponseDto searchGathers(GatheringSearchRequestDto dto) throws Exception {
+		Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
+
+		QGathering gathering = QGathering.gathering;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		
+		//모집 중이면서~~ 오늘 이후의 일정
+		builder.and(gathering.status.eq("모집중"));
+		builder.and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())));
+		
+		//검색 조건 필터 추가
+		if (dto.getSido() !=null && !dto.getSido().isBlank()) {
+			builder.and(gathering.locName.contains(dto.getSido()));
+		}
+		if (dto.getCategory1() != null) {
+		 builder.and(gathering.subCategory.firstCategory.categoryId.eq(dto.getCategory1()));
+		}
+	    if (dto.getCategory2() != null) {
+	        builder.and(gathering.subCategory.subCategoryId.eq(dto.getCategory2()));
+	    }
+	    if (dto.getStartDate() != null) {
+	        builder.and(gathering.meetingDate.goe(Date.valueOf(dto.getStartDate())));
+	    }
+	    if (dto.getEndDate() != null) {
+	        builder.and(gathering.meetingDate.loe(Date.valueOf(dto.getEndDate())));
+	    }
+	    if (dto.getMinAttendees() != null) {
+	        builder.and(gathering.minAttendees.goe(dto.getMinAttendees()));
+	    }
+	    if (dto.getMaxAttendees() != null) {
+	        builder.and(gathering.maxAttendees.loe(dto.getMaxAttendees()));
+	    }
+		if (dto.getTitle() != null) {
+			 builder.and(gathering.title.contains(dto.getTitle()));
+		}
+		List<Gathering> result = jpaQueryFactory
+				.select(gathering)
+				.from(gathering)
+				.where(builder)
+	            .offset(pageable.getOffset())
+	            .limit(pageable.getPageSize())
+	            .fetch();
+	    //총 개수 (distinct count!)
+	    Long total = jpaQueryFactory
+	            .select(gathering.countDistinct())
+	            .from(gathering)
+	            .where(builder)
+	            .fetchOne();
+		List<GatheringDto> dtoList = result.stream()
+				.map(g -> {
+					GatheringDto dto2 = g.toDto();
+					return dto2;
+				}).collect(Collectors.toList());
+		return GatheringSearchResponseDto.builder()
+				.content(dtoList)
+	            .currentPage(dto.getPage() + 1)
+	            .totalPages((int) Math.ceil((double) total / dto.getSize()))
+	            .totalElements(total)
+	            .build();
 	}	
 }

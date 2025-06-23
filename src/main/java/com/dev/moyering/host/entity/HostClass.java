@@ -17,6 +17,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -75,6 +77,9 @@ public class HostClass {
    private String portfolio;
    @Column
    private Integer price;
+
+   @Column(name = "reg_date")
+   private Date regDate; // 강의 개설일
    
    
    public HostClassDto toDto() {
@@ -101,6 +106,7 @@ public class HostClass {
             .keywords(keywords)
             .portfolioName(portfolio)
             .price(price)
+            .regDate(regDate)
             .build();
       if(host!=null) {
          dto.setHostId(host.getHostId());

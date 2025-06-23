@@ -2,15 +2,20 @@ package com.dev.moyering.host.controller;
 
 import java.sql.Date;
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.service.HostClassService;
@@ -23,6 +28,7 @@ public class HostController {
 	private HostService hostService;
 	@Autowired
 	private HostClassService hostClassService;
+	
 	
 	@PostMapping("/host/regist")
 	public ResponseEntity<Integer> hostRegist(HostDto hostDto,
@@ -48,5 +54,34 @@ public class HostController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@GetMapping("/host/HostclassList")
+	public ResponseEntity<List<HostClassDto>> hostClassList(@RequestParam Integer hostId){
+//		
+		try {
+			List<HostClassDto> hostClasses = hostClassService.selectHostClassByHostId(hostId);
+			System.out.println(hostClasses);
+			return new ResponseEntity<>(hostClasses,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+	}
+	
+	@GetMapping("/host/hostClassDetail")
+	public ResponseEntity<HostClassDto> hostClassDetail(@RequestParam Integer classId,
+			@RequestParam Integer calendarId,
+														@RequestParam Integer hostId){
+		try {
+			HostClassDto dto = hostClassService.getClassDetail(classId, calendarId, hostId);
+			return new ResponseEntity<>(dto,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
 
 }

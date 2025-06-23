@@ -25,7 +25,6 @@ public class HostClassController {
 
 		try {
 			response = hostClassService.searchClasses(dto);
-			System.out.println(response+"resresres");
 	        return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			e.printStackTrace();

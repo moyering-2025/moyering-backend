@@ -43,8 +43,12 @@ public class HostClassDto {
    private String keywords;
    private String portfolioName;
    private Integer price;
+   private Date regDate;
    //공통 필드 추가
+
    private Date startDate;
+   private String status;
+   private Integer calendarId;
    private String category1;
    private String category2;
    
@@ -81,6 +85,7 @@ public class HostClassDto {
             .keywords(keywords)
             .portfolio(portfolioName)
             .price(price)
+              .regDate(regDate)
             .build();
       if(hostId!=null) {
          entity.setHost(Host.builder()
