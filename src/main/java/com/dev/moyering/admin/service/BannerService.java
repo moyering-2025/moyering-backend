@@ -2,11 +2,9 @@ package com.dev.moyering.admin.service;
 
 import java.util.List;
 
-import com.dev.moyering.admin.dto.AdminNoticeDto;
 import com.dev.moyering.admin.dto.BannerDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface BannerService {
@@ -18,7 +16,7 @@ public interface BannerService {
 
 	BannerDto updateBanner(BannerDto bannerDto, MultipartFile ifile) throws Exception; // 배너 수정
 
-	BannerDto deleteBanner(Integer bannerId) throws Exception; // 배너 삭제
+	void deleteBanner(Integer bannerId) throws Exception; // 배너 삭제
 
 	BannerDto findBannerByBannerId(Integer bannerId) throws Exception; // 단건 조회
 

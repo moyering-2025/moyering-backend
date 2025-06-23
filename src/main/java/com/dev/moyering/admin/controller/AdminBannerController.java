@@ -24,9 +24,7 @@ import javax.validation.Valid;
 public class AdminBannerController {
     private final BannerService bannerService;
 
-    /**
-     * 배너 등록
-     */
+    /*** 배너 등록*/
     @PostMapping("/create")
     public ResponseEntity<BannerDto> bannerCreate(BannerDto bannerDto,
                                                   @RequestPart(name = "ifile", required = false) MultipartFile bannerImg) {
@@ -46,9 +44,7 @@ public class AdminBannerController {
         }
     }
 
-    /**
-     * 배너 수정
-     */
+    /*** 배너 수정*/
     @PutMapping("/{bannerId}")
     public ResponseEntity<BannerDto> bannerEdit(
 //            @ReqestBody // form-data와 @RequestBody 동시사용 불가 !
@@ -81,6 +77,23 @@ public class AdminBannerController {
     }
 
 
+    /*** 배너 삭제*/
+    @DeleteMapping("/{bannerId}")
+    public ResponseEntity<Void> deleteBanner(@PathVariable Integer bannerId) {
+        log.info("배너 삭제 요청: {}", bannerId);
+        try {
+            bannerService.deleteBanner(bannerId);
+            return ResponseEntity.noContent().build(); // 204
+        } catch (IllegalArgumentException e) {
+            log.error("배너 삭제 실패 - 존재하지 않음: {}", e.getMessage());
+            return ResponseEntity.notFound().build(); // 404
+        } catch (Exception e) {
+            log.error("배너 삭제 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500
+        }
+    }
+
+    /*** 배너 리스트 조회 */
     @GetMapping
     public ResponseEntity<Page<BannerDto>> getBannerList(
             @RequestParam(required = false) String keyword,
@@ -97,6 +110,7 @@ public class AdminBannerController {
         }
     }
 
+    /*** 단건 조회 */
     @GetMapping("/{bannerId}") // 단건 조회
     public ResponseEntity<BannerDto> getBannerById(@PathVariable Integer bannerId) {
         log.info("공지사항 단건 조회 요청 : bannerId = {}", bannerId);
@@ -110,6 +124,36 @@ public class AdminBannerController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             log.error("배너 조회 실패 : {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /*** 배너 숨기기 */
+    @PatchMapping("/{bannerId}/hide")
+    public ResponseEntity<BannerDto> hideBanner(@PathVariable Integer bannerId) {
+        try {
+            log.info(">>> 배너 숨기기 요청 :{}", bannerId);
+            bannerService.hideBanner(bannerId);
+
+            BannerDto updateBanner = bannerService.findBannerByBannerId(bannerId);
+            return ResponseEntity.ok(updateBanner);
+        } catch (Exception e) {
+            log.error("배너 숨기기 실패 : {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /*** 배너 보이기 */
+    @PatchMapping("/{bannerId}/show")
+    public ResponseEntity<BannerDto> showBanner(@PathVariable Integer bannerId) {
+        try {
+            log.info(">>> 배너 보이기 요청 :{}", bannerId);
+            bannerService.showBanner(bannerId);
+
+            BannerDto updateBanner = bannerService.findBannerByBannerId(bannerId);
+            return ResponseEntity.ok(updateBanner);
+        } catch (Exception e) {
+            log.error("배너 보이기 실패 : {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

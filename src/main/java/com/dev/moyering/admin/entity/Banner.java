@@ -1,6 +1,7 @@
 package com.dev.moyering.admin.entity;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.*;
 
@@ -73,14 +74,20 @@ public class Banner {
 		if (img != null) this.bannerImg = img;
 	}
 
-	public void deleteBanner() {Integer bannerId = this.bannerId;}
-
-	public void hide(){
-		this.status = 1;
+	// 논리적 삭제
+	public void deleteBanner() {
+		// 삭제 전 필요 비즈니스 로직
+		this.status = -1; // 삭제 상태로 변경
 	}
 
 
-	public void show(){
+	// 배너 숨기기
+	public void hide(){
 		this.status = 0;
+	}
+
+	// 배너 보이기
+	public void show(){
+		this.status = 1;
 	}
 }

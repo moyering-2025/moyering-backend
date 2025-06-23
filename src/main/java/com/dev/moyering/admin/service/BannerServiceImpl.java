@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -34,6 +35,10 @@ public class BannerServiceImpl implements BannerService {
 		return banners.stream().map(m->m.toDto()).collect(Collectors.toList()); 
 	}
 
+
+	/**
+	 * 배너 검색 및 조회 + 페이징
+	 */
 	@Override
 	public Page<BannerDto> findBannerByKeyword(String keyword, Pageable pageable) throws Exception {
 		log.info("배너 검색 시작: keyword = {}", keyword);
@@ -45,7 +50,9 @@ public class BannerServiceImpl implements BannerService {
 		return result;
 	}
 
-
+	/**
+	 * 배너 생성
+	 */
 	@Transactional
 	@Override
 	public BannerDto createBanner(BannerDto bannerDto, MultipartFile ifile) throws Exception {
@@ -84,6 +91,11 @@ public class BannerServiceImpl implements BannerService {
 		}
 
 
+
+
+	/**
+	 * 배너 수정  => 엔티티 내 changeBanner 메서드 호출하여 title, content, bannerImg 수정
+	 */
 	@Transactional
 	@Override
 	public BannerDto updateBanner(BannerDto bannerDto, MultipartFile ifile) throws Exception {
@@ -129,26 +141,52 @@ public class BannerServiceImpl implements BannerService {
 
 	}
 
-
+	/**
+	 * 배너 삭제  => 엔티티 내 deleteBanner 메서드 호출하여 삭제
+	 */
+	@Transactional
 	@Override
-	public BannerDto deleteBanner(Integer bannerId) throws Exception {
-		return null;
+	public void deleteBanner(Integer bannerId) throws Exception {
+		Banner banner = bannerRepository.findById(bannerId)
+				.orElseThrow(() -> new IllegalArgumentException("배너가 존재하지 않습니다."));
+		banner.deleteBanner(); // 논리적 삭제 처리하기 (엔티티 비즈니스 로직 활용)
 	}
 
+
+
+	/**
+	 * 배너 단건 조회 	 */
 	@Override
 	public BannerDto findBannerByBannerId(Integer bannerId) throws Exception {
-		return null;
+		Banner banner = bannerRepository.findById(bannerId)
+				.orElseThrow(() -> new IllegalArgumentException("배너가 존재하지 않습니다"));
+		return banner.toDto(); // 단건이므로 toDto()만 호출
 	}
 
+
+	/**
+	 * 숨기기 => 엔티티 내 hide() 메서드 호출
+	 */
 	@Override
 	public void hideBanner(Integer bannerId) throws Exception {
+		Banner banner = bannerRepository.findById(bannerId)
+				.orElseThrow(() -> new IllegalArgumentException("배너가 존재하지 않습니다."));
 
+		// 배너 숨김처리 => 엔티티 내 비즈니스 로직 메서드 호출
+		banner.hide() ;
+		// 또는 banner.setStatus(BannerStatus.HIDDEN)
+		bannerRepository.save(banner);
 	}
 
+	/**
+	 * 보이기 => 엔티티 내 show() 메서드 호출
+	 */
 	@Override
 	public void showBanner(Integer bannerId) throws Exception {
+		Banner banner = bannerRepository.findById(bannerId)
+				.orElseThrow(() -> new IllegalArgumentException("배너가 존재하지 않습니다.."));
 
+		banner.show();
+		bannerRepository.save(banner);
 	}
-
-
 }

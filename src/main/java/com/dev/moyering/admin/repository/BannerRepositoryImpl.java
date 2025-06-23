@@ -36,7 +36,8 @@ public class BannerRepositoryImpl implements BannerRepositoryCustom {
                 ))
                 .from(banner)
                 .where(
-                        searchBanner(keyword)
+                        searchBanner(keyword),
+                        banner.status.ne(-1) // 삭제되지 않은 배너만 (삭제됨 : -1, 숨기기 : 0, 보이기 : 1)
                 )
                 .orderBy(
                         banner.createdAt.desc()
@@ -71,7 +72,8 @@ public class BannerRepositoryImpl implements BannerRepositoryCustom {
                         banner.user.userId
                 ))
                 .from(banner)
-                .where(banner.bannerId.eq(bannerId))
+                .where(banner.bannerId.eq(bannerId),
+                        banner.status.ne(-1))
                 .fetchOne();
 
         if (result == null) {
