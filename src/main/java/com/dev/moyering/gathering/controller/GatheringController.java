@@ -1,5 +1,7 @@
 package com.dev.moyering.gathering.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,9 +26,9 @@ import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.dto.GatheringInquiryDto;
 import com.dev.moyering.gathering.service.GatheringApplyService;
 import com.dev.moyering.gathering.service.GatheringInquiryService;
+import com.dev.moyering.gathering.service.GatheringLikesService;
 import com.dev.moyering.gathering.service.GatheringService;
 import com.dev.moyering.user.dto.UserDto;
-import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.service.UserService;
 import com.dev.moyering.util.PageInfo;
 
@@ -38,16 +41,14 @@ public class GatheringController {
 	@Autowired
 	private GatheringApplyService gatheringApplyService;
 	@Autowired
-	private GatheringInquiryService gatheringInquiryService;
+	private GatheringLikesService gatheringLikesService;
 
 	@PostMapping("/user/writeGathering")
-	public ResponseEntity<Integer> write(@AuthenticationPrincipal 
-			PrincipalDetails principal, @ModelAttribute GatheringDto gatheringDto, 
+	public ResponseEntity<Integer> write(@AuthenticationPrincipal PrincipalDetails principal, 
+			@ModelAttribute GatheringDto gatheringDto, 
 			@RequestParam(name="thumbnail") MultipartFile thumbnail) {
 		try {
-			System.out.println(gatheringDto);
-			//User user = principal.getUser();
-			//gatheringDto.setUserId(user.getUserId());
+			gatheringDto.setUserId(principal.getUser().getUserId());
 			gatheringDto.setThumbnailFileName(thumbnail.getOriginalFilename());
 			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
 			Integer gatheringId = gatheringService.writeGathering(gatheringDto, thumbnail);
@@ -59,7 +60,8 @@ public class GatheringController {
 		}
 	}
 	@PostMapping("/user/modifyGathering")
-	public ResponseEntity<GatheringDto> modify(@ModelAttribute GatheringDto gatheringDto, 
+	public ResponseEntity<GatheringDto> modify(@AuthenticationPrincipal PrincipalDetails principal, 
+			@ModelAttribute GatheringDto gatheringDto, 
 			@RequestParam(name="thumbnail", required = false) MultipartFile thumbnail) {
 		try {
 			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
@@ -81,6 +83,7 @@ public class GatheringController {
 			res.put("gathering", nGatheringDto);
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
 			List<GatheringApplyDto> member = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
+//			Integer likeNum = g
 			userDto.setPassword(null);
 			res.put("host", userDto);
 			res.put("member", member);
@@ -90,8 +93,34 @@ public class GatheringController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}	
-	@GetMapping("/detailForModifyGathering")
-	public ResponseEntity<GatheringDto> detailForModifyGathering(@RequestParam("gatheringId") Integer gatheringId) {
+	
+	@GetMapping("/user/detailGathering")
+	public ResponseEntity<Map<String,Object>> extraDetail(@AuthenticationPrincipal PrincipalDetails principal, 
+			@RequestParam("gatheringId") Integer gatheringId) {
+		try {
+			//찜 여부, 신청여부
+			Map<String,Object> res = new HashMap<>();
+			Integer cntApply = gatheringApplyService.findByGatheringIdAndUserId(gatheringId, principal.getUser().getUserId());
+			if(cntApply !=null || cntApply == 0) {
+				res.put("canApply", true);
+			} else {
+				res.put("canApply", false);
+			}
+			Integer totalLike = gatheringLikesService.getTotalLikesOfGatheringByGatheringId(gatheringId);
+			Boolean isLiked = gatheringLikesService.getGatheringLike(principal.getUser().getUserId(), gatheringId);
+			res.put("totalLike", totalLike);//총 찜 갯수
+			res.put("isLiked", isLiked);
+			
+			return new ResponseEntity<>(res, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}	
+	
+	@GetMapping("/user/detailForModifyGathering")
+	public ResponseEntity<GatheringDto> detailForModifyGathering(@AuthenticationPrincipal PrincipalDetails principal, 
+			@RequestParam("gatheringId") Integer gatheringId) {
 		try {
 			GatheringDto gatheringDto = gatheringService.detailGathering(gatheringId);
 			//호스트,신청 멤버 정보 추가
@@ -101,99 +130,28 @@ public class GatheringController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-	}	
-	@GetMapping("/getGatheringInquiries")
-	public ResponseEntity<Map<String, Object>> inquiriesByGatheringId(@RequestParam("gatheringId") Integer gatheringId) {
-		try {
-			Map<String,Object> res = new HashMap<>();
-			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.gatheringInquiryListBygatheringId(gatheringId);
-			//호스트,신청 멤버 정보 추가
-			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
-			res.put("gathering", gatheringInquiryList);
-			res.put("gatheringTitle", nGatheringDto.getTitle());
-			res.put("gatheringThumbnailFileName", nGatheringDto.getThumbnailFileName());
-			res.put("gatheringMeetingDate", nGatheringDto.getMeetingDate());
-			res.put("gatheringStartTime", nGatheringDto.getStartTime());
-			res.put("gatheringEndTime", nGatheringDto.getEndTime());
-			res.put("gatheringAddress", nGatheringDto.getAddress());
-			res.put("gatheringDetailAddress", nGatheringDto.getDetailAddress());
-			res.put("gatheringTags", nGatheringDto.getTags());
-			res.put("gatheringIntrOnln", nGatheringDto.getIntrOnln());
-			return new ResponseEntity<>(res, HttpStatus.OK);
-		} catch(Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}	
-	@GetMapping("/getGatheringInquiriesByUserId")
-	public ResponseEntity<Map<String, Object>> inquiriesByUserId(@RequestParam("gatheringId") Integer gatheringId) {
-		//마이페이지를 위한 문의내역 불러오기
-		try {
-			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.gatheringInquiryListBygatheringId(gatheringId);
-			Map<String,Object> res = new HashMap<>();
-			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
-			res.put("gathering", gatheringInquiryList);
-			res.put("nGatheringDto", nGatheringDto);
-			return new ResponseEntity<>(res, HttpStatus.OK);
-		} catch(Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}	
-	@PostMapping("/user/writeGatheringInquiry")
-	public ResponseEntity<GatheringInquiryDto> writeGatheringInquiry(@ModelAttribute GatheringInquiryDto gatheringInquiryDto) {
-		try {
-			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringInquiryDto);
-			if(gatheringInquiryId!=null) {
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-			}
-			return new ResponseEntity<>(HttpStatus.OK);
-		} catch(Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
 	}
 	
-	@PostMapping("/user/responseToGatheringInquiry")
-	public ResponseEntity<GatheringInquiryDto> responseToGatheringInquiry(@ModelAttribute GatheringInquiryDto gatheringInquiryDto) {
-		return null;
-//		try {
-//			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringInquiryDto);
-//			if(gatheringInquiryId!=null) {
-//				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//			}
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-	}
-	@PostMapping("/user/applyGathering")
-	public ResponseEntity<GatheringApplyDto> applyToGathering(@ModelAttribute GatheringApplyDto gatheringApplyDto) {
-		return null;
-//		try {
-//			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringApplyDto);
-//			if(gatheringInquiryId!=null) {
-//				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//			}
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-	}
-	@PostMapping("/user/updateMemberApproval")
-	public ResponseEntity<GatheringApplyDto> updateMemberApproval(@ModelAttribute GatheringApplyDto gatheringApplyDto) {
-		return null;
-//		try {
-//			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringApplyDto);
-//			if(gatheringInquiryId!=null) {
-//				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//			}
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
+	@GetMapping("/user/myGatheringList")
+	public ResponseEntity<List<GatheringDto>> myGatheringList(@AuthenticationPrincipal PrincipalDetails principal, 
+//			@RequestParam Integer userId, 
+			@RequestBody(required=false) Map<String,String> param){
+		try {
+			Integer userId = principal.getUser().getUserId();
+			String word = null;	
+			PageInfo pageInfo = new PageInfo(1);
+			if(param != null) {
+				if(param.get("page")!=null) {
+					pageInfo.setCurPage(Integer.parseInt(param.get("page")));
+				}
+				word = param.get("word");
+			}
+			List<GatheringDto> myGatheringList = gatheringService.myGatheringList(userId, pageInfo, word);
+			
+			return new ResponseEntity<>(myGatheringList, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 }

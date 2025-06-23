@@ -3,7 +3,9 @@ package com.dev.moyering.gathering.dto;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import com.dev.moyering.common.entity.SubCategory;
 import com.dev.moyering.gathering.entity.Gathering;
@@ -33,7 +35,11 @@ public class GatheringDto {
     private String gatheringContent;
     private String thumbnailFileName;
     private Date meetingDate;
+
+    @JsonFormat(pattern = "HH:mm")
     private String startTime;
+    
+    @JsonFormat(pattern = "HH:mm")
     private String endTime;
     private String address;
     private String detailAddress;
@@ -61,8 +67,8 @@ public class GatheringDto {
     			.gatheringContent(gatheringContent)
     			.thumbnail(thumbnailFileName)
     			.meetingDate(meetingDate)
-    			.startTime(startTime != null ? LocalTime.parse(startTime) : null)
-    			.endTime(endTime != null ? LocalTime.parse(endTime) : null)
+    			.startTime(LocalTime.parse(startTime, DateTimeFormatter.ofPattern("HH:mm")))
+    			.endTime(LocalTime.parse(endTime, DateTimeFormatter.ofPattern("HH:mm")))
     			.address(address)
     			.detailAddress(detailAddress)
     			.locName(locName)

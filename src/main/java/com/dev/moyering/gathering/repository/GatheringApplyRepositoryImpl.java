@@ -56,32 +56,23 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	}
 
 	@Override
-	public void applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception {
-		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+	public Integer findBygatheringIdAnduserId(Integer gatheringId, Integer userId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	public Long countApprovedApplicationsByGatheringId(Integer gatheringId) {
-		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
-	    return jpaQueryFactory
-	       .select(gatheringApply.count())
-	       .from(gatheringApply)
-    		.where(
-				gatheringApply.gathering.gatheringId.eq(gatheringId),
-	            gatheringApply.isApproved.isTrue()
-	        )
-            .fetchOne();
-	}
+	
 //	@Override
-	public List<GatheringApplyDto> selectApplicationsByGatheringId(Integer gatheringId) throws Exception {
-	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
-	    
-	    List<GatheringApply> applications = jpaQueryFactory.selectFrom(gatheringApply)
-	            .where(gatheringApply.gathering.gatheringId.eq(gatheringId))
-	            .orderBy(gatheringApply.applyDate.desc())
-	            .fetch();
-	    
-	    return applications.stream()
-	            .map(GatheringApply::toDto)
-	            .collect(Collectors.toList());
-	}
+//	public List<GatheringApplyDto> selectApplicationsByGatheringId(Integer gatheringId) throws Exception {
+//	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+//	    
+//	    List<GatheringApply> applications = jpaQueryFactory.selectFrom(gatheringApply)
+//	            .where(gatheringApply.gathering.gatheringId.eq(gatheringId))
+//	            .orderBy(gatheringApply.applyDate.desc())
+//	            .fetch();
+//	    
+//	    return applications.stream()
+//	            .map(GatheringApply::toDto)
+//	            .collect(Collectors.toList());
+//	}
 
 }
