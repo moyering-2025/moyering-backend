@@ -3,6 +3,7 @@ package com.dev.moyering.gathering.repository;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,7 +56,23 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	}
 
 	@Override
-	public void applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception {
-		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+	public Integer findBygatheringIdAnduserId(Integer gatheringId, Integer userId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
+	
+//	@Override
+//	public List<GatheringApplyDto> selectApplicationsByGatheringId(Integer gatheringId) throws Exception {
+//	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+//	    
+//	    List<GatheringApply> applications = jpaQueryFactory.selectFrom(gatheringApply)
+//	            .where(gatheringApply.gathering.gatheringId.eq(gatheringId))
+//	            .orderBy(gatheringApply.applyDate.desc())
+//	            .fetch();
+//	    
+//	    return applications.stream()
+//	            .map(GatheringApply::toDto)
+//	            .collect(Collectors.toList());
+//	}
+
 }

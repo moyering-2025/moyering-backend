@@ -61,6 +61,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 	}
 	private BooleanExpression betweenDate(Date fromDate, Date toDate) {
 		if (fromDate == null || toDate == null) return null;
-		return user.regDate.between(fromDate, toDate);
+		//return user.regDate.between(fromDate, toDate);
+		return null;
 	}
 }
