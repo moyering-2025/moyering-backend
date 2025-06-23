@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface FeedRepository extends JpaRepository<Feed, Integer>, FeedRepositoryCustom {
 
     Optional<Feed> findByFeedIdAndIsDeletedFalse(Integer feedId);
+    List<Feed> findAllByUserUserIdOrderByCreateDateDesc(Integer userId);
 }
