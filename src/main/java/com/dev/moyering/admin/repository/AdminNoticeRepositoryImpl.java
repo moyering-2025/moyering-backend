@@ -87,7 +87,5 @@ public class AdminNoticeRepositoryImpl implements AdminNoticeRepositoryCustom {
         return adminNotice.title.containsIgnoreCase(keyword)  // 제목에 검색어 포함 (대소문자 무시)
                 .or(adminNotice.content.containsIgnoreCase(keyword)); // 또는 내용에 검색어 포함
     }
-
-
     // 삭제는 리파지토리에서 구현 X => 서비스에서 notice.hide() => 화면에서만 삭제하기
 }

@@ -1,0 +1,102 @@
+package com.dev.moyering.admin.controller;
+
+import com.dev.moyering.admin.dto.BannerDto;
+import com.dev.moyering.admin.service.BannerService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("api/banner")
+@Slf4j
+@CrossOrigin(origins = "*")
+public class AdminBannerController {
+    private final BannerService bannerService;
+
+    /**
+     * 배너 등록
+     */
+    @PostMapping("/create")
+    public ResponseEntity<BannerDto> bannerCreate(@RequestBody BannerDto bannerDto) {
+        log.info("배너 등록 요청 : {}", bannerDto.getBannerId());
+
+        try {
+            BannerDto createBanner = bannerService.createBanner(bannerDto);
+            return ResponseEntity.ok(createBanner);
+        } catch (Exception e) {
+            log.error("공지사항 등록 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    /**
+     * 배너 수정
+     */
+    @PutMapping("/{bannerId}")
+    public ResponseEntity<BannerDto> bannerEdit(
+            @PathVariable Integer bannerId,
+            @Valid @RequestBody BannerDto bannerDto) {
+        log.info("배너 수정 요청 : {}", bannerDto.getBannerId());
+
+        try {
+            // 배너 id 검증
+            if (bannerDto.getBannerId() != null && !bannerDto.getBannerId().equals(bannerId)) {
+                log.warn("요청 ID 불일치 : pathId = {}, bodyId= {}", bannerId, bannerDto.getBannerId());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            // 검증 후 정상로직 실행
+            BannerDto editBanner = bannerService.updateBanner(bannerId, bannerDto);
+            return ResponseEntity.ok(editBanner);
+
+        } catch (IllegalArgumentException e) {
+            log.error("배너 수정 실패 : {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            log.error("배너 수정 중 오류 발생 : {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<BannerDto>> getBannerList(
+            @RequestParam(required = false) String keyword,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        log.info("배너 목록 조회 요청 : keyword = {}, page = {}", keyword, pageable.getPageNumber());
+
+        try {
+            // 검색 조건 객체 생성 (keyword 활용)
+            Page<BannerDto> banner = bannerService.findBannerByKeyword(keyword, pageable);
+            return ResponseEntity.ok(banner);
+        } catch (Exception e) {
+            log.error("배너 조회 실패 : {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/{bannerId}") // 단건 조회
+    public ResponseEntity<BannerDto> getBannerById(@PathVariable Integer bannerId) {
+        log.info("공지사항 단건 조회 요청 : bannerId = {}", bannerId);
+
+        try {
+            BannerDto banner = bannerService.findBannerByBannerId(bannerId);
+            return ResponseEntity.ok(banner);
+
+        } catch (IllegalArgumentException e) {
+            log.error("배너 단건 조회 요청 실패 : bannerId = {}", bannerId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("배너 조회 실패 : {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+}
