@@ -44,4 +44,10 @@ public class HostServiceImpl implements HostService {
 		return host;
 	}
 
+	@Override
+	public HostDto getHostById(Integer hostId) throws Exception {
+		return hostRepository.findById(hostId)
+				.orElseThrow(()-> new Exception("해당 강사가 존재하지 않습니다.")).toDto();
+	}
+
 }

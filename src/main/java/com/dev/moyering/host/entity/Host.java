@@ -55,7 +55,7 @@ public class Host {
 	@Column
 	private String idCard;
 	
-	HostDto toDto() {
+	public HostDto toDto() {
 		HostDto dto = HostDto.builder()
 				.hostId(hostId)
 				.userId(userId)
