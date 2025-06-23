@@ -37,7 +37,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		
 		String uri = request.getRequestURI();
+		System.out.println(uri);
 		if (uri.equals("/api/login")) { // 관리자 로그인 제외
 			chain.doFilter(request, response);
 			return;
@@ -53,13 +55,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	        chain.doFilter(request, response);
 	        return;
 	    }
-		
 		String authentication = request.getHeader(JwtProperties.HEADER_STRING);
 		if(authentication==null) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"로그인 필요");
 			return;
 		}
-		
 		ObjectMapper objectMapper = new ObjectMapper();
 		Map<String,String> token = objectMapper.readValue(authentication,Map.class);
 		System.out.println(token);
@@ -74,7 +74,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		}
 		
 		accessToken = accessToken.replace(JwtProperties.TOKEN_PREFIX, "");
-		System.out.println(accessToken);
+
 		try {
 			//1. access token check
 			//1-1. 보안키, 만료시간 체크

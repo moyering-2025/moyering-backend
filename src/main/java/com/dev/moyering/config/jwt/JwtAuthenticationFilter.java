@@ -27,7 +27,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, HostRepository hostRepository) {
 		super(authenticationManager);
 		this.hostRepository=hostRepository;
-//		setFilterProcessesUrl("/admin/login");
 	}
 	
 	private JwtToken jwtToken = new JwtToken();

@@ -3,6 +3,7 @@ package com.dev.moyering.gathering.service;
 import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,11 @@ import com.dev.moyering.common.dto.GatheringSearchResponseDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
+import com.dev.moyering.common.repository.SubCategoryRepository;
+import com.dev.moyering.gathering.dto.GatheringApplyDto;
+import com.dev.moyering.gathering.dto.GatheringDto;
+import com.dev.moyering.gathering.entity.Gathering;
+import com.dev.moyering.gathering.repository.GatheringApplyRepository;
 import com.dev.moyering.gathering.repository.GatheringRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
@@ -37,6 +43,9 @@ public class GatheringServiceImpl implements GatheringService {
 	private String duploadPath;
 	@Autowired
 	public GatheringRepository gatheringRepository;
+	@Autowired
+	public GatheringApplyRepository gatheringApplyRepository;
+	@Autowired
 	private final UserRepository userRepository;
 	private final JPAQueryFactory jpaQueryFactory;
 	
@@ -67,31 +76,10 @@ public class GatheringServiceImpl implements GatheringService {
 	public List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word) throws Exception {
 		// 내가 등록한 게더링 목록 + 페이지네이션, 제목으로 검색 
 		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
-		
-		return null;
+		return gatheringRepository.selectMyGatheringList(pageRequest, userId, word);
 	}
-	@Override
-	public Boolean getGatheringLike(Integer userId, Integer gatheringId) throws Exception {
-		//좋아요 여부 조회
-//		return gatheringDslRepository.selectGatheringLike(userId, gatheringId)!=null;
-		return null;
-	}
-	@Override
-	public Boolean toggleGatheringLike(Integer userId, Integer gatheringId) throws Exception {
-		// 좋아요 상태 변경
-		return null;
-//		Integer gatheringLikeNum = gatheringRepository.selectGatheringLike(userId, gatheringId); 
-//		if(gatheringLikeNum==null) {
-//			gatheringRepository.save(
-//					GatheringLike.builder()
-//					.User(User.builder().userId(userId).build())
-//					.gathering(Gathering.builder().gatheringId(gatheringId).build()).build());
-//			return true;
-//		} else {
-//			gatheringDslRepository.deleteGatheringLike(gatheringLikeNum);
-//			return false;
-//		}
-	}
+	
+
 	@Override
 	public List<GatheringDto> myGatheringApplyList(Integer userId, PageInfo pageInfo, String word) throws Exception {
 		// 내가 지원한 게더링 목록 + 페이지네이션, 제목으로 검색 
@@ -104,6 +92,7 @@ public class GatheringServiceImpl implements GatheringService {
 		Gathering gathering = gatheringRepository.findById(gatheringId).orElseThrow(()->new Exception("조회 중 오류"));
 		return gathering.toDto();
 	}
+	
 	@Override
 	public List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception {
 		//메인페이지에 취향에 맞는 게더링 4개 가져오기
