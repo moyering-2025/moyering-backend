@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
+import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.HostClass;
@@ -56,5 +57,11 @@ public class ClassCalendarServiceImpl implements ClassCalendarService {
                 })
                 .collect(Collectors.toList());	
     }
+
+	@Override
+	public List<ClassCalendarDto> selectCalednarByClassId(Integer classId) throws Exception {
+		
+		return null;
+	}
 
 }
