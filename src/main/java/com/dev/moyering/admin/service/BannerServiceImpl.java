@@ -189,4 +189,9 @@ public class BannerServiceImpl implements BannerService {
 		banner.show();
 		bannerRepository.save(banner);
 	}
+
+	public long countVisibleBanners() {
+		return bannerRepository.countVisibleBanners();
+	}
 }
+

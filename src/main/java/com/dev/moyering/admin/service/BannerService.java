@@ -24,6 +24,7 @@ public interface BannerService {
 
 	void showBanner(Integer bannerId) throws Exception; // 배너 보이기
 
+	long countVisibleBanners();
 }
 
 
