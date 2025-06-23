@@ -1,12 +1,12 @@
 package com.dev.moyering.host.entity;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -15,26 +15,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "class_coupon")
+@Table(name = "coupon_policy")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClassCoupon {
+public class CouponPolicy {
 
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Integer classCouponId;
+    private Integer policyId;
 
-    @ManyToOne
-    @JoinColumn(name = "policy_id")
-    private CouponPolicy policy;
+    @Column(nullable = false)
+    private String couponType; // 비율이면 'RT', 금액할인이면 'AMT'
 
-    @ManyToOne
-    @JoinColumn(name = "calendar_id")
-    private ClassCalendar calendar;
+    @Column(nullable = false)
+    private Integer discount; // 예: 10 (%), 5000 (금액)
 
-    @Column
-    private String couponName; //쿠폰 이름
-    @Column
-    private String amount; //발급매수
+    @Column(nullable = false)
+    private Boolean active;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 }

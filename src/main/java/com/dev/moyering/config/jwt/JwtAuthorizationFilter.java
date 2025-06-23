@@ -44,18 +44,22 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			chain.doFilter(request, response);
 			return;
 		}
-		System.out.println("1111");
-		if (!(uri.contains("/host") || uri.contains("/admin") || uri.contains("/user"))) {
+		if(uri.contains("/main")) {
+			if(request.getHeader(JwtProperties.HEADER_STRING)== null) {
+				System.out.println("여기로온거니");
+		        chain.doFilter(request, response);
+		        return;
+			}
+		}
+		if (!(uri.contains("/host") || uri.contains("/admin") ||  uri.contains("/main") ||  uri.contains("/user"))) {
 	        chain.doFilter(request, response);
 	        return;
 	    }
-		System.out.println("2222");
 		String authentication = request.getHeader(JwtProperties.HEADER_STRING);
 		if(authentication==null) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"로그인 필요");
 			return;
 		}
-		System.out.println("3333");
 		ObjectMapper objectMapper = new ObjectMapper();
 		Map<String,String> token = objectMapper.readValue(authentication,Map.class);
 		System.out.println(token);
