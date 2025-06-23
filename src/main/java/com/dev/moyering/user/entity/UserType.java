@@ -20,16 +20,16 @@ public enum UserType {
                 return type;
             }
         }
-        throw new IllegalArgumentException("Unknown user type code: " + code);
+        throw new IllegalArgumentException("알 수 없는 타입코드 :" + code);
     }
 
-    // 화면용 텍스트로 Enum 찾기
+    // 화면용 텍스트로 Enum 찾기 > 관리자 회원관리
     public static UserType fromDisplayName(String displayName) {
         for (UserType type : UserType.values()) {
             if (type.getDisplayName().equals(displayName)) {
                 return type;
             }
         }
-        throw new IllegalArgumentException("Unknown user type display name: " + displayName);
+        throw new IllegalArgumentException("알 수 없는 display name :" + displayName);
     }
 }

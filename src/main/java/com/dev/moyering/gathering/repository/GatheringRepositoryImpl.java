@@ -3,16 +3,22 @@ package com.dev.moyering.gathering.repository;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
+import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
@@ -27,7 +33,8 @@ import lombok.RequiredArgsConstructor;
 public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	@Autowired
 	private final JPAQueryFactory jpaQueryFactory;
-	
+
+	@Override
 	public Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word){	
 		QGathering gathering = QGathering.gathering;
 		if(word==null || word.trim().length()==0) {//검색어 없는 경우
@@ -46,11 +53,41 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		return cnt;
 	}
 	
+	
+	@Override
+	public List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){	
+	    QGathering gathering = QGathering.gathering;
+	    List<Gathering> gatheringList = null;
+	    
+	    if(word == null || word.trim().length() == 0) {
+	        gatheringList = jpaQueryFactory.selectFrom(gathering)
+	                .where(gathering.user.userId.eq(loginId))
+	                .orderBy(gathering.gatheringId.desc())
+	                .offset(pageRequest.getOffset())
+	                .limit(pageRequest.getPageSize())
+	                .fetch();
+
+	        return gatheringList.stream()
+	            .map(Gathering::toDto)  // ModelMapper 대신 toDto() 사용
+	            .collect(Collectors.toList());
+	    } else {
+	    	   gatheringList = jpaQueryFactory.selectFrom(gathering)
+		                .where(gathering.user.userId.eq(loginId)
+		                		.and(gathering.title.contains(word))) // 제목에서 검색
+		                .orderBy(gathering.gatheringId.desc())
+		                .offset(pageRequest.getOffset())
+		                .limit(pageRequest.getPageSize())
+		                .fetch();
+
+		        return gatheringList.stream()
+		            .map(Gathering::toDto) 
+		            .collect(Collectors.toList());
+	    }
+	}
+	
 	@Transactional
 	public void updateGathering(GatheringDto gatheringDto) throws Exception{
 		QGathering gathering = QGathering.gathering;
-		LocalTime startTime = LocalTime.parse(gatheringDto.getStartTime());
-		LocalTime endTime = LocalTime.parse(gatheringDto.getEndTime());
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
 				.set(gathering.title, gatheringDto.getTitle())
 				.set(gathering.gatheringContent, gatheringDto.getGatheringContent())
@@ -63,8 +100,8 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 				.set(gathering.intrOnln, gatheringDto.getIntrOnln())//한줄 소개
 				.set(gathering.minAttendees, gatheringDto.getMinAttendees())
 				.set(gathering.maxAttendees, gatheringDto.getMaxAttendees())
-				.set(gathering.startTime, startTime)
-				.set(gathering.endTime, endTime)
+				.set(gathering.startTime, LocalTime.parse(gatheringDto.getStartTime()))
+				.set(gathering.endTime, LocalTime.parse(gatheringDto.getEndTime()))
 				.set(gathering.applyDeadline, gatheringDto.getApplyDeadline())
 				.where(gathering.gatheringId.eq(gatheringDto.getGatheringId()));
 		if(gatheringDto.getThumbnailFileName()!=null && !gatheringDto.getThumbnailFileName().equals("")) {
@@ -72,6 +109,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		}
 		clause.execute();
 	}
+	@Override
 	public void updateGatheringStatus(Integer gatheringId, String status) throws Exception{
 		QGathering gathering = QGathering.gathering;
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
@@ -129,26 +167,36 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		return preferred;
 	}
   
-  @Override
-	public List<Gathering> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){	
-		QGathering gathering = QGathering.gathering;
-		List<Gathering> gatheringList = null;
-		if(word==null || word.trim().length()==0) {//검색어 없는 경우
-			gatheringList = jpaQueryFactory.selectFrom(gathering)
-					.where(gathering.user.userId.eq(loginId))//등록한 사람이 로그인 아이디와 일치하는 경우에만.
-					.orderBy(gathering.gatheringId.desc())
-					.offset(pageRequest.getOffset())
-					.limit(pageRequest.getPageSize())
-					.fetch();
-		} else { // 검색어 있는 경우
-		    gatheringList = jpaQueryFactory.selectFrom(gathering)
-		            .where(gathering.user.userId.eq(loginId)
-		                .and(gathering.title.contains(word))) // 제목에서 검색
-		            .orderBy(gathering.gatheringId.desc())
-		            .offset(pageRequest.getOffset())
-		            .limit(pageRequest.getPageSize())
-		            .fetch();
-		}
-		return gatheringList;
-	}
+//  @Override
+//	public List<GatheringDto> selectGatheringByUserIdAndPaging(PageRequest pageRequest, Integer loginId, String word){	
+//		QGathering gathering = QGathering.gathering;
+//		List<Tuple> gatheringList = null;
+//		if(word==null || word.trim().length()==0) {//검색어 없는 경우
+//			gatheringList = jpaQueryFactory.selectFrom(gathering)
+//					.where(gathering.user.userId.eq(loginId))//등록한 사람이 로그인 아이디와 일치하는 경우에만.
+//					.orderBy(gathering.gatheringId.desc())
+//					.offset(pageRequest.getOffset())
+//					.limit(pageRequest.getPageSize())
+//					.fetch();
+//		} else { // 검색어 있는 경우
+//		    gatheringList = jpaQueryFactory.selectFrom(gathering)
+//		            .where(gathering.user.userId.eq(loginId)
+//		                .and(gathering.title.contains(word))) // 제목에서 검색
+//		            .orderBy(gathering.gatheringId.desc())
+//		            .offset(pageRequest.getOffset())
+//		            .limit(pageRequest.getPageSize())
+//		            .fetch();
+//		}
+//
+//		return gatheringList.stream()
+//				.map(t-> {
+//					Gathering g = t.get(0,Gathering.class);
+//					GatheringDto gatheringDto = modelMapper.map(g, GatheringDto.class);
+//					return gatheringDto;
+//				}).collect(Collectors.toList());
+//	}
+//  
+  
+  
+  
 }

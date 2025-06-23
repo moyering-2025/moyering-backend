@@ -3,7 +3,6 @@ package com.dev.moyering.admin.controller;
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
 import com.dev.moyering.user.service.UserService;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,7 +12,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 
 @RestController
@@ -27,7 +25,7 @@ public class AdminMemberController {
     @GetMapping
     public ResponseEntity<Page<AdminMemberDto>> getMemberList(
             @RequestParam(required = false) String keyword,
-            @PageableDefault(size = 10, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
         log.info("회원 목록 조회 요청: keyword={}, page={}", keyword, pageable.getPageNumber());
 

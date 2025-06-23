@@ -147,6 +147,47 @@ public class HostClassServiceImpl implements HostClassService {
 		if (dto.getPriceMax() != null) {
 			builder.and(hostClass.price.loe(dto.getPriceMax()));
 		}
+	    if (dto.getCategory2() != null) {
+	        builder.and(hostClass.subCategory.subCategoryId.eq(dto.getCategory2()));
+	    }
+	    if (dto.getStartDate() != null) {
+	        builder.and(calendar.startDate.goe(Date.valueOf(dto.getStartDate())));
+	    }
+	    if (dto.getEndDate() != null) {
+	        builder.and(calendar.startDate.loe(Date.valueOf(dto.getEndDate())));
+	    }
+	    if (dto.getPriceMin() != null) {
+	        builder.and(hostClass.price.goe(dto.getPriceMin()));
+	    }
+	    if (dto.getPriceMax() != null) {
+	        builder.and(hostClass.price.loe(dto.getPriceMax()));
+	    }
+		if (dto.getName() != null) {
+			 builder.and(hostClass.name.contains(dto.getName()));
+		}
+	    // 가장 빠른 모집중 일정 1건만 JOIN된 클래스만 조회
+	    List<HostClass> result = jpaQueryFactory
+	            .select(calendar.hostClass)
+	            .from(calendar)
+	            .join(calendar.hostClass, hostClass)
+	            .where(builder)
+	            .groupBy(hostClass.classId)
+	            .orderBy(calendar.startDate.min().asc())
+	            .offset(pageable.getOffset())
+	            .limit(pageable.getPageSize())
+	            .fetch();
+	    //총 개수 (distinct count!)
+	    Long total = jpaQueryFactory
+	            .select(calendar.hostClass.classId.countDistinct())
+	            .from(calendar)
+	            .where(builder)
+	            .fetchOne();
+	    
+	    //날짜만 얻어오기
+		List<Integer> classIds = result.stream()
+		        .map(HostClass::getClassId)
+		        .collect(Collectors.toList());
+	    Map<Integer, Date> startDateMap = classCalendarRepository.findEarliestStartDatesByClassIds(classIds);
 
 		// 가장 빠른 모집중 일정 1건만 JOIN된 클래스만 조회
 		List<HostClass> result = jpaQueryFactory.select(calendar.hostClass).from(calendar)
