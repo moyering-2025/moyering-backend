@@ -21,6 +21,9 @@ public class AdminCoupon {
     private String couponType;
 
     @Column(nullable = false)
+    private String couponCode;
+
+    @Column(nullable = false)
     private String discountType; // 비율이면 'RT', 금액할인이면 'AMT'
 
     @Column(nullable = false)
@@ -41,9 +44,10 @@ public class AdminCoupon {
     private ClassCalendar calendar;
 
     @Builder
-    public AdminCoupon(Integer couponId, String couponType, String discountType, Integer discount, LocalDateTime validFrom, LocalDateTime validUntil, LocalDateTime createdAt, String couponName, ClassCalendar calendar) {
+    public AdminCoupon(Integer couponId, String couponType, String couponCode, String discountType, Integer discount, LocalDateTime validFrom, LocalDateTime validUntil, LocalDateTime createdAt, String couponName, ClassCalendar calendar) {
         this.couponId = couponId;
         this.couponType = couponType;
+        this.couponCode = couponCode;
         this.discountType = discountType;
         this.discount = discount;
         this.validFrom = validFrom;
@@ -58,6 +62,7 @@ public class AdminCoupon {
         return new AdminCoupon(
                 this.couponId,
                 this.couponType,
+                this.couponCode,
                 this.discountType,
                 this.discount,
                 this.validFrom,

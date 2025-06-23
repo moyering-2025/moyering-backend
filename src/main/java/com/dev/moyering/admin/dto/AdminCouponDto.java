@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class AdminCouponDto {
     private Integer couponId; // 쿠폰 아이디
     private String couponType; // 쿠폰 유형 (관리자면 'MG' 강사면 'HT")
+    private String couponCode; // 쿠폰 코드
     private String discountType;  // 비율이면 'RT', 금액할인이면 'AMT'
     private Integer discount; // 예: 10 (%), 5000 (금액)
     private Integer issueCount; // 발급매수
@@ -32,6 +33,7 @@ public class AdminCouponDto {
         return AdminCoupon.builder()
                 .couponId(this.couponId)
                 .couponType(this.couponType)
+                .couponCode(this.couponCode)
                 .discountType(this.discountType)
                 .discount(this.discount)
                 .validFrom(this.validFrom)
