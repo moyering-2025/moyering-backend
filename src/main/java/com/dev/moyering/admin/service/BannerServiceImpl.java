@@ -1,11 +1,12 @@
 package com.dev.moyering.admin.service;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.dev.moyering.admin.dto.BannerDto;
-import com.dev.moyering.admin.entity.AdminNotice;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,14 +16,17 @@ import com.dev.moyering.admin.repository.BannerRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.dev.moyering.admin.entity.QBanner.banner;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class BannerServiceImpl implements BannerService {
 	private final BannerRepository bannerRepository;
+
+	// 배너 경로
+	@Value("${iupload.path}")
+	private String bannerUploadPath;
 
 	@Override
 	public List<BannerDto> getMainBnanerList(Integer status) throws Exception {
@@ -41,10 +45,21 @@ public class BannerServiceImpl implements BannerService {
 		return result;
 	}
 
+
 	@Transactional
 	@Override
-	public BannerDto createBanner(BannerDto bannerDto) throws Exception {
+	public BannerDto createBanner(BannerDto bannerDto, MultipartFile ifile) throws Exception {
+		// 배너 이미지 검증
+		if (ifile != null && !ifile.isEmpty()) { // 배너이미지에 값이 있으면,
+			log.info("파일 업로드 전 - bannerImg: {}", bannerDto.getBannerImg());
+			bannerDto.setBannerImg (ifile.getOriginalFilename());
+			log.info("파일 업로드 후 - bannerImg: {}", bannerDto.getBannerImg());
+			File UpFile = new File(bannerUploadPath + ifile.getOriginalFilename());
+			ifile.transferTo(UpFile);
+		}
 			try {
+				// 날짜 수동 설정
+				bannerDto.setCreatedAt(new java.sql.Date(System.currentTimeMillis()));
 				log.info("=== 배너 등록 시작 ===");
 				log.info("제목: {}, 내용 : {}, 등록일 : {}",
 						bannerDto.getTitle(), bannerDto.getContent(), bannerDto.getCreatedAt());
@@ -69,20 +84,49 @@ public class BannerServiceImpl implements BannerService {
 		}
 
 
+	@Transactional
 	@Override
-	public BannerDto updateBanner(Integer bannerId, BannerDto bannerDto) throws Exception {
-		log.info("배너수정 시작 : bannerId ={}", bannerId);
+	public BannerDto updateBanner(BannerDto bannerDto, MultipartFile ifile) throws Exception {
+		log.info("배너수정 시작 : bannerId ={}", bannerDto.getBannerId());
+		log.info("받은 파일 : {}", ifile != null ? ifile.getOriginalFilename() : "null");
 
 		// 엔티티 조회 - orElseThrow 사용
-		Banner banner = bannerRepository.findById(bannerId)
-				.orElseThrow(() -> new IllegalArgumentException("해당 배을 찾을 수 없습니다. ID : " + bannerId));
+		Banner banner = bannerRepository.findById(bannerDto.getBannerId())
+				.orElseThrow(() -> new IllegalArgumentException("해당 배을 찾을 수 없습니다. ID : " + bannerDto.getBannerId()));
 
+		// 파일업로드 추가
+		if (ifile != null && !ifile.isEmpty()) { // 값이 있으면,
+			log.info("파일 업로드 : {}", ifile.getOriginalFilename());
+
+			// 새 파일 저장
+			File uploadFile = new File(bannerUploadPath + ifile.getOriginalFilename());
+			ifile.transferTo(uploadFile);
+
+			// DTO에 파일명 설정
+			bannerDto.setBannerImg(ifile.getOriginalFilename());
+			log.info("DTO에 설정된 이미지: {}", bannerDto.getBannerImg());
+		} else { // 값이 없으면 기존 저장된 파일 유지
+			bannerDto.setBannerImg(banner.getBannerImg());
+			log.info("기존이미지 유지 : {}", bannerDto.getBannerImg());
+		}
+
+		log.info("메서드 호출 전 : {}", bannerDto.getTitle(), bannerDto.getContent(), bannerDto.getBannerImg());
 		// 비즈니스 메서드 호출해서 값 수정
 		banner.changeBanner(bannerDto.getTitle(),
 				bannerDto.getContent(),
 				bannerDto.getBannerImg());
-		log.info("배너 수정 완료 : bannerId = {}", bannerId);
-		return banner.toDto();
+
+		log.info("메서드 호출 후 : {}", bannerDto.getTitle(), bannerDto.getContent(), bannerDto.getBannerImg());
+
+
+		// save 호출
+		Banner savedBanner = bannerRepository.save(banner);
+		log.info("배너 수정 완료 : bannerId = {}", bannerDto.getBannerId());
+
+		BannerDto result =  savedBanner.toDto();
+		log.info("최종 DTO - bannerImg : {}", result.getBannerImg());
+		return result;
+
 	}
 
 
@@ -97,12 +141,12 @@ public class BannerServiceImpl implements BannerService {
 	}
 
 	@Override
-	public void hideNotice(Integer bannerId) throws Exception {
+	public void hideBanner(Integer bannerId) throws Exception {
 
 	}
 
 	@Override
-	public void showNotice(Integer bannerId) throws Exception {
+	public void showBanner(Integer bannerId) throws Exception {
 
 	}
 

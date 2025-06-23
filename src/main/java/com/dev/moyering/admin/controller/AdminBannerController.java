@@ -1,6 +1,7 @@
 package com.dev.moyering.admin.controller;
 
 import com.dev.moyering.admin.dto.BannerDto;
+import com.dev.moyering.admin.entity.Banner;
 import com.dev.moyering.admin.service.BannerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +12,13 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/banner")
+@RequestMapping("/api/banner")
 @Slf4j
 @CrossOrigin(origins = "*")
 public class AdminBannerController {
@@ -26,14 +28,20 @@ public class AdminBannerController {
      * 배너 등록
      */
     @PostMapping("/create")
-    public ResponseEntity<BannerDto> bannerCreate(@RequestBody BannerDto bannerDto) {
+    public ResponseEntity<BannerDto> bannerCreate(BannerDto bannerDto,
+                                                  @RequestPart(name = "ifile", required = false) MultipartFile bannerImg) {
+
         log.info("배너 등록 요청 : {}", bannerDto.getBannerId());
+        log.info(bannerImg != null ? bannerImg.getOriginalFilename() : "null",
+                bannerImg != null ? bannerImg.getSize() : 0,
+                bannerImg != null ? bannerImg.isEmpty() : "null");
 
         try {
-            BannerDto createBanner = bannerService.createBanner(bannerDto);
+            // 배너 생성 후 바로 생성된 배너 정보 반환
+            BannerDto createBanner = bannerService.createBanner(bannerDto, bannerImg);
             return ResponseEntity.ok(createBanner);
         } catch (Exception e) {
-            log.error("공지사항 등록 실패: {}", e.getMessage());
+            log.error("배너 등록 실패: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -43,21 +51,26 @@ public class AdminBannerController {
      */
     @PutMapping("/{bannerId}")
     public ResponseEntity<BannerDto> bannerEdit(
-            @PathVariable Integer bannerId,
-            @Valid @RequestBody BannerDto bannerDto) {
-        log.info("배너 수정 요청 : {}", bannerDto.getBannerId());
+//            @ReqestBody // form-data와 @RequestBody 동시사용 불가 !
+            // 개별파라미터로 받기
+                @PathVariable Integer bannerId,
+                @RequestParam(required = false) String title,
+                @RequestParam(required = false) String content,
+//                @RequestPart(name="bannerDto") BannerDto bannerDto,
+                @RequestPart(name = "ifile", required = false) MultipartFile bannerImg) {
+        log.info("배너 수정 요청 - bannerId : {}, title : {}, content : {}, bannerImg : {}", bannerId, title, content,  bannerImg);
+        log.info("받은 파일: {}", bannerImg != null ? bannerImg.getOriginalFilename() : "파일 없음");
 
         try {
-            // 배너 id 검증
-            if (bannerDto.getBannerId() != null && !bannerDto.getBannerId().equals(bannerId)) {
-                log.warn("요청 ID 불일치 : pathId = {}, bodyId= {}", bannerId, bannerDto.getBannerId());
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
+            // DTO 생성
+            BannerDto bannerDto = new BannerDto();
+            bannerDto.setBannerId(bannerId);
+            bannerDto.setTitle(title);
+            bannerDto.setContent(content);
 
-            // 검증 후 정상로직 실행
-            BannerDto editBanner = bannerService.updateBanner(bannerId, bannerDto);
+            // 서비스 호출
+            BannerDto editBanner = bannerService.updateBanner(bannerDto, bannerImg);
             return ResponseEntity.ok(editBanner);
-
         } catch (IllegalArgumentException e) {
             log.error("배너 수정 실패 : {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -66,6 +79,7 @@ public class AdminBannerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     @GetMapping
     public ResponseEntity<Page<BannerDto>> getBannerList(
