@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA용 기본 생성자, 빈 객체 생성 차단
 @Entity
 @ToString
+@Table(name = "notice")
 public class AdminNotice extends BaseEntity {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
