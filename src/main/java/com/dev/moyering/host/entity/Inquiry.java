@@ -4,6 +4,7 @@ import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,44 +29,37 @@ public class Inquiry {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer InquiryId;
 	@Column
-	private String className;
-	@Column
-	private String studentName;
+	private String content;
 	@Column
 	private Date inquiryDate;
 	@Column
-	private String state;
-	@Column
 	private String iqResContent;
 	@Column
-	private Date ResponseDate;
-	@Column
-	private String content;
-	@ManyToOne
+	private Date responseDate;
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="calendarId")
 	private ClassCalendar classCalendar;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="hostId")
 	private Host host;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="userId")
 	private User user;
 	
 	public InquiryDto toDto() {
 		InquiryDto dto = InquiryDto.builder()
 				.InquiryId(InquiryId)
-				.className(className)
 				.inquiryDate(inquiryDate)
-				.state(state)
 				.iqResContent(iqResContent)
-				.ResponseDate(ResponseDate)
 				.content(content)
 				.build();
 		if(classCalendar!=null) {
 			dto.setCalendarId(classCalendar.getCalendarId());
+			dto.setClassName(classCalendar.getClass().getName());
 		}
 		if(host!=null) {
-			dto.setHostId(host.getHostId());			
+			dto.setHostId(host.getHostId());	
+			dto.setHostName(host.getName());
 		}
 		if(user!=null) {
 			dto.setUserId(user.getUserId());

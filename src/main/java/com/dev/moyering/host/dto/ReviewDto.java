@@ -2,6 +2,7 @@ package com.dev.moyering.host.dto;
 
 import java.sql.Date;
 
+import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.entity.Review;
 import com.dev.moyering.user.entity.User;
@@ -17,24 +18,29 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ReviewDto {
 	private Integer reviewId;
-	private String className;
 	private String content;
-	private Integer state;
+	private Date reviewDate;
 	private String revRegCotnent;
 	private Date responseDate;
+	private Integer star;
 	private Integer calendarId;
-	private Integer hostId;
 	private Integer userId;
-	private String studentName;
+	private Integer hostId;
 	
+	private String studentName;
+	private String className;
+	private String hostName;
+	private String profileName; //리뷰 작성자 프사
+	private String hostProfileName; //리뷰 답변자 (강사) 프사
+
 	public Review toEntity() {
 		Review entity = Review.builder()
 				.reviewId(reviewId)
-				.className(className)
 				.content(content)
-				.state(state)
+				.reviewDate(reviewDate)
 				.revRegCotnent(revRegCotnent)
 				.responseDate(responseDate)
+				.star(star)
 				.build();
 		if(hostId!=null) {
 			entity.setHost(Host.builder()
@@ -43,7 +49,11 @@ public class ReviewDto {
 		if(userId!=null) {
 			entity.setUser(User.builder()
 					.userId(userId)
-					.name(studentName)
+					.build());
+		}
+		if(calendarId!=null) {
+			entity.setClassCalendar(ClassCalendar.builder()
+					.calendarId(calendarId)
 					.build());
 		}
 		return entity;

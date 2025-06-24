@@ -9,4 +9,5 @@ public interface BannerRepositoryCustom {
     // 목록 조회 및 검색
     Page<BannerDto> findBannerByKeyword(String keyword, Pageable pageable); // 배너아이디, 제목 검색
     BannerDto findBannerByBannerId(Integer bannerId);
+    long countVisibleBanners();
 }

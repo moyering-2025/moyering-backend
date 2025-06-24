@@ -11,4 +11,5 @@ import com.dev.moyering.host.entity.ClassCalendar;
 public interface ClassCalendarRepository extends JpaRepository<ClassCalendar, Integer>, ClassCalendarRepositoryCustom {
 	List<ClassCalendar> findByHostClassClassIdIn(Set<Integer> classIds) throws Exception;
 	Optional<ClassCalendar> findByCalendarIdAndHostClass_ClassId(Integer calendarId, Integer classId);
+	List<ClassCalendar> findAllByHostClass_ClassIdAndStatus(Integer classId,String status);
 }

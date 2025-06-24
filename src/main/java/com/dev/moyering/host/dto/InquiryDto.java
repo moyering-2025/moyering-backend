@@ -18,25 +18,24 @@ import lombok.NoArgsConstructor;
 @Builder
 public class InquiryDto {
 	private Integer InquiryId;
-	private String className;
-	private String studentName;
-	private Date inquiryDate;
-	private String state;
-	private String iqResContent;
-	private Date ResponseDate;
 	private String content;
+	private Date inquiryDate;
+	private String iqResContent;
+	private Date responseDate;
 	private Integer calendarId;
 	private Integer hostId;
 	private Integer userId; 
 	
+	private String studentName;
+	private String className;
+	private String hostName;
+
 	public Inquiry toEntity() {
 		Inquiry entity = Inquiry.builder()
 				.InquiryId(InquiryId)
-				.className(className)
 				.inquiryDate(inquiryDate)
-				.state(state)
 				.iqResContent(iqResContent)
-				.ResponseDate(ResponseDate)
+				.responseDate(responseDate)
 				.content(content)
 				.build();
 		if(calendarId!=null) {
@@ -50,7 +49,6 @@ public class InquiryDto {
 		if(userId!=null) {
 			entity.setUser(User.builder()
 					.userId(userId)
-					.name(studentName)
 					.build());
 		}
 		return entity;

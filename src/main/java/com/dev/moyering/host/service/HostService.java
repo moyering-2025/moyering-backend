@@ -9,4 +9,5 @@ import com.dev.moyering.host.entity.Host;
 public interface HostService {
 	Integer registHost(HostDto hostDto,MultipartFile profile) throws Exception;
 	Host findByUserId(Integer userId) throws Exception;
+	HostDto getHostById(Integer hostId) throws Exception;
 }
