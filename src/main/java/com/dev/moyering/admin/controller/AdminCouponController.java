@@ -2,7 +2,6 @@ package com.dev.moyering.admin.controller;
 
 import com.dev.moyering.admin.dto.AdminCouponDto;
 import com.dev.moyering.admin.dto.AdminCouponSearchCond;
-import com.dev.moyering.admin.dto.AdminNoticeDto;
 import com.dev.moyering.admin.service.AdminCouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
