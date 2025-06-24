@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -83,10 +84,11 @@ public class GatheringController {
 			res.put("gathering", nGatheringDto);
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
 			List<GatheringApplyDto> member = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
-//			Integer likeNum = g
+//			Integer totalLikeNum = gatheringLikesService.getTotalLikesOfGatheringByGatheringId(gatheringId);
 			userDto.setPassword(null);
 			res.put("host", userDto);
 			res.put("member", member);
+//			res.put("totalLikeNum", totalLikeNum);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -98,17 +100,22 @@ public class GatheringController {
 	public ResponseEntity<Map<String,Object>> extraDetail(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestParam("gatheringId") Integer gatheringId) {
 		try {
+	        System.out.println("API 호출됨!");
+	        System.out.println("gatheringId: " + gatheringId);
+	        System.out.println("로그인 정보 : "+principal.getUser().getUserId());
 			//찜 여부, 신청여부
 			Map<String,Object> res = new HashMap<>();
+			System.out.println("로그인 정보 : "+principal.getUser().getUserId());
 			Integer cntApply = gatheringApplyService.findByGatheringIdAndUserId(gatheringId, principal.getUser().getUserId());
-			if(cntApply !=null || cntApply == 0) {
-				res.put("canApply", true);
-			} else {
+			System.out.println("cnt :" + cntApply);
+			if(cntApply !=null && cntApply != 0) {
 				res.put("canApply", false);
+			} else {
+				res.put("canApply", true);
 			}
-			Integer totalLike = gatheringLikesService.getTotalLikesOfGatheringByGatheringId(gatheringId);
+			
 			Boolean isLiked = gatheringLikesService.getGatheringLike(principal.getUser().getUserId(), gatheringId);
-			res.put("totalLike", totalLike);//총 찜 갯수
+			
 			res.put("isLiked", isLiked);
 			
 			return new ResponseEntity<>(res, HttpStatus.OK);
@@ -117,7 +124,19 @@ public class GatheringController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}	
-	
+	@PostMapping("/user/toggleGatheringLike")
+	@ResponseBody
+	public String toggleGatheringLike(@AuthenticationPrincipal PrincipalDetails principal, 
+			@RequestParam("gatheringId") Integer gatheringId) {
+		try {
+			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
+			Boolean isLike = gatheringLikesService.toggleGatheringLike(principal.getUser().getUserId(), gatheringId);
+			return String.valueOf(isLike);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return String.valueOf(false);
+		}
+	}
 	@GetMapping("/user/detailForModifyGathering")
 	public ResponseEntity<GatheringDto> detailForModifyGathering(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestParam("gatheringId") Integer gatheringId) {

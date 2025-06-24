@@ -73,6 +73,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                         feed.img1, feed.img2, feed.img3, feed.img4, feed.img5,
                         feed.tag1, feed.tag2, feed.tag3, feed.tag4, feed.tag5,
                         feed.isDeleted,
+                        user.userId,
                         user.username.as("writerId"),
                         user.profile.as("writerProfile"),
                         user.userBadgeId.as("writerBadge"),

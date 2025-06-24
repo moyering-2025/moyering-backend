@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,12 +18,12 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/socialing")
+@RequestMapping()
 public class FeedController {
-	
+
     private final FeedService feedService;
 
-    @GetMapping("/feeds")
+    @GetMapping("/socialing/feeds")
     public ResponseEntity<List<FeedDto>> getFeeds(
             @RequestParam(defaultValue = "all") String sort,
             @RequestParam(required = false) String userId
@@ -30,6 +31,10 @@ public class FeedController {
 
         try {
             List<FeedDto> feeds = feedService.getFeeds(sort, userId);
+            for (FeedDto feed : feeds) {
+                feed.toEntity();
+                System.out.println(feed.toEntity().getUser().getUserId());
+            }
             return new ResponseEntity<>(feeds, HttpStatus.OK);
 
         } catch (Exception e) {
@@ -68,7 +73,7 @@ public class FeedController {
 //        return ResponseEntity.ok(response);
 //    }
 
-    @GetMapping("/feed")
+    @GetMapping("/socialing/feed")
     public ResponseEntity<FeedDto> getFeedDetail(
             @RequestParam Integer feedId,
             @AuthenticationPrincipal PrincipalDetails principal) {
@@ -81,5 +86,33 @@ public class FeedController {
         FeedDto dto = feedService.getFeedDetail(feedId, currentUserId);
         System.out.println(dto);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping(value = "/user/socialing/feed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<FeedDto> createFeed(
+            @RequestPart("feed") FeedDto feedDto,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        try {
+            Integer created = feedService.createFeed(feedDto, images);
+            FeedDto nFeedDto = feedService.getFeedDetail(created, principal.getUser().getUserId());
+            return new ResponseEntity<>(nFeedDto, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/socialing/userFeed/{nickName}")
+    public ResponseEntity<List<FeedDto>> getUserFeeds(@PathVariable("nickName") String nickName) {
+        try {
+        List<FeedDto> feeds = feedService.getFeedsByNickname(nickName);
+        return ResponseEntity.ok(feeds);
+
+        }catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

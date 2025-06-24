@@ -39,14 +39,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			throws IOException, ServletException {
 
 		String uri = request.getRequestURI();
-		System.out.println(uri);
 		if (uri.equals("/api/login")) { // 관리자 로그인 제외
 			chain.doFilter(request, response);
 			return;
 		}
 		if(uri.contains("/main")) {
 			if(request.getHeader(JwtProperties.HEADER_STRING)== null) {
-				System.out.println("여기로온거니");
 		        chain.doFilter(request, response);
 		        return;
 			}

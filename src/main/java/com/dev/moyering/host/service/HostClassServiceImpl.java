@@ -287,6 +287,12 @@ public class HostClassServiceImpl implements HostClassService {
         return dto;
 	}
 
+	@Override
+	public HostClassDto getClassDetailByClassID(Integer classId) throws Exception {
+		HostClassDto hostclass= hostClassRepository.findById(classId).orElseThrow(()-> new Exception("해당 클래스가 존재하지 않습니다.")).toDto();
+		return hostclass;
+	}
+
 	
 
 

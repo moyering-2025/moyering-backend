@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,25 +40,26 @@ public class GatheringApplyController {
 	private UserService userService;
 	@Autowired
 	private GatheringApplyService gatheringApplyService;
-	@Autowired
-	private GatheringInquiryService gatheringInquiryService;
-	@PostMapping("/user/applyGathering")
-	public ResponseEntity<GatheringApplyDto> applyToGathering(@AuthenticationPrincipal PrincipalDetails principal, 
-			@RequestBody Map<String,Object> param) {
-		
-		return null;
-//		try {
-//			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringApplyDto);
-//			if(gatheringInquiryId!=null) {
-//				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//			}
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-	}
 	
+	@PostMapping("/user/applyGathering")
+	@ResponseBody
+	public String applyGathering(@AuthenticationPrincipal PrincipalDetails principal, 
+			@RequestBody Map<String, Object> param){
+		try {
+			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
+			Integer gatheringId = (Integer) param.get("gatheringId");
+			String aspiration = (String) param.get("aspiration");
+			GatheringApplyDto gatheringApplyDto = new GatheringApplyDto();
+			gatheringApplyDto.setGatheringId(gatheringId);
+			gatheringApplyDto.setUserId(principal.getUser().getUserId());
+			gatheringApplyDto.setAspiration(aspiration);
+			Integer res = gatheringApplyService.applyToGathering(gatheringApplyDto);
+			return String.valueOf(res!=null);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return String.valueOf(false);
+		}
+	}
 	@PostMapping("/user/updateMemberApproval")
 	public ResponseEntity<GatheringApplyDto> updateMemberApproval(@AuthenticationPrincipal PrincipalDetails principal,
 			@ModelAttribute GatheringApplyDto gatheringApplyDto) {

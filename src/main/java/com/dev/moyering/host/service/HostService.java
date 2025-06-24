@@ -12,4 +12,5 @@ public interface HostService {
 	Host findByHostId(Integer hostId) throws Exception;
 	Host updateHost(Integer hostId,String name,String publicTel,String email,String intro,MultipartFile profile) throws Exception;
 	Host updateHostSettlement(Integer hostId,String bankName,String accName,String accNum,MultipartFile idCard) throws Exception;
+	HostDto getHostById(Integer hostId) throws Exception;
 }

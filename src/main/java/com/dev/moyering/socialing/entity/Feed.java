@@ -11,6 +11,7 @@ import lombok.*;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -76,7 +77,7 @@ public class Feed {
                .tag4(tag4)
                .tag5(tag5)
                .isDeleted(isDeleted)
-               .writerId(user.getNickName())
+               .writerId(user.getUsername())
                .writerProfile(user.getProfile())
                .writerBadge(user.getUserBadgeId())
                .build();

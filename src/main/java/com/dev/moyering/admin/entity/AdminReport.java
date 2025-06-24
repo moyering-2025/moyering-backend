@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
+@Table (name = "report")
 public class AdminReport {
 
     @Id
