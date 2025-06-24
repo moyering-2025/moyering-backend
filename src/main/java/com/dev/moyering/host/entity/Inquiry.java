@@ -55,7 +55,8 @@ public class Inquiry {
 				.build();
 		if(classCalendar!=null) {
 			dto.setCalendarId(classCalendar.getCalendarId());
-			dto.setClassName(classCalendar.getClass().getName());
+			dto.setClassName(classCalendar.getHostClass().getName());
+			dto.setClassId(classCalendar.getHostClass().getClassId());
 		}
 		if(host!=null) {
 			dto.setHostId(host.getHostId());	

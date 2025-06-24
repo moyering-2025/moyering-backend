@@ -25,6 +25,7 @@ import com.dev.moyering.gathering.service.GatheringService;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostDto;
+import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.service.ClassCalendarService;
 import com.dev.moyering.host.service.HostClassService;
@@ -120,6 +121,20 @@ public class MainController {
     	try {
     		PageResponseDto<ReviewDto> reviewList = reviewService.getAllReviewByHostId(hostId, page, size);
             return ResponseEntity.ok(reviewList);
+
+		} catch (Exception e) {
+	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			
+		}
+    }
+    
+    @GetMapping("/classInquiryList/{classId}") 
+    public ResponseEntity<PageResponseDto<InquiryDto>> classInquiryList (
+    		@PathVariable("classId") Integer classId,
+    		@RequestParam(defaultValue = "0") int page,
+    		@RequestParam(defaultValue = "10") int size) {
+    	try {
+    		PageResponseDto<InquiryDto> inquiryList = inquiryService.getInquiryListByClassId(classId, page, size);
+            return ResponseEntity.ok(inquiryList);
 
 		} catch (Exception e) {
 	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			
