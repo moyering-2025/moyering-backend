@@ -29,25 +29,29 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
 		OAuth2UserInfo oAuth2UserInfo=null;
 		String registrationId = userRequest.getClientRegistration().getRegistrationId();
 		 if(registrationId.equals("kakao")) {
-			oAuth2UserInfo = new KaKaoUserInfo(oAuth2User.getAttribute("properties"));
+			oAuth2UserInfo = new KaKaoUserInfo(oAuth2User.getAttributes());
 		}else {
-			System.out.println("카카오와 네이버만 지원");
+			System.out.println("카카오만 지원");
 		}
-		
+		 
 		//1. DB에서 조회
 		Optional<User> ouser =  userRepository.findByProviderAndProviderId(oAuth2UserInfo.getProvider(), oAuth2UserInfo.getProviderId());
 		User user = null;
 		if(ouser.isEmpty()) { //1-1. 가입되어 있지 않으면 삽입
 			user = User.builder()
 						.username(oAuth2UserInfo.getProviderId())
-						.userType("ROLE USER")
+						.userType("ROLE_MB")
+						.nickName(oAuth2UserInfo.getNickName())
 						.provider(oAuth2UserInfo.getProvider())
 						.providerId(oAuth2UserInfo.getProviderId())
+						.profile(oAuth2UserInfo.getProfileImage())
 						.build();
 		userRepository.save(user);
 		}else { //1-2.가입되어 있으면 업데이트
 			user = ouser.get();
 			user.setEmail(oAuth2UserInfo.getEmail());
+			user.setProfile(oAuth2UserInfo.getProfileImage());
+			user.setNickName(oAuth2UserInfo.getNickName());
 			userRepository.save(user);
 		}
 		return new PrincipalDetails(user,oAuth2User.getAttributes());

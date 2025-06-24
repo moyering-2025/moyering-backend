@@ -59,12 +59,12 @@ public class SecurityConfig {
 			.httpBasic().disable() //httpBasic은 header에 username,password를 암호화하지 않은 상태로 주고받는다. 이를 사용하지 않겠다는 것.
 			.addFilterAt(new JwtAuthenticationFilter(authenticationManager,hostRepository), UsernamePasswordAuthenticationFilter.class);
 			
-//		http.oauth2Login()
-//			.authorizationEndpoint().baseUri("/oauth2/authorization") //front로그인 uri
-//			.and()
-//			.redirectionEndpoint().baseUri("/callback/*")
-//			.and().userInfoEndpoint().userService(principalOAuth2UserService)
-//			.and().successHandler(oAuth2SuccessHandler);
+		http.oauth2Login()
+			.authorizationEndpoint().baseUri("/oauth2/authorization") //front로그인 uri
+			.and()
+			.redirectionEndpoint().baseUri("/callback/*")
+			.and().userInfoEndpoint().userService(principalOAuth2UserService)
+			.and().successHandler(oAuth2SuccessHandler);
 		
 		http.addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository))
 			.authorizeRequests()

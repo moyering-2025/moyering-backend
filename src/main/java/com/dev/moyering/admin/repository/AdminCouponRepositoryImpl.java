@@ -1,100 +1,162 @@
 package com.dev.moyering.admin.repository;
 
 import com.dev.moyering.admin.dto.AdminCouponDto;
-import com.dev.moyering.admin.dto.AdminCouponDto;
+import com.dev.moyering.admin.dto.AdminCouponSearchCond;
+import com.dev.moyering.admin.entity.AdminCoupon;
+import com.dev.moyering.admin.entity.CouponStatus;
 import com.dev.moyering.admin.entity.QAdminCoupon;
+import com.dev.moyering.user.entity.QUserCoupon;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
-@RequiredArgsConstructor // final 필드 생성자 자동 생성
+@RequiredArgsConstructor
 public class AdminCouponRepositoryImpl implements AdminCouponRepositoryCustom {
-    QAdminCoupon coupon = QAdminCoupon.adminCoupon;
 
     private final JPAQueryFactory queryFactory;
+    private static final QAdminCoupon coupon = QAdminCoupon.adminCoupon;
 
     @Override
-    public Page<AdminCouponDto> findCouponByKeyword(String searchKeyword, Pageable pageable) {
+    public Page<AdminCouponDto> findCouponByCond(AdminCouponSearchCond cond, Pageable pageable) {
 
-        // 데이터 조회
-        List<AdminCouponDto> content = queryFactory
-                .select(Projections.constructor(AdminCouponDto.class,
-                        // AdminCouponDto의 생성자에 들어갈 컬럼 순서
-                        coupon.couponId,
-                        coupon.couponType,
-                        coupon.discountType,
-                        coupon.discount,
-                        coupon.discount,
-                        coupon.validFrom,
-                        coupon.validUntil,
-                        coupon.createdAt,
-                        coupon.couponName,
-                        coupon.calendar
-                ))
-                .from(coupon)
-                .where(
-                        searchCoupon(searchKeyword) // 검색 기능 (검색 조건 메서드 호출)
-                )
-                .orderBy(
-                        coupon.validUntil.desc(), // 쿠폰 만료일 (내림차순)
-                        coupon.createdAt.desc() // 그 다음 최신 작성일 순 (내림차순)
-                )
+        BooleanBuilder builder = new BooleanBuilder();
 
-                .offset(pageable.getOffset()) // 몇 번째 데이터부터 가져올지 (페이지 * 크기)
-                .limit(pageable.getPageSize()) // 몇 개를 가져올지 (한 페이지 크기)
-                .fetch(); // 쿼리 실행하고 결과를 List로 받아오기
-
-        // 전체 데이터 개수 조회 (페이징 위함)
-        Long total = queryFactory
-                .select(coupon.count()) // COUNT(*) 쿼리: 전체 개수만 세기
-                .from(coupon)
-                .where(
-                        searchCoupon(searchKeyword) // 위 검색과 같은 검색 조건 적용
-                )
-                .fetchOne(); // 쿼리 실행하고 결과  받아오기
-
-//        Spring의 Page 객체로 변환해서 반환
-        return new PageImpl<>(content, pageable, total != null ? total : 0); // 실제 데이터 리스트, 페이징 정보(현재 페이지, 크기), 전체 데이터 개수 가져오기
-    }
-
-
-    @Override
-    public AdminCouponDto findCouponByCouponId(Integer couponId) {
-        return queryFactory
-                .select(Projections.constructor(AdminCouponDto.class,
-                        coupon.couponId,
-                        coupon.couponType,
-                        coupon.discountType,
-                        coupon.discount,
-                        coupon.discount,
-                        coupon.validFrom,
-                        coupon.validUntil,
-                        coupon.createdAt,
-                        coupon.couponName,
-                        coupon.calendar
-                        ))
-                .from(coupon)
-                .where(
-                        coupon.couponId.eq(couponId)
-                )
-                .fetchOne(); //단건조회
-    }
-
-    // 공지사항 제목, 내용 검색
-    private BooleanExpression searchCoupon(String keyword) {
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return null; //검색 없으면 전체 조회
+        // 검색 키워드 (쿠폰명 또는 쿠폰코드)
+        if (StringUtils.hasText(cond.getKeyword())) {
+            builder.and(
+                    coupon.couponName.containsIgnoreCase(cond.getKeyword())
+                            .or(coupon.couponCode.containsIgnoreCase(cond.getKeyword()))
+            );
         }
-        // 검색어가 있으면 제목 또는 내용에 포함된 데이터 찾기
-        return coupon.couponCode.containsIgnoreCase(keyword);  // 제목에 검색어 포함 (대소문자 무시)
+
+        // 쿠폰 발급 주체 필터
+        if (StringUtils.hasText(cond.getCouponType()) && !"ALL".equals(cond.getCouponType())) {
+            builder.and(coupon.couponType.eq(cond.getCouponType()));
+        }
+
+        // 날짜 범위 검색
+        if (cond.getFromDate() != null) {
+            LocalDateTime fromDateTime = cond.getFromDate().toLocalDate().atStartOfDay();
+            builder.and(coupon.createdAt.goe(fromDateTime));
+        }
+
+        if (cond.getToDate() != null) {
+            LocalDateTime toDateTime = cond.getToDate().toLocalDate().atTime(23, 59, 59);
+            builder.and(coupon.createdAt.loe(toDateTime));
+        }
+
+        // 쿠폰 데이터 조회
+        List<AdminCoupon> content = queryFactory
+                .selectFrom(coupon)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(coupon.createdAt.desc())
+                .fetch();
+
+        // 전체 카운트 조회
+        long total = queryFactory
+                .select(coupon.count())
+                .from(coupon)
+                .where(builder)
+                .fetchOne();
+
+        // Entity -> DTO 변환 및 상태 계산
+        List<AdminCouponDto> dtoList = content.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+
+        // 상태 필터 적용 (DB에서 필터링하기 어려운 동적 계산 필드)
+        if (StringUtils.hasText(cond.getStatus()) && !"ALL".equals(cond.getStatus())) {
+            CouponStatus filterStatus = CouponStatus.valueOf(cond.getStatus());
+            dtoList = dtoList.stream()
+                    .filter(dto -> dto.calculateStatus() == filterStatus)
+                    .collect(Collectors.toList());
+        }
+
+        return new PageImpl<>(dtoList, pageable, total);
     }
-    // 삭제는 리파지토리에서 구현 X => 서비스에서 notice.hide() => 화면에서만 삭제하기
+
+    // Entity -> DTO 변환 (실제 발급/사용 통계 포함)
+    private AdminCouponDto convertToDto(AdminCoupon entity) {
+
+        // user_coupon 테이블에서 실제 발급/사용 통계 조회
+        CouponUsageStats stats = getCouponUsageStats(entity.getCouponId());
+
+        AdminCouponDto dto = entity.toDto();
+
+        // 동적 계산 필드 설정
+        return AdminCouponDto.builder()
+                .couponId(dto.getCouponId())
+                .couponType(dto.getCouponType())
+                .couponCode(dto.getCouponCode())
+                .discountType(dto.getDiscountType())
+                .discount(dto.getDiscount())
+                .issueCount(dto.getIssueCount()) // 최대 발급 가능 수량
+                .validFrom(dto.getValidFrom())
+                .validUntil(dto.getValidUntil())
+                .createdAt(dto.getCreatedAt())
+                .couponName(dto.getCouponName())
+                .calendar(dto.getCalendar())
+                .actualIssuedCount(stats.getActualIssuedCount()) // 실제 발급된 수
+                .usedCount(stats.getUsedCount()) // 실제 사용된 수
+                .remainingCount(Math.max(0, dto.getIssueCount() - stats.getActualIssuedCount()))
+                .status(CouponStatus.determineCouponStatus(
+                        dto.getValidFrom(), dto.getValidUntil(),
+                        dto.getIssueCount(), stats.getActualIssuedCount(), stats.getUsedCount()))
+                .build();
+    }
+
+    // user_coupon 테이블에서 실제 발급/사용 통계 조회
+    private CouponUsageStats getCouponUsageStats(Integer couponId) {
+        QUserCoupon userCoupon = QUserCoupon.userCoupon;
+
+        // 실제 발급된 수 조회
+        Long actualIssuedCount = queryFactory
+                .select(userCoupon.count())
+                .from(userCoupon)
+                .where(userCoupon.ucId.eq(couponId))
+                .fetchOne();
+
+        // 사용된 수 조회
+        Long usedCount = queryFactory
+                .select(userCoupon.count())
+                .from(userCoupon)
+                .where(userCoupon.ucId.eq(couponId)
+                        .and(userCoupon.status.eq("사용")))
+                .fetchOne();
+
+        return new CouponUsageStats(
+                actualIssuedCount != null ? actualIssuedCount.intValue() : 0,
+                usedCount != null ? usedCount.intValue() : 0
+        );
+    }
+
+    // 쿠폰 사용 통계를 담는 내부 클래스
+    @Getter
+    @AllArgsConstructor
+    private static class CouponUsageStats {
+        private Integer actualIssuedCount;  // 실제 발급된 수 (user_coupon 테이블 기준)
+        private Integer usedCount;          // 실제 사용된 수 (status='사용')
+    }
 }
+
+// 쿠폰 활성 / 만료
+// 쿠폰 시작 - 종료일자 안에 있으면 '활성'
+// 종료일 밖에있으면 => 만료
+// 유효기간 안에 있으나 쿠폰 사용이 발급보다 많아지면, 소진

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
-import com.dev.moyering.common.dto.ClassSearchResponseDto;
+import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.service.HostClassService;
 
@@ -23,10 +23,9 @@ public class HostClassController {
     private final HostClassService hostClassService;
 
     @PostMapping("/classList")
-    public ResponseEntity<ClassSearchResponseDto> searchClasses(
+    public ResponseEntity<PageResponseDto<HostClassDto>> searchClasses(
             @RequestBody ClassSearchRequestDto dto) {
-        ClassSearchResponseDto response;
-		System.out.println(dto+"dtodtodtodto");
+    	PageResponseDto<HostClassDto> response;
 
 		try {
 			response = hostClassService.searchClasses(dto);
