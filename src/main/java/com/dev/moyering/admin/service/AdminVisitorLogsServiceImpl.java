@@ -21,12 +21,26 @@ public class AdminVisitorLogsServiceImpl implements AdminVisitorLogsService {
     @Override
     public void recordVisit(HttpServletRequest request) {
         try {
+
+
             String sessionId = request.getSession().getId(); // 세션 ID
             String ipAddress = request.getRemoteAddr();      // IP 주소
             Integer userId = getCurrentUserId(request);       // 로그인 사용자 ID
             LocalDate today = LocalDate.now();
 
-            // 오늘 이미 기록했는지 체크
+            // DB 조회 전 세션에서 확인
+            // 🎯 세션에서 먼저 체크 (DB 조회 전에!)
+            String todayKey = "visited_" + today.toString();
+            if (request.getSession().getAttribute(todayKey) != null) {
+                return; // 이미 기록했으면 리턴!
+            }
+
+            log.info(" 요청 URI: {}", request.getRequestURI());
+            log.info(" 세션 ID: {}", sessionId);
+            log.info(" 오늘 기록 존재 여부: {}", visitorLogsRepository.existsBySessionIdAndVisitDate(sessionId, today));
+
+
+            // DB조회 전 오늘 이미 기록했는지 체크
             if (!visitorLogsRepository.existsBySessionIdAndVisitDate(sessionId, today)) {
                 VisitorLogs visitorLog = VisitorLogs.builder()  // log → visitorLog로 변경!
                         .userId(userId)
@@ -45,29 +59,29 @@ public class AdminVisitorLogsServiceImpl implements AdminVisitorLogsService {
         }
     }
 
-    @Override
-    public VisitorLogsDto getTodayStats() {
-        LocalDate today = LocalDate.now();
-
-        long totalCount = visitorLogsRepository.countByVisitDate(today);
-        long memberCount = visitorLogsRepository.countByVisitDateAndMemberYn(today, true);
-        long guestCount = visitorLogsRepository.countByVisitDateAndMemberYn(today, false);
-
-        return VisitorLogsDto.builder()
-                .visitDate(today)
-                .visitorCount(totalCount)
-                .memberCount(memberCount)
-                .guestCount(guestCount)
-                .build();
-    }
-
-    @Override
-    public long getMonthlyVisitorCount() {
-        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
-        LocalDate endOfMonth = LocalDate.now();
-
-        return visitorLogsRepository.countByVisitDateBetween(startOfMonth, endOfMonth);
-    }
+//    @Override
+//    public VisitorLogsDto getTodayStats() {
+//        LocalDate today = LocalDate.now();
+//
+//        long totalCount = visitorLogsRepository.countByVisitDate(today);
+//        long memberCount = visitorLogsRepository.countByVisitDateAndMemberYn(today, true);
+//        long guestCount = visitorLogsRepository.countByVisitDateAndMemberYn(today, false);
+//
+//        return VisitorLogsDto.builder()
+//                .visitDate(today)
+//                .visitorCount(totalCount)
+//                .memberCount(memberCount)
+//                .guestCount(guestCount)
+//                .build();
+//    }
+//
+//    @Override
+//    public long getMonthlyVisitorCount() {
+//        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
+//        LocalDate endOfMonth = LocalDate.now();
+//
+//        return visitorLogsRepository.countByVisitDateBetween(startOfMonth, endOfMonth);
+//    }
 
     /**
      * 현재 사용자 ID 가져오기 (private 메서드)

@@ -58,9 +58,7 @@ public class AdminMemberController {
         }
     }
 
-    /**
-     * 회원 상태 변경 (활성화/비활성화)
-     */
+    /*** 회원 상태 변경 (활성화/비활성화)*/
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateMemberStatus(
             @PathVariable Integer userId,

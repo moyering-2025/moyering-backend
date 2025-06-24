@@ -23,25 +23,25 @@ public class AdminVisitorLogsController {
     @GetMapping("/")
     public ResponseEntity<String> home(HttpServletRequest request) {
         // 방문 기록
-        visitorLogsService.recordVisit(request);
+//        visitorLogsService.recordVisit(request);
         return ResponseEntity.ok("메인 페이지입니다!");
     }
 
-    /**
-     * 대시보드용 - 오늘 방문자 통계
-     */
-    @GetMapping("/visitor-stats")
-    public ResponseEntity<VisitorLogsDto> getTodayStats() {
-        VisitorLogsDto stats = visitorLogsService.getTodayStats();
-        return ResponseEntity.ok(stats);
-    }
-
-    /**
-     * 대시보드용 - 이번 달 방문자 수
-     */
-    @GetMapping("/monthly-visitors")
-    public ResponseEntity<Long> getMonthlyVisitors() {
-        long count = visitorLogsService.getMonthlyVisitorCount();
-        return ResponseEntity.ok(count);
-    }
+//    /**
+//     * 대시보드용 - 오늘 방문자 통계
+//     */
+//    @GetMapping("/visitor-stats")
+//    public ResponseEntity<VisitorLogsDto> getTodayStats() {
+//        VisitorLogsDto stats = visitorLogsService.getTodayStats();
+//        return ResponseEntity.ok(stats);
+//    }
+//
+//    /**
+//     * 대시보드용 - 이번 달 방문자 수
+//     */
+//    @GetMapping("/monthly-visitors")
+//    public ResponseEntity<Long> getMonthlyVisitors() {
+//        long count = visitorLogsService.getMonthlyVisitorCount();
+//        return ResponseEntity.ok(count);
+//    }
 }

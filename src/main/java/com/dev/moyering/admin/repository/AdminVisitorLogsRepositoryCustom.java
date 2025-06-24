@@ -14,6 +14,6 @@ public interface AdminVisitorLogsRepositoryCustom {
     // 이번 달 방문자 수 (MAU)
     long countByVisitDateBetween(LocalDate startDate, LocalDate endDate);
 
-    // 오늘 회원/비회원 수 (추가!)
+    // 오늘 회원/비회원 수
     long countByVisitDateAndMemberYn(LocalDate date, Boolean isMember);
 }
