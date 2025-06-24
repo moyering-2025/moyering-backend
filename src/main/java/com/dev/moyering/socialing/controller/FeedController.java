@@ -4,6 +4,9 @@ import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.service.FeedService;
+import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +25,7 @@ import java.util.Map;
 public class FeedController {
 
     private final FeedService feedService;
+    private final UserRepository userRepository;
 
     @GetMapping("/socialing/feeds")
     public ResponseEntity<List<FeedDto>> getFeeds(
@@ -104,15 +108,44 @@ public class FeedController {
         }
     }
 
-    @GetMapping("/socialing/userFeed/{nickName}")
-    public ResponseEntity<List<FeedDto>> getUserFeeds(@PathVariable("nickName") String nickName) {
+    /*@GetMapping("/socialing/userFeed/{nickName}")
+    public ResponseEntity<List<FeedDto>> getUserByNickName(@PathVariable String nickName) {
         try {
-        List<FeedDto> feeds = feedService.getFeedsByNickname(nickName);
-        return ResponseEntity.ok(feeds);
+            User user = userRepository.findByNickName(nickName).orElseThrow(() -> new Exception("유저를 찾을 수 없습니다"));
 
         }catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }*/
+    @GetMapping("/socialing/memberFeed/{nickName}")
+    public ResponseEntity<List<FeedDto>> getFeedsByNickName(
+            @PathVariable("nickName") String nickName,
+            @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        Integer userId = principal != null ? principal.getUser().getUserId() : null;
+        try {
+            List<FeedDto> feeds = feedService.getFeedsByNickname(nickName, userId);
+            return new ResponseEntity<>(feeds, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping(value = "/user/socialing/feed/{feedId}")
+    public ResponseEntity<Void> updateFeed(
+            @PathVariable Integer feedId,
+            @RequestPart("feed") FeedDto feedDto,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @RequestPart(value = "removeUrls", required = false) List<String> removeUrls,
+            @AuthenticationPrincipal PrincipalDetails principal
+    ) throws Exception {
+        FeedDto existing = feedService.getFeedDetail(feedId, principal.getUser().getUserId());
+        if (!existing.getWriterId().equals(principal.getUser().getUsername())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        feedService.updateFeed(feedId, feedDto, images, removeUrls);
+        return ResponseEntity.noContent().build();
     }
 }

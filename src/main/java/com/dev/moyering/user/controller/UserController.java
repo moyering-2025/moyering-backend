@@ -3,9 +3,7 @@ package com.dev.moyering.user.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
@@ -29,6 +27,19 @@ public class UserController {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	
+
+
+
+	//feed
+	@GetMapping("/socialing/feedUser/{nickname}")
+	public ResponseEntity<UserDto> getUserByNickname(@PathVariable String nickname) {
+		try {
+			UserDto user = userService.getByNickname(nickname);
+			return ResponseEntity.ok(user);
+		} catch (Exception e) {
+			// 닉네임이 없으면 404
+			return ResponseEntity.notFound().build();
+		}
+	}
+
 }

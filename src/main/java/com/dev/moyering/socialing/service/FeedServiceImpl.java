@@ -13,14 +13,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,16 +94,40 @@ public class FeedServiceImpl implements FeedService {
         return dto;
     }
 
-    @Override
-    public List<FeedDto> getFeedsByUserId(Integer userId) throws Exception {
-        List<Feed> feeds = feedRepository.findAllByUserUserIdOrderByCreateDateDesc(userId);
-        return feeds.stream().map(Feed::toDto).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<FeedDto> getFeedsByUserId(Integer userId) throws Exception {
+//        List<Feed> feeds = feedRepository.findAllByUserUserIdOrderByCreateDateDesc(userId);
+//        return feeds.stream().map(Feed::toDto).collect(Collectors.toList());
+//    }
 
     @Override
-    public List<FeedDto> getFeedsByNickname(String nickname) throws Exception {
+    public List<FeedDto> getFeedsByNickname(String nickname, Integer userId) throws Exception {
         User user = userRepository.findByNickName(nickname).orElseThrow(() -> new Exception("유저를 찾을 수 없습니다 : " + nickname));
-        return getFeedsByUserId(user.getUserId());
+        List<Feed> feeds = feedRepository.findByUserNickName(nickname);
+
+        return feeds.stream().map(feed -> {
+                    FeedDto dto = feed.toDto();
+                    dto.setCommentsCount(commentRepository.countByFeedFeedIdAndIsDeletedFalse(feed.getFeedId()));
+                    dto.setLikesCount(likeListRepository.countByFeedFeedId(feed.getFeedId()));
+
+                    dto.setCreatedAt(feed.getCreateDate());
+                    dto.setMine(feed.getUser().getUserId().equals(userId));
+
+                    List<CommentDto> commentDtos = commentRepository.findByFeed_FeedIdOrderByCreateAtAsc(feed.getFeedId())
+                            .stream().map(Comment::toDto)
+                            .collect(Collectors.toList());
+                    dto.setComments(commentDtos);
+
+                    List<String> moreImgs = feeds.stream()
+                            .filter(f -> !f.getFeedId().equals(feed.getFeedId()))
+                            .map(Feed::getImg1)
+                            .collect(Collectors.toList());
+                    dto.setMoreImg1List(moreImgs);
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
     }
 
     @Override
@@ -144,4 +172,74 @@ public class FeedServiceImpl implements FeedService {
         entityManager.clear();
         return feedNum;
     }
+
+    @Override
+    @Transactional
+    public void updateFeed(Integer feedId, FeedDto feedDto, List<MultipartFile> images, List<String> removeUrls) throws Exception {
+        Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new Exception("수정하려고 하는 피드가 없습니다"));
+
+        feed.setContent(feedDto.getContent());
+        feed.setTag1(feedDto.getTag1());
+        feed.setTag2(feedDto.getTag2());
+        feed.setTag3(feedDto.getTag3());
+        feed.setTag4(feedDto.getTag4());
+        feed.setTag5(feedDto.getTag5());
+
+        List<String> currentUrls = new ArrayList<>();
+        if (feed.getImg1() != null) currentUrls.add(feed.getImg1());
+        if (feed.getImg2() != null) currentUrls.add(feed.getImg2());
+        if (feed.getImg3() != null) currentUrls.add(feed.getImg3());
+        if (feed.getImg4() != null) currentUrls.add(feed.getImg4());
+        if (feed.getImg5() != null) currentUrls.add(feed.getImg5());
+
+        // 3) 삭제할 기존 이미지 파일 삭제
+        Path dir = Paths.get(iuploadPath);
+        if (removeUrls != null && !removeUrls.isEmpty()) {
+            for (String url : removeUrls) {
+                String filename = Paths.get(url).getFileName().toString();
+                try {
+                    Files.deleteIfExists(dir.resolve(filename));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            currentUrls = currentUrls.stream()
+                    .filter(u -> !removeUrls.contains(u))
+                    .collect(Collectors.toList());
+        }
+        // 새 이미지 저장
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile img : images) {
+                if (img.isEmpty()) continue;
+                String orig = img.getOriginalFilename();
+                String fname = /*System.currentTimeMillis() + "_" +*/iuploadPath+ orig;
+                Path target = dir.resolve(fname);
+                try {
+                    Files.copy(img.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("이미지 저장 실패: " + fname, e);
+                }
+                currentUrls.add("/uploads/feeds/" + feedId + "/" + fname);
+            }
+
+        }
+        // 엔티티 이미지 필드 초기화
+        feed.setImg1(null);
+        feed.setImg2(null);
+        feed.setImg3(null);
+        feed.setImg4(null);
+        feed.setImg5(null);
+
+        // 최종 URL 매핑
+        if (currentUrls.size() > 0) feed.setImg1(currentUrls.get(0));
+        if (currentUrls.size() > 1) feed.setImg2(currentUrls.get(1));
+        if (currentUrls.size() > 2) feed.setImg3(currentUrls.get(2));
+        if (currentUrls.size() > 3) feed.setImg4(currentUrls.get(3));
+        if (currentUrls.size() > 4) feed.setImg5(currentUrls.get(4));
+
+        feedRepository.save(feed);
+    }
 }
+
+
