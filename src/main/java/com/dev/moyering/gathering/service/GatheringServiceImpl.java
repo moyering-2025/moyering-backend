@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.common.dto.GatheringSearchRequestDto;
-import com.dev.moyering.common.dto.GatheringSearchResponseDto;
+import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
@@ -113,7 +113,7 @@ public class GatheringServiceImpl implements GatheringService {
                 .collect(Collectors.toList());
 	}
 	@Override
-	public GatheringSearchResponseDto searchGathers(GatheringSearchRequestDto dto) throws Exception {
+	public PageResponseDto<GatheringDto> searchGathers(GatheringSearchRequestDto dto) throws Exception {
 		Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
 
 		QGathering gathering = QGathering.gathering;
@@ -167,7 +167,8 @@ public class GatheringServiceImpl implements GatheringService {
 					GatheringDto dto2 = g.toDto();
 					return dto2;
 				}).collect(Collectors.toList());
-		return GatheringSearchResponseDto.builder()
+		
+		return PageResponseDto.<GatheringDto>builder()
 				.content(dtoList)
 	            .currentPage(dto.getPage() + 1)
 	            .totalPages((int) Math.ceil((double) total / dto.getSize()))
