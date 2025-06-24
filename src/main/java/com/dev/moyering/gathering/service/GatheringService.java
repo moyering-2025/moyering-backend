@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.common.dto.GatheringSearchRequestDto;
-import com.dev.moyering.common.dto.GatheringSearchResponseDto;
+import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.util.PageInfo;
@@ -22,5 +22,5 @@ public interface GatheringService {
 	
 	//메인페이지 게더링
 	List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception;
-	GatheringSearchResponseDto searchGathers(GatheringSearchRequestDto dto)throws Exception;
+	PageResponseDto<GatheringDto> searchGathers(GatheringSearchRequestDto dto)throws Exception;
 }

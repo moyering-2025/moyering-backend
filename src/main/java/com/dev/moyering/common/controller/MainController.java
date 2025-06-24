@@ -11,13 +11,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.admin.dto.BannerDto;
 import com.dev.moyering.admin.service.BannerService;
 import com.dev.moyering.auth.PrincipalDetails;
+import com.dev.moyering.common.dto.ClassRingDetailResponseDto;
 import com.dev.moyering.common.dto.GatheringSearchRequestDto;
-import com.dev.moyering.common.dto.GatheringSearchResponseDto;
+import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.service.GatheringService;
 import com.dev.moyering.host.dto.ClassCalendarDto;
@@ -75,9 +77,9 @@ public class MainController {
     }
     
     @PostMapping("/gatheringList")
-    public ResponseEntity<GatheringSearchResponseDto> searchClasses(
+    public ResponseEntity<PageResponseDto<GatheringDto>> searchClasses(
             @RequestBody GatheringSearchRequestDto dto) {
-    	GatheringSearchResponseDto response;
+    	PageResponseDto<GatheringDto> response;
 
 		try {
 			response = gatheringService.searchGathers(dto);
@@ -89,19 +91,35 @@ public class MainController {
     }
     
     @GetMapping("/classRingDetail/{classId}") 
-    public ResponseEntity<Map<String, Object>> classRingDetail (@PathVariable("classId") Integer classId) {
+    public ResponseEntity<ClassRingDetailResponseDto> classRingDetail (@PathVariable("classId") Integer classId) {
     	try {
 			HostClassDto hostclass = hostClassService.getClassDetailByClassID(classId);
 	        List<ClassCalendarDto> classCalendar = classCalendarService.getClassCalendarByHostClassId(classId);
 	        HostDto host = hostService.getHostById(hostclass.getHostId());
 	        List<ReviewDto> reviews = reviewService.getReviewByHostId(hostclass.getHostId());
-	        Map<String, Object> result = new HashMap<>();
-	        result.put("class", hostclass);
-	        result.put("calendar", classCalendar);
-	        result.put("currList", classCalendar);
-	        result.put("host", host);
-	        result.put("reviews", reviews);
+	        
+	        ClassRingDetailResponseDto result = ClassRingDetailResponseDto.builder()
+	                .hostClass(hostclass)
+	                .calendarList(classCalendar)
+	                .currList(classCalendar) // 혹시 다르면 따로 분리
+	                .host(host)
+	                .reviews(reviews)
+	                .build();
 	        return ResponseEntity.ok(result);
+
+		} catch (Exception e) {
+	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			
+		}
+    }
+    
+    @GetMapping("/classRingReviewList/{hostId}") 
+    public ResponseEntity<PageResponseDto<ReviewDto>> classRingReviewList (
+    		@PathVariable("hostId") Integer hostId,
+    		@RequestParam(defaultValue = "0") int page,
+    		@RequestParam(defaultValue = "10") int size) {
+    	try {
+    		PageResponseDto<ReviewDto> reviewList = reviewService.getAllReviewByHostId(hostId, page, size);
+            return ResponseEntity.ok(reviewList);
 
 		} catch (Exception e) {
 	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			

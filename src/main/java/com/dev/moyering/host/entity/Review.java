@@ -38,6 +38,8 @@ public class Review {
 	private Date responseDate; //리뷰 답변일자
 	@Column
 	private Integer star; //별점
+	@Column
+	private String reviewImg;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="calendarId")
@@ -57,6 +59,7 @@ public class Review {
 				.revRegCotnent(revRegCotnent)
 				.responseDate(responseDate)
 				.star(star)
+				.reviewImgName(reviewImg)
 				.build();
 		if(classCalendar!=null) {
 			dto.setCalendarId(classCalendar.getCalendarId());
