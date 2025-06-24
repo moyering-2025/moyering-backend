@@ -6,4 +6,5 @@ public interface OAuth2UserInfo {
 	String getEmail();
 	String getName();
 	String getProfileImage();
+	String getNickName();//nickname. 카카오에서는 profileName으로 줌
 }
