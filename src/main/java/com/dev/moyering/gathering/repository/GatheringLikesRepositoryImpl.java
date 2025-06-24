@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
@@ -46,6 +48,7 @@ public class GatheringLikesRepositoryImpl implements GatheringLikesRepositoryCus
 				.fetchOne();
 	}
 	@Override
+	@Transactional
 	public void deleteGatheringLikes(Integer gatheringLikeId) throws Exception {
 		QGatheringLikes gatheringLikes = QGatheringLikes.gatheringLikes;
 		

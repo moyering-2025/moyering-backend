@@ -16,4 +16,5 @@ public interface HostClassService {
 	Map<Integer,List<ClassCalendarDto>> getHostClassesWithCalendars(Integer hostId) throws Exception;
 	List<HostClassDto> selectHostClassByHostId(Integer hostId) throws Exception;
 	HostClassDto getClassDetail(Integer classId, Integer calendarId, Integer hostId);
+	HostClassDto getClassDetailByClassID(Integer classId) throws Exception;
 }

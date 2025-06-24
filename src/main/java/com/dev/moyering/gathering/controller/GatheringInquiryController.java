@@ -15,6 +15,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -111,15 +113,16 @@ public class GatheringInquiryController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}	
-	@PostMapping("/writeGatheringInquiry")
+	@PostMapping("/user/writeGatheringInquiry")
 	public ResponseEntity<Integer> writeGatheringInquiry(@AuthenticationPrincipal PrincipalDetails principal, 
-			@ModelAttribute GatheringInquiryDto gatheringInquiryDto) {
+		@RequestBody  Map<String, Object> requestData) {
 		try {
-			if(gatheringInquiryDto.getUserId()==null || !gatheringInquiryDto.getUserId().equals(principal.getUser().getUserId())) {
-				gatheringInquiryDto.setUserId(principal.getUser().getUserId());
-			}
+			 GatheringInquiryDto gatheringInquiryDto = new GatheringInquiryDto();
+			gatheringInquiryDto.setGatheringId(Integer.valueOf(requestData.get("gatheringId").toString()));
+			gatheringInquiryDto.setInquiryContent(requestData.get("inquiryContent").toString());
+			gatheringInquiryDto.setUserId(principal.getUser().getUserId());
+			System.out.println("여기까지는 옴 : "+ gatheringInquiryDto);
 			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringInquiryDto);
-			
 			if(gatheringInquiryId!=null) {
 				return new ResponseEntity<>(gatheringInquiryId, HttpStatus.OK);
 			} else {

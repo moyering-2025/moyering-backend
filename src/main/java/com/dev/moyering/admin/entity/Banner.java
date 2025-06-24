@@ -1,5 +1,6 @@
 package com.dev.moyering.admin.entity;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 
 import javax.persistence.*;
@@ -38,12 +39,13 @@ public class Banner {
 	@Comment("1=게시, 0은 숨김")
 	private Integer status = 1;
 
-    @CreatedDate
+//    @CreatedDate // util.date 일 경우만 사용
+//	@Temporal(TemporalType.DATE) // util.date 일 경우만 사용
     @Column(updatable = false)
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     @Column
-    private String bannerImg;
+    private String bannerImg; // 배너 이미지용
 
 
 	@ManyToOne(fetch=FetchType.LAZY)
@@ -66,19 +68,26 @@ public class Banner {
 	}
 
 	public void changeBanner(String title, String content, String img) {
-		this.title = title;
-		this.content = content;
-		this.bannerImg = img;
+		// 값이 없을 경우에는 유지, 업데이트하는 값이 있을 경우에만 수정
+		if (title != null) this.title = title;
+		if (content != null) this.content = content;
+		if (img != null) this.bannerImg = img;
 	}
 
-	public void deleteBanner() {Integer bannerId = this.bannerId;}
+	// 논리적 삭제
+	public void deleteBanner() {
+		// 삭제 전 필요 비즈니스 로직
+		this.status = -1; // 삭제 상태로 변경
+	}
 
+
+	// 배너 숨기기
 	public void hide(){
-		this.status = 1;
+		this.status = 0;
 	}
 
-
+	// 배너 보이기
 	public void show(){
-		this.status = 0;
+		this.status = 1;
 	}
 }

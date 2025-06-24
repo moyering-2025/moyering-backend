@@ -4,6 +4,7 @@ import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,45 +29,48 @@ public class Review {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer reviewId;
 	@Column
-	private String className;
+	private String content; //리뷰 
 	@Column
-	private String content;
+	private Date reviewDate; //리뷰 날짜 
 	@Column
-	private String studentName;
+	private String revRegCotnent; //리뷰 답변
 	@Column
-	private Integer state;
+	private Date responseDate; //리뷰 답변일자
 	@Column
-	private String revRegCotnent;
-	@Column
-	private Date responseDate;
-	@ManyToOne
+	private Integer star; //별점
+	
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="calendarId")
 	private ClassCalendar classCalendar;
-	@ManyToOne
-	@JoinColumn(name="hostId")
-	private Host host;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="userId")
 	private User user;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="hostId")
+	private Host host;
 	
-	ReviewDto toDto() {
+	public ReviewDto toDto() {
 		ReviewDto dto = ReviewDto.builder()
 				.reviewId(reviewId)
-				.className(className)
 				.content(content)
-				.state(state)
+				.reviewDate(reviewDate)
 				.revRegCotnent(revRegCotnent)
 				.responseDate(responseDate)
+				.star(star)
 				.build();
 		if(classCalendar!=null) {
 			dto.setCalendarId(classCalendar.getCalendarId());
+			dto.setClassName(classCalendar.getHostClass().getName());
 		}
 		if(host!=null) {
-			dto.setHostId(host.getHostId());			
+			dto.setHostId(host.getHostId());	
+			dto.setHostName(host.getName());
+			dto.setHostProfileName(host.getProfile());
 		}
 		if(user!=null) {
-			dto.setUserId(host.getHostId());
-			dto.setStudentName(host.getName());
+			dto.setUserId(user.getUserId());
+			dto.setStudentName(user.getName());
+			dto.setProfileName(user.getProfile());
 		}
 		return dto;
 	}

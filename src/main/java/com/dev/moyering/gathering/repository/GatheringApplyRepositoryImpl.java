@@ -52,13 +52,22 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	@Override
 	public void updateMemberApproval(Integer gatheringId, Integer userId, boolean isApproved) throws Exception {
 		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+		    QUser user = QUser.user;
 		
 	}
 
 	@Override
 	public Integer findBygatheringIdAnduserId(Integer gatheringId, Integer userId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+	    QUser user = QUser.user;
+		return jpaQueryFactory.select(gatheringApply.count())
+		        .from(gatheringApply)
+		        .join(user).on(gatheringApply.user.userId.eq(user.userId))
+		        .where(
+		            gatheringApply.gathering.gatheringId.eq(gatheringId),
+		            gatheringApply.user.userId.eq(userId)
+		        )
+		        .fetchOne().intValue();
 	}
 	
 //	@Override

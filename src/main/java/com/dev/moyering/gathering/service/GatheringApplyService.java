@@ -13,5 +13,5 @@ public interface GatheringApplyService {
 	public List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId)throws Exception;
 
 	public Integer findByGatheringIdAndUserId(Integer gatheringId, Integer userId)throws Exception;
-
+	public Integer applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception;
 }

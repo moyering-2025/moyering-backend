@@ -2,7 +2,7 @@ package com.dev.moyering.admin.repository;
 
 import com.dev.moyering.admin.dto.BannerDto;
 
-import com.dev.moyering.admin.entity.Banner;
+import com.dev.moyering.admin.entity.QBanner;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -36,7 +36,8 @@ public class BannerRepositoryImpl implements BannerRepositoryCustom {
                 ))
                 .from(banner)
                 .where(
-                        searchBanner(keyword)
+                        searchBanner(keyword),
+                        banner.status.ne(-1) // 삭제되지 않은 배너만 (삭제됨 : -1, 숨기기 : 0, 보이기 : 1)
                 )
                 .orderBy(
                         banner.createdAt.desc()
@@ -71,7 +72,8 @@ public class BannerRepositoryImpl implements BannerRepositoryCustom {
                         banner.user.userId
                 ))
                 .from(banner)
-                .where(banner.bannerId.eq(bannerId))
+                .where(banner.bannerId.eq(bannerId),
+                        banner.status.ne(-1))
                 .fetchOne();
 
         if (result == null) {
@@ -79,5 +81,18 @@ public class BannerRepositoryImpl implements BannerRepositoryCustom {
         }
 
         return result;
+    }
+
+
+    @Override
+    public long countVisibleBanners() {
+        return queryFactory
+                .select(banner.count())
+                .from(banner)
+                .where(
+                        banner.status.eq(1)           // status = 1 (보임)
+                                .or(banner.status.isNull())   // 또는 status가 null (기본값으로 보임 처리)
+                )
+                .fetchOne();
     }
 }
