@@ -86,7 +86,7 @@ public class GatheringController {
 			List<GatheringApplyDto> member = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
 //			Integer totalLikeNum = gatheringLikesService.getTotalLikesOfGatheringByGatheringId(gatheringId);
 			userDto.setPassword(null);
-			res.put("host", userDto);
+			res.put("organizer", userDto);
 			res.put("member", member);
 //			res.put("totalLikeNum", totalLikeNum);
 			return new ResponseEntity<>(res, HttpStatus.OK);
@@ -100,9 +100,6 @@ public class GatheringController {
 	public ResponseEntity<Map<String,Object>> extraDetail(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestParam("gatheringId") Integer gatheringId) {
 		try {
-	        System.out.println("API 호출됨!");
-	        System.out.println("gatheringId: " + gatheringId);
-	        System.out.println("로그인 정보 : "+principal.getUser().getUserId());
 			//찜 여부, 신청여부
 			Map<String,Object> res = new HashMap<>();
 			System.out.println("로그인 정보 : "+principal.getUser().getUserId());
@@ -141,10 +138,21 @@ public class GatheringController {
 	public ResponseEntity<GatheringDto> detailForModifyGathering(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestParam("gatheringId") Integer gatheringId) {
 		try {
+	        System.out.println("API 호출됨!");
+	        System.out.println("gatheringId: " + gatheringId);
+	        System.out.println("로그인 정보 : "+principal.getUser().getUserId());
 			GatheringDto gatheringDto = gatheringService.detailGathering(gatheringId);
-			//호스트,신청 멤버 정보 추가
 			System.out.println("조회된 게더링 : " + gatheringDto);
-			return new ResponseEntity<>(gatheringDto, HttpStatus.OK);
+			if(gatheringDto==null) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			} else {
+				if(gatheringDto.getUserId()==principal.getUser().getUserId()) {
+					return new ResponseEntity<>(gatheringDto, HttpStatus.OK);
+				} else {
+					return new ResponseEntity<>(HttpStatus.FORBIDDEN); 
+				}
+				
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -20,7 +20,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.user.entity.User;
-import com.dev.moyering.common.entity.Category;
 import com.dev.moyering.common.entity.SubCategory;
 
 import lombok.AllArgsConstructor;
