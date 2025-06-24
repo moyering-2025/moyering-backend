@@ -28,10 +28,9 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 	public Integer findByGatheringIdAndUserId(Integer gatheringId, Integer userId) throws Exception {
 		return gatheringApplyRepository.findBygatheringIdAnduserId(gatheringId, userId);
 	} 
-	public Integer applyToGathering(Integer gatheringId, Integer userId) throws Exception {
-		GatheringApplyDto gatheringApplyDto = new GatheringApplyDto();
-		gatheringApplyDto.setGatheringId(gatheringId);
-		gatheringApplyDto.setUserId(userId);
+	@Override
+	public Integer applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception {
+		
 		GatheringApply gatheringApply = gatheringApplyDto.toEntity();
 		gatheringApplyRepository.save(gatheringApply);
 		return gatheringApply.getGatheringApplyId();

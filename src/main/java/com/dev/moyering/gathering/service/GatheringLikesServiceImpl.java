@@ -37,6 +37,7 @@ public class GatheringLikesServiceImpl implements GatheringLikesService {
 		// 좋아요 상태 변경
 		
 		Integer gatheringLikeNum = gatheringLikesRepository.selectGatheringLikes(userId, gatheringId); 
+		System.out.println("gatheringLikeNum : "+gatheringLikeNum);
 		if(gatheringLikeNum==null) {
 			gatheringLikesRepository.save(
 					GatheringLikes.builder()
