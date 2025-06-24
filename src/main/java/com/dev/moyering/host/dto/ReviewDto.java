@@ -2,6 +2,8 @@ package com.dev.moyering.host.dto;
 
 import java.sql.Date;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.entity.Review;
@@ -23,6 +25,7 @@ public class ReviewDto {
 	private String revRegCotnent;
 	private Date responseDate;
 	private Integer star;
+	private String reviewImgName;
 	private Integer calendarId;
 	private Integer userId;
 	private Integer hostId;
@@ -32,6 +35,7 @@ public class ReviewDto {
 	private String hostName;
 	private String profileName; //리뷰 작성자 프사
 	private String hostProfileName; //리뷰 답변자 (강사) 프사
+   private MultipartFile reviewImg;
 
 	public Review toEntity() {
 		Review entity = Review.builder()
@@ -41,6 +45,7 @@ public class ReviewDto {
 				.revRegCotnent(revRegCotnent)
 				.responseDate(responseDate)
 				.star(star)
+				.reviewImg(reviewImgName)
 				.build();
 		if(hostId!=null) {
 			entity.setHost(Host.builder()

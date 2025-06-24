@@ -29,6 +29,7 @@ public class InquiryDto {
 	private String studentName;
 	private String className;
 	private String hostName;
+	private Integer classId;
 
 	public Inquiry toEntity() {
 		Inquiry entity = Inquiry.builder()
