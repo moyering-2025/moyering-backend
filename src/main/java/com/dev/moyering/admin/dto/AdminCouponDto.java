@@ -1,6 +1,7 @@
 package com.dev.moyering.admin.dto;
 
 import com.dev.moyering.admin.entity.AdminCoupon;
+import com.dev.moyering.admin.entity.CouponStatus;
 import com.dev.moyering.host.entity.ClassCalendar;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,9 +27,16 @@ public class AdminCouponDto {
     private String couponName; // 쿠폰 이름
     private ClassCalendar calendar; // 일정 아이디
 
+    // 동적으로 계산되는 필드
+    private CouponStatus status; // 쿠폰 상태
+    private Integer actualIssuedCount; // 실제 발급된 쿠폰 수 (user_coupon 테이블 기준)
+    private Integer usedCount; // 사용된 쿠폰 수 (user_coupon.status='사용')
+    private Integer remainingCount; // 남은 발급 가능 쿠폰 수
 
 
-    // DTO -> Entity 변환 (  * Repository에서 사용하는 생성자로 순서가 Repository 구현과 정확히 일치해야 함)
+
+
+    // DTO -> Entity 변환
     public AdminCoupon toEntity() {
         return AdminCoupon.builder()
                 .couponId(this.couponId)
@@ -36,11 +44,30 @@ public class AdminCouponDto {
                 .couponCode(this.couponCode)
                 .discountType(this.discountType)
                 .discount(this.discount)
+                .issueCount(this.issueCount)
                 .validFrom(this.validFrom)
                 .validUntil(this.validUntil)
                 .createdAt(this.createdAt)
                 .couponName(this.couponName)
                 .calendar(this.calendar)
                 .build();
+    }
+
+    // 쿠폰 상태 계산 메서드
+    public CouponStatus calculateStatus() {
+        return CouponStatus.determineCouponStatus(
+                this.validFrom,
+                this.validUntil,
+                this.issueCount,
+                this.actualIssuedCount,
+                this.usedCount
+        );
+    }
+
+    // 남은 발급 가능 쿠폰 수 계산
+    public Integer calculateRemainingCount() {
+        if (this.issueCount == null) return 0;
+        if (this.actualIssuedCount == null) return this.issueCount;
+        return Math.max(0, this.issueCount - this.actualIssuedCount);
     }
 }
