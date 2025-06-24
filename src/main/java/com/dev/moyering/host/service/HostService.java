@@ -10,6 +10,6 @@ public interface HostService {
 	Integer registHost(HostDto hostDto,MultipartFile profile) throws Exception;
 	Host findByUserId(Integer userId) throws Exception;
 	Host findByHostId(Integer hostId) throws Exception;
-	Host updateHost(Integer hostId,String name,String publicTel,String email,String intro,String profile) throws Exception;
+	Host updateHost(Integer hostId,String name,String publicTel,String email,String intro,MultipartFile profile) throws Exception;
 	Host updateHostSettlement(Integer hostId,String bankName,String accName,String accNum,MultipartFile idCard) throws Exception;
 }

@@ -26,120 +26,110 @@ import com.dev.moyering.host.service.ScheduleDetailService;
 
 @RestController
 public class HostController {
-	
+
 	@Autowired
 	private HostService hostService;
 	@Autowired
 	private HostClassService hostClassService;
 	@Autowired
 	private ScheduleDetailService scheduleDetailService;
-	
-	
+
 	@PostMapping("/host/regist")
 	public ResponseEntity<Integer> hostRegist(HostDto hostDto,
-			@RequestParam(name="ifile",required=false) MultipartFile profile){
+			@RequestParam(name = "ifile", required = false) MultipartFile profile) {
 		try {
-			Integer hostId = hostService.registHost(hostDto,profile);
+			Integer hostId = hostService.registHost(hostDto, profile);
 			System.out.println(hostId);
-			return new ResponseEntity<Integer>(hostId,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<Integer>(hostId, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		
+
 		}
 	}
-	
+
 	@GetMapping("/host/hostProfile")
-	public ResponseEntity<Host> hostProfile(@RequestParam Integer hostId){
+	public ResponseEntity<Host> hostProfile(@RequestParam Integer hostId) {
 		try {
 			Host host = hostService.findByHostId(hostId);
-			return new ResponseEntity<>(host,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<>(host, HttpStatus.OK);
+		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@PostMapping("/host/hostProfileUpdate")
 	public ResponseEntity<Host> hostProfileUpdate(@RequestParam Integer hostId,
-			@RequestParam(required = false) String name,
-			@RequestParam(required = false) String publicTel,
-			@RequestParam(required = false) String email,
-			@RequestParam(required = false) String intro,
-			@RequestParam(required = false) String profile
-			){
-		try{
+			@RequestParam(required = false) String name, @RequestParam(required = false) String publicTel,
+			@RequestParam(required = false) String email, @RequestParam(required = false) String intro,
+			@RequestParam(required = false) MultipartFile profile) {
+		try {
 			Host host = hostService.updateHost(hostId, name, publicTel, email, intro, profile);
-			return new ResponseEntity<>(host,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<>(host, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@PostMapping("/host/settlementInfoUpdate")
 	public ResponseEntity<Host> hostSettlementInfoUpdate(@RequestParam Integer hostId,
-			@RequestParam(required = false) String bankName,
-			@RequestParam(required = false) String accName,
+			@RequestParam(required = false) String bankName, @RequestParam(required = false) String accName,
 			@RequestParam(required = false) String accNum,
-			@RequestParam(value="idCard", required = false) MultipartFile idCard){
+			@RequestParam(value = "idCard", required = false) MultipartFile idCard) {
 		try {
-			System.out.println("original"+idCard.getOriginalFilename());
 			Host host = hostService.updateHostSettlement(hostId, bankName, accName, accNum, idCard);
-			return new ResponseEntity<>(host,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<>(host, HttpStatus.OK);
+		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	
-	
+
 	@PostMapping("/host/classRegist/submit")
-	public ResponseEntity<Integer> classRegist(HostClassDto hostClassDto, Date[] dates,@RequestPart("scheduleDetail") String scheduleDetail){
+	public ResponseEntity<Integer> classRegist(HostClassDto hostClassDto, Date[] dates,
+			@RequestPart("scheduleDetail") String scheduleDetail) {
 		try {
 			Integer classId = hostClassService.registClass(hostClassDto, Arrays.asList(dates));
 			System.out.println(hostClassDto.getCategory1());
 			System.out.println(hostClassDto.getCategory2());
 			scheduleDetailService.registScheduleDetail(scheduleDetail, classId);
 			return new ResponseEntity<>(classId, HttpStatus.OK);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@GetMapping("/host/HostclassList")
-	public ResponseEntity<List<HostClassDto>> hostClassList(@RequestParam Integer hostId){
+	public ResponseEntity<List<HostClassDto>> hostClassList(@RequestParam Integer hostId) {
 //		
 		try {
 			List<HostClassDto> hostClasses = hostClassService.selectHostClassByHostId(hostId);
 			System.out.println(hostClasses);
-			return new ResponseEntity<>(hostClasses,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<>(hostClasses, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
+
 	}
-	
+
 	@GetMapping("/host/hostClassDetail")
-	public ResponseEntity<Map<String,Object>> hostClassDetail(@RequestParam Integer classId,
-			@RequestParam Integer calendarId,
-														@RequestParam Integer hostId){
+	public ResponseEntity<Map<String, Object>> hostClassDetail(@RequestParam Integer classId,
+			@RequestParam Integer calendarId, @RequestParam Integer hostId) {
 		try {
-			Map<String,Object> result = new HashMap<>();
+			Map<String, Object> result = new HashMap<>();
 			HostClassDto dto = hostClassService.getClassDetail(classId, calendarId, hostId);
 			List<ScheduleDetailDto> scheduleDetails = scheduleDetailService.selectScheduleDetailByClassId(classId);
 			System.out.println(classId);
 			System.out.println(scheduleDetails);
 			result.put("hostClass", dto);
 			result.put("scheduleDetail", scheduleDetails);
-			return new ResponseEntity<>(result,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	
 
 }

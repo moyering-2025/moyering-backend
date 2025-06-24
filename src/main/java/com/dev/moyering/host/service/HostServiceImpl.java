@@ -53,14 +53,20 @@ public class HostServiceImpl implements HostService {
 	}
 
 	@Override
-	public Host updateHost(Integer hostId,String name, String publicTel, String email, String intro, String profile) throws Exception {
+	public Host updateHost(Integer hostId,String name, String publicTel, String email, String intro, MultipartFile profile) throws Exception {
 		Host host = hostRepository.findById(hostId).get();
 		if(host != null) {
 			if(name!= null) host.setName(name);
 			if(publicTel != null) host.setPublicTel(publicTel);
 			if(email != null) host.setEmail(email);
 			if(intro != null) host.setIntro(intro);
-			if(profile != null)host.setProfile(profile);			
+			if(profile != null)host.setProfile(profile.getOriginalFilename());			
+		}
+		if(profile != null && !profile.isEmpty()) {
+			String fileName = profile.getOriginalFilename();
+		    Path savePath = Paths.get(iuploadPath, fileName);  // ✅ 폴더 + 파일명
+		    Files.write(savePath, profile.getBytes());
+		    host.setIdCard(fileName);  // DB에는 파일명만 저장
 		}
 		hostRepository.save(host);
 		Host sHost = hostRepository.findById(hostId).get();
@@ -70,7 +76,9 @@ public class HostServiceImpl implements HostService {
 	@Override
 	public Host updateHostSettlement(Integer hostId, String bankName, String accName, String accNum, MultipartFile idCard)
 			throws Exception {
+		System.out.println(hostId);
 		Host host = hostRepository.findById(hostId).get();
+		System.out.println(host);
 		if(host != null) {
 			if(bankName!=null)host.setBankName(bankName);
 			if(accName!=null)host.setAccName(accName);
