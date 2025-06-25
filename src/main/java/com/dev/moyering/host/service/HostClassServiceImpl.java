@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
-import com.dev.moyering.common.dto.ClassSearchResponseDto;
+import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.common.repository.SubCategoryRepository;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
@@ -113,7 +113,7 @@ public class HostClassServiceImpl implements HostClassService {
 	}
 
 	@Override
-	public ClassSearchResponseDto searchClasses(ClassSearchRequestDto dto) throws Exception {
+	public PageResponseDto<HostClassDto> searchClasses(ClassSearchRequestDto dto) throws Exception {
 		Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
 
 		QHostClass hostClass = QHostClass.hostClass;
@@ -197,7 +197,7 @@ public class HostClassServiceImpl implements HostClassService {
 			return dto2;
 		}).collect(Collectors.toList());
 
-		return ClassSearchResponseDto.builder().content(dtoList).currentPage(dto.getPage() + 1)
+		return PageResponseDto.<HostClassDto>builder().content(dtoList).currentPage(dto.getPage() + 1)
 				.totalPages((int) Math.ceil((double) total / dto.getSize())).totalElements(total).build();
 	}
 

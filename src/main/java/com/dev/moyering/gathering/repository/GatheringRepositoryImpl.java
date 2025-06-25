@@ -103,6 +103,9 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 				.set(gathering.startTime, LocalTime.parse(gatheringDto.getStartTime()))
 				.set(gathering.endTime, LocalTime.parse(gatheringDto.getEndTime()))
 				.set(gathering.applyDeadline, gatheringDto.getApplyDeadline())
+				.set(gathering.latitude, gatheringDto.getLatitude())
+				.set(gathering.locName, gatheringDto.getLocName())
+				.set(gathering.longitude, gatheringDto.getLongitude())
 				.where(gathering.gatheringId.eq(gatheringDto.getGatheringId()));
 		if(gatheringDto.getThumbnailFileName()!=null && !gatheringDto.getThumbnailFileName().equals("")) {
 			clause.set(gathering.thumbnail, gatheringDto.getThumbnailFileName());
