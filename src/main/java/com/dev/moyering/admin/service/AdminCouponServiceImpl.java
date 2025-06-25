@@ -56,8 +56,6 @@ public class AdminCouponServiceImpl implements AdminCouponService {
                     .issueCount(couponDto.getIssueCount())
                     .validFrom(couponDto.getValidFrom())
                     .validUntil(couponDto.getValidUntil())
-                    .couponName(couponDto.getCouponName())
-                    .calendar(couponDto.getCalendar())
                     .build();
         }
 
@@ -92,8 +90,6 @@ public class AdminCouponServiceImpl implements AdminCouponService {
                 .validFrom(dto.getValidFrom())
                 .validUntil(dto.getValidUntil())
                 .createdAt(existingCoupon.getCreatedAt()) // 기존 생성일시 유지
-                .couponName(dto.getCouponName())
-                .calendar(dto.getCalendar())
                 .build();
 
         AdminCoupon savedCoupon = adminCouponRepository.save(updatedCoupon);
