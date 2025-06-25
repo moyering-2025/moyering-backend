@@ -17,18 +17,22 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dev.moyering.host.dto.ClassCouponDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostClassSearchRequestDto;
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.dto.HostPageResponseDto;
 import com.dev.moyering.host.dto.ScheduleDetailDto;
 import com.dev.moyering.host.entity.Host;
+import com.dev.moyering.host.service.ClassCouponService;
 import com.dev.moyering.host.service.HostClassService;
 import com.dev.moyering.host.service.HostService;
 import com.dev.moyering.host.service.ScheduleDetailService;
-import com.dev.moyering.user.dto.UserDto;
-import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @RestController
 public class HostController {
@@ -41,6 +45,8 @@ public class HostController {
 	private ScheduleDetailService scheduleDetailService;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private ClassCouponService couponService;
 
 	@PostMapping("/host/regist")
 	public ResponseEntity<Integer> hostRegist(HostDto hostDto,
@@ -110,13 +116,24 @@ public class HostController {
 	}
 
 	@PostMapping("/host/classRegist/submit")
-	public ResponseEntity<Integer> classRegist(HostClassDto hostClassDto, Date[] dates,
+	public ResponseEntity<Integer> classRegist(HostClassDto hostClassDto, Date[] dates,@RequestPart("coupons") String couponsJson,
 			@RequestPart("scheduleDetail") String scheduleDetail) {
 		try {
 			Integer classId = hostClassService.registClass(hostClassDto, Arrays.asList(dates));
 			System.out.println(hostClassDto.getCategory1());
 			System.out.println(hostClassDto.getCategory2());
 			scheduleDetailService.registScheduleDetail(scheduleDetail, classId);
+			
+			 ObjectMapper mapper = new ObjectMapper();
+		        mapper.registerModule(new JavaTimeModule()); // LocalDateTime용
+		        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+		        List<ClassCouponDto> coupons = mapper.readValue(
+		                couponsJson,
+		                new TypeReference<List<ClassCouponDto>>() {}
+		        );
+			
+			couponService.insertHostSelectedCoupon(coupons, classId);
 			return new ResponseEntity<>(classId, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();

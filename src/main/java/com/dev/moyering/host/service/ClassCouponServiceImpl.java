@@ -1,6 +1,8 @@
 package com.dev.moyering.host.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,6 +65,20 @@ public class ClassCouponServiceImpl implements ClassCouponService {
         //클래스 쿠폰의 사용량 증가
         classCoupon.setUsedCnt(classCoupon.getUsedCnt()+1);
         classCouponRepository.save(classCoupon);
+	}
+
+	@Override
+	public void insertHostSelectedCoupon(List<ClassCouponDto> couponList,Integer classId) throws Exception {
+		for(ClassCouponDto coupon : couponList) {
+			if(coupon.getValidFrom().isAfter(LocalDateTime.now())) {
+				coupon.setStatus("활성");
+			}else if(coupon.getValidFrom().isBefore(LocalDateTime.now())) {				
+				coupon.setStatus("예정");
+			}
+			coupon.setUsedCnt(0);
+			classCouponRepository.save(coupon.toEntity());
+		}
+		
 	}
 
 }
