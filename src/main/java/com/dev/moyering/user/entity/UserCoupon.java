@@ -13,15 +13,19 @@ import javax.persistence.Table;
 
 import com.dev.moyering.admin.entity.AdminCoupon;
 import com.dev.moyering.host.entity.ClassCoupon;
+import com.dev.moyering.host.entity.HostClass;
+import com.dev.moyering.user.dto.UserCouponDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "user_coupon")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -35,7 +39,8 @@ public class UserCoupon {
 
     @Column(nullable = false)
     private LocalDateTime downloadedAt;
-
+    
+    @Column
     private LocalDateTime usedAt;
 
     @ManyToOne
@@ -49,4 +54,27 @@ public class UserCoupon {
     @ManyToOne
     @JoinColumn(name = "coupon_id")
     private AdminCoupon adminCoupon;
+    
+    public UserCouponDto toDto() {
+    	UserCouponDto dto = UserCouponDto.builder()
+    			.ucId(ucId)
+    			.status(status)
+    			.downloadedAt(downloadedAt)
+    			.usedAt(usedAt)
+    			.build();
+    	if (user!= null ) {
+    		dto.setUserId(user.getUserId());
+    	}
+    	if (classCoupon!= null) {
+    		dto.setClassCouponId(classCoupon.getClassCouponId());
+    		dto.setCouponName(classCoupon.getCouponName());
+    		dto.setClassName(classCoupon.getHostClass().getName());
+    	}
+    	if (adminCoupon!= null) {
+    		dto.setCouponId(adminCoupon.getCouponId());
+    		dto.setCouponName(adminCoupon.getCouponCode());
+    	}
+    	
+    	return dto;
+    }
 }

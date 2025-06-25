@@ -20,10 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 @Slf4j
-public class UserClassController {
+public class UserInquiryController {
 	private final ReviewService reviewService;
 	private final InquiryService inquiryService;
 	
+	//클래스 상세 문의하기
 	@PostMapping("/writeClassInquiry")
 	public ResponseEntity<Integer> writeClassInquiry(
 			@RequestBody InquiryDto dto,@AuthenticationPrincipal PrincipalDetails principal) {
