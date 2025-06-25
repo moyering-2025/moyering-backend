@@ -1,4 +1,4 @@
-package com.dev.moyering.user.repository;
+package com.dev.moyering.classring.repository;
 
 public interface UserCouponRepositoryCustom {
 

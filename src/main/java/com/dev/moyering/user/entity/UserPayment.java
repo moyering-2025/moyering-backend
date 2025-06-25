@@ -1,6 +1,7 @@
 package com.dev.moyering.user.entity;
 
 import com.dev.moyering.admin.dto.AdminCouponDto;
+import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.ClassRegist;
 import com.dev.moyering.user.dto.UserPaymentDto;
