@@ -3,6 +3,7 @@ package com.dev.moyering.common.dto;
 import java.util.List;
 
 import com.dev.moyering.host.dto.ClassCalendarDto;
+import com.dev.moyering.host.dto.ClassCouponDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.dto.ReviewDto;
@@ -22,4 +23,5 @@ public class ClassRingDetailResponseDto {
     private List<ClassCalendarDto> currList;
     private HostDto host;
     private List<ReviewDto> reviews;
+    private List<ClassCouponDto> coupons;
 }

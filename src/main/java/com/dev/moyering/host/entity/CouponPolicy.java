@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+//안쓰는것..? 아마도?
 @Entity
 @Table(name = "coupon_policy")
 @Getter

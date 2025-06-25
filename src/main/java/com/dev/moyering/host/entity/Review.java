@@ -28,7 +28,7 @@ public class Review {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer reviewId;
-	@Column
+    @Column(nullable = false)
 	private String content; //리뷰 
 	@Column
 	private Date reviewDate; //리뷰 날짜 
