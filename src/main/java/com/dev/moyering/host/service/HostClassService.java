@@ -10,8 +10,8 @@ import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.dev.moyering.host.dto.HostClassSearchRequestDto;
+import com.dev.moyering.host.dto.HostPageResponseDto;
 
 public interface HostClassService {
 	List<HostClassDto> getRecommendHostClassesForUser(Integer userId) throws Exception;
@@ -21,8 +21,5 @@ public interface HostClassService {
 	List<HostClassDto> selectHostClassByHostId(Integer hostId) throws Exception;
 	HostClassDto getClassDetail(Integer classId, Integer calendarId, Integer hostId);
 	HostClassDto getClassDetailByClassID(Integer classId) throws Exception;
-
-	// 관리자 > 클래스 관리
-
-
+	HostPageResponseDto<HostClassDto> selectHostClassByHostIdWithPagination(HostClassSearchRequestDto dto) throws Exception;
 }
