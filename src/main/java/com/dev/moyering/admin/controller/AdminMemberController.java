@@ -50,7 +50,7 @@ public class AdminMemberController {
     public ResponseEntity<AdminMemberDto> getMemberDetail(@PathVariable Integer userId) {
         log.info("회원 상세정보 요청: id = {}", userId);
         try {
-            AdminMemberDto member = userService.getMemberDetail(userId); // 올바른 메서드 호출
+            AdminMemberDto member = userService.getMemberDetail(userId);
             return ResponseEntity.ok(member);
         } catch (Exception e) {
             log.error("회원 상세 조회 실패: id = {}, error = {}", userId, e.getMessage());
@@ -58,9 +58,7 @@ public class AdminMemberController {
         }
     }
 
-    /**
-     * 회원 상태 변경 (활성화/비활성화)
-     */
+    /*** 회원 상태 변경 (활성화/비활성화)*/
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateMemberStatus(
             @PathVariable Integer userId,

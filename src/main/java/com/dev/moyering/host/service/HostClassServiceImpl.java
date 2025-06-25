@@ -3,14 +3,16 @@ package com.dev.moyering.host.service;
 import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.dev.moyering.admin.dto.AdminClassDto;
+import com.dev.moyering.admin.dto.AdminClassSearchCond;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,8 @@ import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.common.repository.SubCategoryRepository;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
+import com.dev.moyering.host.dto.HostClassSearchRequestDto;
+import com.dev.moyering.host.dto.HostPageResponseDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.QClassCalendar;
@@ -32,6 +36,7 @@ import com.dev.moyering.host.repository.HostClassRepository;
 import com.dev.moyering.host.repository.HostRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
+import com.dev.moyering.util.PageInfo;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -39,6 +44,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class HostClassServiceImpl implements HostClassService {
 	private final HostClassRepository hostClassRepository;
 	private final ClassCalendarRepository classCalendarRepository;
@@ -265,6 +271,99 @@ public class HostClassServiceImpl implements HostClassService {
 
 	    return result; // 여러 일정을 포함한 클래스 리스트 반환
 	}
+	
+	@Override
+	public HostPageResponseDto<HostClassDto> selectHostClassByHostIdWithPagination(HostClassSearchRequestDto dto) throws Exception {
+	    Integer hostId = dto.getHostId();
+	    int page = dto.getPage();
+	    int size = dto.getSize();
+
+	    List<HostClass> classListEntity = hostClassRepository.findByHostHostId(hostId);
+	    List<HostClassDto> classList = classListEntity.stream()
+	        .map(HostClass::toDto)
+	        .collect(Collectors.toList());
+
+	    Set<Integer> classIds = classList.stream()
+	        .map(HostClassDto::getClassId)
+	        .collect(Collectors.toSet());
+
+	    List<ClassCalendar> calendarEntityList = classCalendarRepository.findByHostClassClassIdIn(classIds);
+	    List<ClassCalendarDto> calendarList = calendarEntityList.stream()
+	        .map(ClassCalendar::toDto)
+	        .collect(Collectors.toList());
+
+	    List<HostClassDto> mergedList = new ArrayList<>();
+
+	    for (HostClassDto hostClass : classList) {
+	        List<ClassCalendarDto> matchingCalendars = calendarList.stream()
+	            .filter(calendar -> calendar.getClassId().equals(hostClass.getClassId()))
+	            .collect(Collectors.toList());
+
+	        for (ClassCalendarDto calendar : matchingCalendars) {
+	            HostClassDto classWithCalendar = new HostClassDto();
+	            BeanUtils.copyProperties(hostClass, classWithCalendar);
+	            classWithCalendar.setStartDate(calendar.getStartDate());
+	            classWithCalendar.setStatus(calendar.getStatus());
+	            classWithCalendar.setCalendarId(calendar.getCalendarId());
+	            mergedList.add(classWithCalendar);
+	        }
+	    }
+
+	    // 🔍 필터링 조건 처리
+	    Stream<HostClassDto> stream = mergedList.stream();
+
+	    if (dto.getKeyword() != null && !dto.getKeyword().isEmpty()) {
+	        stream = stream.filter(c -> c.getName() != null && c.getName().contains(dto.getKeyword()));
+	    }
+
+	    if (dto.getCategory1() != null) {
+	        stream = stream.filter(c -> c.getCategory1() != null && c.getCategory1().equals(dto.getCategory1()));
+	    }
+
+	    if (dto.getCategory2() != null) {
+	        stream = stream.filter(c -> c.getCategory2() != null && c.getCategory2().equals(dto.getCategory2()));
+	    }
+
+	    if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
+	        stream = stream.filter(c -> c.getStatus() != null && c.getStatus().equals(dto.getStatus()));
+	    }
+
+	    if (dto.getStartDate() != null && !dto.getStartDate().isEmpty() &&
+	    	    dto.getStartDate() != null && !dto.getStartDate().isEmpty()) {
+
+	    	    LocalDate start = LocalDate.parse(dto.getStartDate());
+	    	    LocalDate end = LocalDate.parse(dto.getStartDate());
+
+	    	    stream = stream.filter(c -> {
+	    	        if (c.getStartDate() == null) return false;
+	    	        LocalDate classStart = c.getStartDate().toLocalDate();
+	    	        return !classStart.isBefore(start) && !classStart.isAfter(end);
+	    	    });
+	    	}
+
+	    List<HostClassDto> filteredList = stream.collect(Collectors.toList());
+
+	    // 📦 페이지네이션 적용
+	    int total = filteredList.size();
+	    int start = (page - 1) * size;
+	    int end = Math.min(start + size, total);
+	    List<HostClassDto> pageList = (start < end) ? filteredList.subList(start, end) : new ArrayList<>();
+
+	    // 페이지 정보 계산
+	    PageInfo pageInfo = new PageInfo();
+	    pageInfo.setCurPage(page);
+	    int allPage = (int) Math.ceil((double) total / size);
+	    pageInfo.setAllPage(allPage);
+	    pageInfo.setStartPage(Math.max(1, page - 2));
+	    pageInfo.setEndPage(Math.min(allPage, page + 2));
+	    
+	    return HostPageResponseDto.<HostClassDto>builder()
+	    	    .content(pageList)
+	    	    .pageInfo(pageInfo)
+	    	    .build();
+	}
+	
+	
 
 	@Override
 	public HostClassDto getClassDetail(Integer classId, Integer calendarId, Integer hostId) {
@@ -295,6 +394,9 @@ public class HostClassServiceImpl implements HostClassService {
 
 	
 
+	
+
 
 
 }
+

@@ -11,13 +11,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.host.dto.HostClassDto;
+import com.dev.moyering.host.dto.HostClassSearchRequestDto;
 import com.dev.moyering.host.dto.HostDto;
+import com.dev.moyering.host.dto.HostPageResponseDto;
 import com.dev.moyering.host.dto.ScheduleDetailDto;
 import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.service.HostClassService;
@@ -100,18 +103,31 @@ public class HostController {
 		}
 	}
 
-	@GetMapping("/host/HostclassList")
-	public ResponseEntity<List<HostClassDto>> hostClassList(@RequestParam Integer hostId) {
-//		
-		try {
-			List<HostClassDto> hostClasses = hostClassService.selectHostClassByHostId(hostId);
-			System.out.println(hostClasses);
-			return new ResponseEntity<>(hostClasses, HttpStatus.OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-
+//	@GetMapping("/host/HostclassList")
+//	public ResponseEntity<List<HostClassDto>> hostClassList(@RequestParam Integer hostId,
+//			@RequestParam(defaultValue="1")int page,
+//			@RequestParam(defaultValue="10")int size) {
+////		
+//		try {
+//			List<HostClassDto> hostClasses = hostClassService.selectHostClassByHostId(hostId);
+//			System.out.println(hostClasses);
+//			return new ResponseEntity<>(hostClasses, HttpStatus.OK);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
+//
+//	}
+	
+	@PostMapping("/host/class/list")
+	public ResponseEntity<HostPageResponseDto<HostClassDto>> getClassListByHostIdWithPagination(
+	        @RequestBody HostClassSearchRequestDto dto) {
+	    try {
+	    	HostPageResponseDto<HostClassDto> response = hostClassService.selectHostClassByHostIdWithPagination(dto);
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
 	}
 
 	@GetMapping("/host/hostClassDetail")
