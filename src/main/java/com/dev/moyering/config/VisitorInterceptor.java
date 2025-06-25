@@ -30,7 +30,10 @@ public class VisitorInterceptor implements HandlerInterceptor {
                     && !uri.contains(".jpg")
                     && !uri.contains(".png")
                     && !uri.contains(".css")
-                    && !uri.contains(".js")) {
+                    && !uri.contains(".js")
+                    && !uri.startsWith("/api/")
+                    && !uri.startsWith("/error")) {
+
                 visitorLogsService.recordVisit(request);
             }
         } catch (Exception e) {
