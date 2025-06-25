@@ -1,5 +1,6 @@
 package com.dev.moyering.gathering.controller;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
@@ -97,16 +99,22 @@ public class GatheringInquiryController {
 	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	    }
 	}
-	@GetMapping("/user/getGatheringInquiriesByUserId")
-	public ResponseEntity<Map<String, Object>> inquiriesByUserId(@AuthenticationPrincipal PrincipalDetails principal, 
-			@RequestParam("gatheringId") Integer gatheringId) {
-		//마이페이지를 위한 문의내역 불러오기
+	@GetMapping("/user/getOrganizedGatheringInquiriesByUserId")
+	public ResponseEntity<Map<String,Object>> getGatheringInquiriesByUserId(@AuthenticationPrincipal PrincipalDetails principal, 
+			@RequestBody(required=false) Map<String, Object> param) {
+		//마이페이지를 위한 문의내역 불러오기(주최자 입장)
 		try {
-			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.gatheringInquiryListBygatheringId(gatheringId);
+			PageInfo pageInfo = new PageInfo(1);
+
+			if(param != null) {
+				if(param.get("page")!=null) {
+					pageInfo.setCurPage((Integer) param.get("page"));
+				}
+			}
+			param.put("gatheringOrganizer", principal.getUser().getUserId());
+			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findGatheringInquiriesByUserAndPeriod(pageInfo, param);
 			Map<String,Object> res = new HashMap<>();
-			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
 			res.put("gathering", gatheringInquiryList);
-			res.put("nGatheringDto", nGatheringDto);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
