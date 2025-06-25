@@ -4,6 +4,7 @@ import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
 
 public interface InquiryService {
-	PageResponseDto<InquiryDto> getInquiryListByClassId(Integer classId, int page, int size);
+	PageResponseDto<InquiryDto> getInquiryListByClassId(Integer classId, int page, int size) throws Exception;
+	Integer writeInquriy(InquiryDto dto) throws Exception;
 
 }
