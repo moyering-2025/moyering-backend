@@ -18,9 +18,7 @@ public enum CouponStatus {
     // 쿠폰 상태 판별 로직
     public static CouponStatus determineCouponStatus(LocalDateTime validFrom,
                                                      LocalDateTime validUntil,
-                                                     Integer issueCount,
-                                                     Integer actualIssuedCount,
-                                                     Integer usedCount) {
+                                                     Integer issueCount) {
         LocalDateTime now = LocalDateTime.now();
 
         // 쿠폰 유효기간에셔 쿠폰 시작일이 오늘 이전일 경우 '예정'
@@ -33,10 +31,10 @@ public enum CouponStatus {
             return EXPIRED; //  종료
         }
 
-        // 유효기간 내이지만 발급 가능 수량을 모두 발급한 경우
-        if (actualIssuedCount != null && issueCount != null && actualIssuedCount >= issueCount) {
-            return EXHAUSTED; // 소진
-        }
+//        // 유효기간 내이지만 발급 가능 수량을 모두 발급한 경우
+//        if (usedCount != null && issueCount != null && usedCount >= issueCount) {
+//            return EXHAUSTED; // 소진
+//        }
 
         // 유효기간 내이고 발급 가능한 경우
         // - validFrom == null 이거나 now >= validFrom (시작됨)
