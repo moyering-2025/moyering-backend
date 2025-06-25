@@ -21,15 +21,12 @@ public class AdminVisitorLogsServiceImpl implements AdminVisitorLogsService {
     @Override
     public void recordVisit(HttpServletRequest request) {
         try {
-
-
             String sessionId = request.getSession().getId(); // 세션 ID
             String ipAddress = request.getRemoteAddr();      // IP 주소
             Integer userId = getCurrentUserId(request);       // 로그인 사용자 ID
             LocalDate today = LocalDate.now();
 
             // DB 조회 전 세션에서 확인
-            // 🎯 세션에서 먼저 체크 (DB 조회 전에!)
             String todayKey = "visited_" + today.toString();
             if (request.getSession().getAttribute(todayKey) != null) {
                 return; // 이미 기록했으면 리턴!
@@ -42,7 +39,7 @@ public class AdminVisitorLogsServiceImpl implements AdminVisitorLogsService {
 
             // DB조회 전 오늘 이미 기록했는지 체크
             if (!visitorLogsRepository.existsBySessionIdAndVisitDate(sessionId, today)) {
-                VisitorLogs visitorLog = VisitorLogs.builder()  // log → visitorLog로 변경!
+                VisitorLogs visitorLog = VisitorLogs.builder()
                         .userId(userId)
                         .sessionId(sessionId)
                         .ipAddress(ipAddress)
@@ -52,7 +49,7 @@ public class AdminVisitorLogsServiceImpl implements AdminVisitorLogsService {
                         .build();
 
                 visitorLogsRepository.save(visitorLog);
-                log.info("방문 기록: 세션={}, 회원={}", sessionId, userId != null); // 이제 정상 작동!
+                log.info("방문 기록: 세션={}, 회원={}", sessionId, userId != null);
             }
         } catch (Exception e) {
             log.error("방문 기록 실패", e);

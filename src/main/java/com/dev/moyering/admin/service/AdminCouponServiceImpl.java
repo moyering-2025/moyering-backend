@@ -33,7 +33,6 @@ public class AdminCouponServiceImpl implements AdminCouponService {
 
         AdminCoupon coupon = adminCouponRepository.findById(couponId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쿠폰입니다. ID: " + couponId));
-
         return coupon.toDto();
     }
 
