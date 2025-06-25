@@ -1,9 +1,12 @@
 package com.dev.moyering.admin.service;
 
-import com.dev.moyering.admin.dto.AdminCouponDto;
-import com.dev.moyering.admin.dto.AdminCouponSearchCond;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import com.dev.moyering.admin.dto.AdminCouponDto;
+import com.dev.moyering.admin.dto.AdminCouponSearchCond;
 
 public interface AdminCouponService {
     Page<AdminCouponDto> getCouponList(AdminCouponSearchCond cond, Pageable pageable) throws Exception; // 리스트 조회
@@ -15,5 +18,7 @@ public interface AdminCouponService {
     AdminCouponDto updateCoupon(Integer couponId, AdminCouponDto dto) throws Exception; // 수정 + 검증 + 권한체크
 
     AdminCouponDto deleteCoupon(Integer couponId) throws Exception;             // 삭제 + 권한체크 + 로깅
+    
+    List<AdminCouponDto> selectHostAllCoupon(String type) throws Exception; //모든 쿠폰 조회
 
 }

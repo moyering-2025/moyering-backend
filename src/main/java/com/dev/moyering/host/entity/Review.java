@@ -35,6 +35,8 @@ public class Review {
 	@Column
 	private String revRegCotnent; //리뷰 답변
 	@Column
+	private Integer state;
+	@Column
 	private Date responseDate; //리뷰 답변일자
 	@Column
 	private Integer star; //별점
@@ -57,6 +59,7 @@ public class Review {
 				.content(content)
 				.reviewDate(reviewDate)
 				.revRegCotnent(revRegCotnent)
+				.state(state)
 				.responseDate(responseDate)
 				.star(star)
 				.reviewImgName(reviewImg)

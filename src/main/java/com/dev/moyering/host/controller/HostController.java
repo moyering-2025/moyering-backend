@@ -26,6 +26,9 @@ import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.service.HostClassService;
 import com.dev.moyering.host.service.HostService;
 import com.dev.moyering.host.service.ScheduleDetailService;
+import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.service.UserService;
 
 @RestController
 public class HostController {
@@ -36,13 +39,19 @@ public class HostController {
 	private HostClassService hostClassService;
 	@Autowired
 	private ScheduleDetailService scheduleDetailService;
+	@Autowired
+	private UserService userService;
 
 	@PostMapping("/host/regist")
 	public ResponseEntity<Integer> hostRegist(HostDto hostDto,
-			@RequestParam(name = "ifile", required = false) MultipartFile profile) {
+			@RequestParam(name = "ifile", required = false) MultipartFile profile,
+			Integer userId) {
 		try {
+			System.out.println("호스트DTO:"+hostDto);
+			System.out.println("유저아이디:"+userId);
 			Integer hostId = hostService.registHost(hostDto, profile);
 			System.out.println(hostId);
+			userService.updateUserRole(userId);
 			return new ResponseEntity<Integer>(hostId, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -50,6 +59,18 @@ public class HostController {
 
 		}
 	}
+	
+	@GetMapping("/host/getMyHostInfo")
+	public ResponseEntity<Integer> getMyHostInfo(Integer userId){
+		try {
+			Integer hostId = hostService.findByUserId(userId).getHostId();
+			return new ResponseEntity<Integer>(hostId,HttpStatus.OK);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<Integer>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 
 	@GetMapping("/host/hostProfile")
 	public ResponseEntity<Host> hostProfile(@RequestParam Integer hostId) {

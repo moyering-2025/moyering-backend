@@ -35,6 +35,8 @@ public class Inquiry {
 	@Column
 	private String iqResContent;
 	@Column
+	private Integer state;
+	@Column
 	private Date responseDate;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="calendarId")
@@ -51,6 +53,7 @@ public class Inquiry {
 				.InquiryId(InquiryId)
 				.inquiryDate(inquiryDate)
 				.iqResContent(iqResContent)
+				.state(state)
 				.content(content)
 				.build();
 		if(classCalendar!=null) {
