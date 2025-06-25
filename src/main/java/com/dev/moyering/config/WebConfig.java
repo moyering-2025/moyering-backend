@@ -36,11 +36,11 @@ public class WebConfig implements WebMvcConfigurer {
                 );
     }
     // 쿠키 허용
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5173") // 프론트 주소
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowCredentials(true); // 쿠키 허용!
-    }
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/api/**")
+//                .allowedOrigins("http://localhost:5173") // 프론트 주소
+//                .allowedMethods("GET", "POST", "PUT", "DELETE")
+//                .allowCredentials(true); // 쿠키 허용!
+//    }
 }
