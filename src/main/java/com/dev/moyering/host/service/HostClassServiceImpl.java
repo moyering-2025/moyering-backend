@@ -3,15 +3,16 @@ package com.dev.moyering.host.service;
 import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.dev.moyering.admin.dto.AdminClassDto;
+import com.dev.moyering.admin.dto.AdminClassSearchCond;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class HostClassServiceImpl implements HostClassService {
 	private final HostClassRepository hostClassRepository;
 	private final ClassCalendarRepository classCalendarRepository;
@@ -397,3 +399,4 @@ public class HostClassServiceImpl implements HostClassService {
 
 
 }
+

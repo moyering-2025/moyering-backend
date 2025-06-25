@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.dev.moyering.admin.dto.AdminClassDto;
+import com.dev.moyering.admin.dto.AdminClassSearchCond;
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
