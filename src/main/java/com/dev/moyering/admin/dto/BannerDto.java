@@ -20,7 +20,7 @@ public class BannerDto {
 	private String bannerImg; // 배너이미지
 	private Date createdAt; // 등록일자
 	private String title; // 제목
-	private String content;
+	private String content; // 내용
 	private Integer status; // 상태 (보이기 : 1, 숨기기 : 0)
 	private Integer userId; // 등록아이디
 	

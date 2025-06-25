@@ -7,9 +7,6 @@ import com.dev.moyering.admin.entity.CouponStatus;
 import com.dev.moyering.admin.entity.QAdminCoupon;
 import com.dev.moyering.user.entity.QUserCoupon;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -156,7 +153,9 @@ public class AdminCouponRepositoryImpl implements AdminCouponRepositoryCustom {
     }
 }
 
-// 쿠폰 활성 / 만료
+
+// 쿠폰 상태 : 예정 / 활성 / 만료 / 소진
 // 쿠폰 시작 - 종료일자 안에 있으면 '활성'
 // 종료일 밖에있으면 => 만료
 // 유효기간 안에 있으나 쿠폰 사용이 발급보다 많아지면, 소진
+// 쿠폰 시작일이 오늘일자 이후면 '예정'
