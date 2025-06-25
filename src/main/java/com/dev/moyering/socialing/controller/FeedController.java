@@ -3,6 +3,8 @@ package com.dev.moyering.socialing.controller;
 import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
+import com.dev.moyering.socialing.entity.Feed;
+import com.dev.moyering.socialing.repository.LikeListRepository;
 import com.dev.moyering.socialing.service.FeedService;
 import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class FeedController {
 
     private final FeedService feedService;
     private final UserRepository userRepository;
+    private final LikeListRepository likeListRepository;
 
     @GetMapping("/socialing/feeds")
     public ResponseEntity<List<FeedDto>> getFeeds(
@@ -35,12 +39,17 @@ public class FeedController {
 
         try {
             List<FeedDto> feeds = feedService.getFeeds(sort, userId);
-            for (FeedDto feed : feeds) {
+           for (FeedDto feed : feeds) {
                 feed.toEntity();
-                System.out.println(feed.toEntity().getUser().getUserId());
+//              System.out.println(feed.toEntity().getUser().getNickName());
             }
             return new ResponseEntity<>(feeds, HttpStatus.OK);
-
+//            return feeds.stream()
+//                    .map(feed ->{
+//                        boolean liked = likeListRepository.existsByFeedFeedIdAndUserUserId(feed.getFeedId(),userId);
+//                        long likesCount = likeListRepository.countByFeedFeedId(feed.getFeedId());
+//                        return new FeedDto(feed,liked,likesCount).toEntity();
+//                    }).collect(Collectors.toList());
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -82,23 +91,25 @@ public class FeedController {
             @RequestParam Integer feedId,
             @AuthenticationPrincipal PrincipalDetails principal) {
 
-        System.out.println(feedId);
         Integer currentUserId = principal != null
                 ? principal.getUser().getUserId()
                 : null;
 
         FeedDto dto = feedService.getFeedDetail(feedId, currentUserId);
-        System.out.println(dto);
+//        System.out.println(dto);
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping(value = "/user/socialing/feed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<FeedDto> createFeed(
             @RequestPart("feed") FeedDto feedDto,
+//            @ModelAttribute FeedDto feedDto,
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @AuthenticationPrincipal PrincipalDetails principal
     ) {
         try {
+//            System.out.println("이거 확인해야함!!" +principal.getUser().getNickName());
+            feedDto.setWriterId(principal.getUser().getNickName());
             Integer created = feedService.createFeed(feedDto, images);
             FeedDto nFeedDto = feedService.getFeedDetail(created, principal.getUser().getUserId());
             return new ResponseEntity<>(nFeedDto, HttpStatus.CREATED);
@@ -133,7 +144,7 @@ public class FeedController {
         }
     }
 
-    @PutMapping(value = "/user/socialing/feed/{feedId}")
+    @PatchMapping(value = "/user/socialing/feed/{feedId}")
     public ResponseEntity<Void> updateFeed(
             @PathVariable Integer feedId,
             @RequestPart("feed") FeedDto feedDto,

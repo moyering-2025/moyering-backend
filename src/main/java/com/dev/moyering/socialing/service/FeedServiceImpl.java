@@ -46,6 +46,25 @@ public class FeedServiceImpl implements FeedService {
     @Transactional
     public List<FeedDto> getFeeds(String sortType, String userId) throws Exception {
         return feedRepository.findFeeds(sortType, userId);
+        // 1) 먼저 모든 FeedDto 를 쿼리로 조회
+        /*List<FeedDto> feeds = feedRepository.findFeeds(sortType,userId);
+
+        if (userId != null) {
+            // 2) 이 유저가 좋아요 누른 피드 ID 리스트 한 번만 조회
+            List<Integer> likedIds = likeListRepository.findFeedIdsByUserId(userId);
+            Set<Integer> likedSet = new HashSet<>(likedIds);
+
+            // 3) 피드별 좋아요 여부, 총 좋아요 개수 채우기
+            for (FeedDto feed : feeds) {
+                feed.setLikedByUser(likedSet.contains(feed.getFeedId()));
+                feed.setLikesCount(likeListRepository.countByFeedFeedId(feed.getFeedId()));
+            }
+        } else {
+            // 비로그인 상태면 모두 false
+            feeds.forEach(f -> f.setLikedByUser(false));
+        }
+
+        return feeds;*/
     }
 
     @Override
@@ -133,7 +152,18 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public Integer createFeed(FeedDto feedDto, List<MultipartFile> images) throws Exception {
-        User writer = userRepository.findByUsername(feedDto.getWriterId())
+        File uploadDir = new File(iuploadPath);
+        if (!uploadDir.exists()) {
+            boolean created = uploadDir.mkdirs();
+            if (!created) {
+                throw new IOException("업로드 디렉터리 생성에 실패했습니다: " + uploadDir.getAbsolutePath());
+            }
+        }
+//        System.out.println("uploadDir.exists=" + uploadDir.exists()
+//                + ", canRead=" + uploadDir.canRead()
+//                + ", canWrite=" + uploadDir.canWrite());
+
+        User writer = userRepository.findByNickName(feedDto.getWriterId())
                 .orElseThrow(() -> new Exception("작성자 '" + feedDto.getWriterId() + "'를 찾을 수 없습니다."));
 
         Feed feed = feedDto.toEntity();
@@ -145,7 +175,8 @@ public class FeedServiceImpl implements FeedService {
                     String filename = img.getOriginalFilename();
                     File file = new File(iuploadPath, filename);
                     img.transferTo(file);
-                    String publicUrl = iuploadPath + filename;
+
+                    String publicUrl = filename;
                     switch (i) {
                         case 0:
                             feed.setImg1(publicUrl);

@@ -3,7 +3,13 @@ package com.dev.moyering.socialing.dto;
 import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.socialing.entity.LikeList;
 import com.dev.moyering.user.entity.User;
+import lombok.*;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class LikeListDto {
 
     private Integer likeid;

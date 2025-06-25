@@ -17,5 +17,5 @@ public interface LikeListRepository extends JpaRepository<LikeList, Integer> {
     Optional<LikeList> findByFeed_FeedIdAndUser_Username(Integer feedId, String id);
 
     // 좋아요 삭제
-    void deleteByFeed_FeedIdAndUser_Username(Integer feedId, Integer id);
+    void deleteByFeedFeedIdAndUserUserId(Integer feedId, Integer userId);
 }
