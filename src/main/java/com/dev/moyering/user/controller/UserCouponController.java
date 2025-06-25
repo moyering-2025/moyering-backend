@@ -20,12 +20,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserCouponController {
-	private ClassCouponService classCouponService;
+	private final ClassCouponService classCouponService;
 	
 	@PostMapping("/classCoupons/download")
 	public ResponseEntity<?> downloadClassCoupon(@RequestBody ClassCouponDto dto,
             @AuthenticationPrincipal PrincipalDetails principal) {
-		System.out.println("ddddddddddddddddddddddddddddddclassCouponId"+dto.getClassCouponId());
+		
 	    Integer userId = principal.getUser().getUserId();
 	    Integer classCouponId = dto.getClassCouponId();
 
@@ -33,6 +33,7 @@ public class UserCouponController {
 	    	classCouponService.downloadClassCoupon(userId, classCouponId);
 	        return ResponseEntity.ok("쿠폰 다운로드 완료");
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("다운로드 실패: " + e.getMessage());
 	    }
 	}

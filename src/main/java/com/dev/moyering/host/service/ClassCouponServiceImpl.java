@@ -34,9 +34,8 @@ public class ClassCouponServiceImpl implements ClassCouponService {
 	@Transactional
 	@Override
 	public void downloadClassCoupon(Integer userId, Integer classCouponId) throws Exception {
-	    User user = userRepository.findById(userId)
+		User user = userRepository.findById(userId)
 	            .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
-	    System.out.println("ddddddddddsfliejlnldshf/olidhdf");
         // 클래스 쿠폰 조회
         ClassCoupon classCoupon = classCouponRepository.findById(classCouponId)
             .orElseThrow(() -> new RuntimeException("쿠폰을 찾을 수 없습니다"));
