@@ -26,5 +26,4 @@ public class ClassCouponRepositoryImpl implements ClassCouponRepositoryCustom {
 		return ccs;
 	}
 
-	
 }

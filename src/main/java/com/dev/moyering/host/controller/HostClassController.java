@@ -21,20 +21,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class HostClassController {
     private final HostClassService hostClassService;
-
-    @PostMapping("/classList")
-    public ResponseEntity<PageResponseDto<HostClassDto>> searchClasses(
-            @RequestBody ClassSearchRequestDto dto) {
-    	PageResponseDto<HostClassDto> response;
-
-		try {
-			response = hostClassService.searchClasses(dto);
-	        return ResponseEntity.ok(response);
-		} catch (Exception e) {
-			e.printStackTrace();
-	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			
-		}
-    }
     
     @GetMapping("/host/calendar")
     public ResponseEntity<List<HostClassDto>> selectClassCalendar(@RequestParam Integer hostId){

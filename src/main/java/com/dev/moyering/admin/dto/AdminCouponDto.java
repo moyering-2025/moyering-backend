@@ -2,8 +2,9 @@ package com.dev.moyering.admin.dto;
 
 import com.dev.moyering.admin.entity.AdminCoupon;
 import com.dev.moyering.admin.entity.CouponStatus;
+import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.host.entity.HostClass;
-import com.dev.moyering.user.entity.UserCoupon;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
