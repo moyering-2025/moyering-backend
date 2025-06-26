@@ -10,5 +10,5 @@ public interface AlarmService {
 	Boolean sendAlarm(AlarmDto alarmDto) throws Exception;
 	Boolean confirmAlarm(Integer alarmId) throws Exception;
 	Boolean confirmAlarmAll(List<Integer> alarmList)throws Exception;
-	void registFcmToken(Integer userId, String fcmToken);
+	void registFcmToken(Integer userId, String fcmToken)throws Exception;
 }
