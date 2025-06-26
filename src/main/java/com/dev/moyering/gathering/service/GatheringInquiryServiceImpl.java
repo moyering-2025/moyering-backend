@@ -49,15 +49,19 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 		pageInfo.setAllPage(allPage);
 		pageInfo.setStartPage(startPage);
 		pageInfo.setEndPage(endPage);
-		
+		if(cnt > 0) {
 		return gatheringInquiryRepository.findInquiriesSentByUser(userId, startDate, endDate, isAnswered, pageRequest);
+		} else { 
+			System.out.println("등록된 문의 없음");
+			return null;
+		}
 	}
 	@Override
 	public List<GatheringInquiryDto> findInquiriesReceivedByOrganizer(PageInfo pageInfo, Integer userId, Date startDate, Date endDate,
 			Boolean isAnswered) throws Exception {
 		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
 		Long cnt = gatheringInquiryRepository.countInquiriesReceivedByOrganizer(userId, startDate, endDate, isAnswered);
-		
+		System.out.println("cnt : "+cnt);
 		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
 		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
 		Integer endPage = Math.min(startPage+10-1, allPage);
@@ -65,7 +69,11 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 		pageInfo.setAllPage(allPage);
 		pageInfo.setStartPage(startPage);
 		pageInfo.setEndPage(endPage);
-		
-		return gatheringInquiryRepository.findInquiriesReceivedByOrganizer(userId, startDate, endDate, isAnswered, pageRequest);
+		if(cnt > 0 ) { 
+			return gatheringInquiryRepository.findInquiriesReceivedByOrganizer(userId, startDate, endDate, isAnswered, pageRequest);			
+		} else { 
+			System.out.println("등록된 문의 없음");
+			return null;
+		}
 	}
 }

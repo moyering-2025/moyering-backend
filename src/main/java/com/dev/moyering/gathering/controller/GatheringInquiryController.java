@@ -183,7 +183,7 @@ public class GatheringInquiryController {
 			
 			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findInquiriesSentByUser(pageInfo, loginId, startDate, endDate, isAnswered);
 			Map<String,Object> res = new HashMap<>();
-			System.out.println("findInquiriesSentByUser " + gatheringInquiryList);
+			System.out.println("findInquiriesSentByUser : " + gatheringInquiryList);
 			res.put("findInquiriesSentByUser", gatheringInquiryList);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
@@ -194,16 +194,12 @@ public class GatheringInquiryController {
 	@PostMapping("/user/responseToGatheringInquiry")
 	public ResponseEntity<GatheringInquiryDto> responseToGatheringInquiry(@AuthenticationPrincipal PrincipalDetails principal, 
 			@ModelAttribute GatheringInquiryDto gatheringInquiryDto) {
-		return null;
-//		try {
-//			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringInquiryDto);
-//			if(gatheringInquiryId!=null) {
-//				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//			}
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
+		try {
+			gatheringInquiryService.responseToGatheringInquiry(gatheringInquiryDto);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 }

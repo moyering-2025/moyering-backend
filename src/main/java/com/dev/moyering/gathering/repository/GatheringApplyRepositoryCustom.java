@@ -10,6 +10,7 @@ import com.querydsl.core.Tuple;
 public interface GatheringApplyRepositoryCustom {
 	
 	List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId) throws Exception;
-	void updateMemberApproval (Integer gatheringId, Integer userId, boolean isApproved) throws Exception;
-	Integer findBygatheringIdAnduserId(Integer gatheringId, Integer userId) throws Exception;
+	void updateGatheringApplyApproval (Integer gatheringApplyId, boolean isApproved) throws Exception;
+	Integer findByGatheringIdAndUserId(Integer gatheringId, Integer userId) throws Exception;
+	List<GatheringApplyDto> findApplyUserListByGatheringIdForOrganizer(Integer gatheringId) throws Exception;
 }
