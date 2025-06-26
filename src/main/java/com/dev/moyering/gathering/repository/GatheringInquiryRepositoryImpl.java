@@ -2,12 +2,10 @@ package com.dev.moyering.gathering.repository;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
@@ -15,10 +13,8 @@ import com.dev.moyering.gathering.dto.GatheringInquiryDto;
 import com.dev.moyering.gathering.entity.GatheringInquiry;
 import com.dev.moyering.gathering.entity.QGathering;
 import com.dev.moyering.gathering.entity.QGatheringInquiry;
-import com.dev.moyering.user.entity.QUser;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
@@ -29,8 +25,6 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 
 	@Autowired
 	private final JPAQueryFactory jpaQueryFactory;
-	@Autowired
-	private ModelMapper modelMapper;
 
 	@Override
 	public List<GatheringInquiryDto> gatheringInquiryListBygatheringId(Integer gatheringId) throws Exception {
@@ -45,65 +39,6 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 		return inquiryList.stream().map(GatheringInquiry::toDto) // 엔티티의 toDto() 메소드 활용
 				.collect(Collectors.toList());
 	}
-
-	@Override
-	public List<GatheringInquiryDto> findGatheringInquiriesByUserAndPeriod(PageRequest pageRequest, Map<String, Object> params) {
-	    
-	    QGatheringInquiry gatheringInquiry = QGatheringInquiry.gatheringInquiry;
-	    QUser inquiryUser = new QUser("inquiryUser");  // 문의 작성자
-	    QGathering gathering = QGathering.gathering;
-			// 파라미터 추출
-		Integer organizerUserId = (Integer) params.get("gatheringOrganizer");
-		Date startDate = (Date) params.get("startDate");
-		Date endDate = (Date) params.get("endDate");
-		Boolean isAnswered = (Boolean) params.get("isAnswered");
-	    JPAQuery<Tuple> query = jpaQueryFactory.select(gatheringInquiry, gathering.title, gathering.meetingDate, inquiryUser.nickName, inquiryUser.profile)
-	    	    .from(gatheringInquiry)
-	    	    .leftJoin(gathering).on(gatheringInquiry.gathering.gatheringId.eq(gathering.gatheringId))
-	    	    .leftJoin(inquiryUser).on(gatheringInquiry.user.userId.eq(inquiryUser.userId))
-	    	    .where(buildWhereConditions(gathering, gatheringInquiry, organizerUserId, startDate, endDate, isAnswered))
-	    	    .orderBy(gatheringInquiry.inquiryDate.desc())
-	    	    .offset(pageRequest.getOffset())
-	    	    .limit(pageRequest.getPageSize());
-	        
-	    return query.fetch().stream()
-	        .map(tuple -> tuple.get(0, GatheringInquiry.class).toDto())
-	        .collect(Collectors.toList());
-	}
-
-	// WHERE 조건을 동적으로 생성하는 메서드
-	private BooleanExpression buildWhereConditions(QGathering gathering, QGatheringInquiry gatheringInquiry,
-	        Integer organizerUserId, Date startDate, Date endDate, Boolean isAnswered) {
-	    // 기본 조건: 주최자 ID
-	    BooleanExpression condition = gathering.user.userId.eq(organizerUserId);
-	    boolean isStartDateEmpty = (startDate== null || startDate.toString().trim().isEmpty());
-	    boolean isEndDateEmpty = (endDate== null || endDate.toString().trim().isEmpty());
-	    // 날짜 범위 조건 추가
-	    if (!isStartDateEmpty || !isEndDateEmpty) {
-	        BooleanExpression dateCondition = null;
-	        if (!isStartDateEmpty) {
-	            dateCondition = gatheringInquiry.inquiryDate.goe(startDate);
-	        }
-	        if (!isEndDateEmpty) {
-	            BooleanExpression endCondition = gatheringInquiry.inquiryDate.loe(endDate);
-	            dateCondition = (dateCondition != null) ? dateCondition.and(endCondition) : endCondition;
-	        }
-	        condition = condition.and(dateCondition);
-	    }
-	    // 답변 완료 여부 조건 추가
-	    if (isAnswered != null) {
-	        BooleanExpression answerCondition;
-	        if (isAnswered) {
-	            answerCondition = gatheringInquiry.responseContent.isNotNull()
-	                    .and(gatheringInquiry.responseContent.ne(""));
-	        } else {
-	            answerCondition = gatheringInquiry.responseContent.isNull()
-	                    .or(gatheringInquiry.responseContent.eq(""));
-	        }
-	        condition = condition.and(answerCondition);
-	    }
-	    return condition;
-	}
 	
 	@Override
 	@Transactional
@@ -115,23 +50,138 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 				.where(gatheringInquiry.inquiryId.eq(gatheringInquiryDto.getInquiryId()));
 		clause.execute();
 	}
-
+	
 	@Override
-	public Long selectInquiryCount(Map<String, Object> params) {
-		QGatheringInquiry gatheringInquiry = QGatheringInquiry.gatheringInquiry;
-		QGathering gathering = QGathering.gathering;
+	public List<GatheringInquiryDto> findInquiriesReceivedByOrganizer(
+		    Integer organizerUserId,
+		    Date startDate,
+		    Date endDate,
+		    Boolean isAnswered,
+		    PageRequest pageRequest
+		) {
+		    QGatheringInquiry inquiry = QGatheringInquiry.gatheringInquiry;
+		    QGathering gathering = QGathering.gathering;
 
-		// 파라미터 추출
-		Integer organizerUserId = (Integer) params.get("gatheringOrganizer");
-		Date startDate = (Date) params.get("startDate");
-		Date endDate = (Date) params.get("endDate");
-		Boolean isAnswered = (Boolean) params.get("isAnswered");
+		    BooleanBuilder builder = new BooleanBuilder();
+		    builder.and(gathering.user.userId.eq(organizerUserId));
+		    builder.and(inquiry.gathering.eq(gathering));
+		    builder.and(buildInquiryConditions(startDate, endDate, isAnswered));
 
-		// 기존 조건 생성 메서드들을 재사용하여 count 쿼리 생성
-		return jpaQueryFactory.select(gatheringInquiry.count()).from(gatheringInquiry).leftJoin(gathering)
-				.on(gatheringInquiry.gathering.gatheringId.eq(gathering.gatheringId))
-				.where(buildWhereConditions(gathering, gatheringInquiry, organizerUserId, startDate, endDate,
-						isAnswered))
-				.fetchOne();
-	}
+		    List<GatheringInquiry> entities = jpaQueryFactory
+		    	    .selectFrom(inquiry)
+		    	    .leftJoin(inquiry.gathering).fetchJoin()  // N+1 문제 방지
+		    	    .leftJoin(inquiry.user).fetchJoin()       // N+1 문제 방지
+		    	    .where(builder)
+		    	    .offset(pageRequest.getOffset())
+		    	    .limit(pageRequest.getPageSize())
+		    	    .fetch();
+
+		    	// 엔티티를 DTO로 변환
+		    	return entities.stream()
+		    	    .map(GatheringInquiry::toDto)
+		    	    .collect(Collectors.toList());
+		}
+	
+	@Override
+	public long countInquiriesReceivedByOrganizer(
+		    Integer organizerUserId,
+		    Date startDate,
+		    Date endDate,
+		    Boolean isAnswered
+		) {
+		    QGatheringInquiry inquiry = QGatheringInquiry.gatheringInquiry;
+		    QGathering gathering = QGathering.gathering;
+
+		    BooleanBuilder builder = new BooleanBuilder();
+		    builder.and(gathering.user.userId.eq(organizerUserId));
+		    builder.and(inquiry.gathering.eq(gathering));
+		    builder.and(buildInquiryConditions(startDate, endDate, isAnswered));
+
+		    return jpaQueryFactory
+		        .select(inquiry.count())
+		        .from(inquiry)
+		        .join(inquiry.gathering, gathering)
+		        .where(builder)
+		        .fetchOne();
+		}
+
+
+	private BooleanBuilder buildInquiryConditions(
+		    Date startDate,
+		    Date endDate,
+		    Boolean isAnswered
+		) {
+		    QGatheringInquiry inquiry = QGatheringInquiry.gatheringInquiry;
+		    BooleanBuilder builder = new BooleanBuilder();
+
+		    if (startDate != null) {
+		        builder.and(inquiry.inquiryDate.goe(startDate));
+		    }
+		    if (endDate != null) {
+		        builder.and(inquiry.inquiryDate.loe(endDate));
+		    }
+		    if (isAnswered != null) {
+		        if (isAnswered) {
+		            builder.and(inquiry.responseContent.isNotNull().and(inquiry.responseContent.ne("")));
+		        } else {
+		            builder.and(inquiry.responseContent.isNull().or(inquiry.responseContent.eq("")));
+		        }
+		    }
+
+		    return builder;
+		}
+	@Override
+	public long countInquiriesSentByUser(
+		    Integer userId,
+		    Date startDate,
+		    Date endDate,
+		    Boolean isAnswered
+		) {
+		    QGatheringInquiry inquiry = QGatheringInquiry.gatheringInquiry;
+
+		    BooleanBuilder builder = new BooleanBuilder();
+		    builder.and(inquiry.user.userId.eq(userId));
+		    builder.and(buildInquiryConditions(startDate, endDate, isAnswered));
+
+		    return jpaQueryFactory
+		        .select(inquiry.count())
+		        .from(inquiry)
+		        .where(builder)
+		        .fetchOne();
+		}
+	@Override
+	public List<GatheringInquiryDto> findInquiriesSentByUser(
+		    Integer userId,
+		    Date startDate,
+		    Date endDate,
+		    Boolean isAnswered,
+		    PageRequest pageRequest
+		) {
+		    QGatheringInquiry inquiry = QGatheringInquiry.gatheringInquiry;
+
+		    BooleanBuilder builder = new BooleanBuilder();
+		    builder.and(inquiry.user.userId.eq(userId));
+		    builder.and(buildInquiryConditions(startDate, endDate, isAnswered));
+
+		    return jpaQueryFactory
+		        .select(Projections.constructor(GatheringInquiryDto.class,
+		                inquiry.inquiryId,           // Integer inquiryId
+		                inquiry.gathering.gatheringId, // Integer gatheringId  
+		                inquiry.gathering.title,     // String title
+		                inquiry.gathering.user.userId, // Integer userId
+		                inquiry.gathering.user.nickName, // String nickName
+		                inquiry.gathering.user.profile,  // String profile
+		                inquiry.inquiryContent,      // String inquiryContent
+		                inquiry.inquiryDate,         // Date inquiryDate
+		                inquiry.responseDate,        // Date responseDate
+		                inquiry.gathering.meetingDate, // Date meetingDate (추가 필요)
+		                inquiry.responseContent     // String responseContent
+		        ))
+		        .from(inquiry)
+		        .where(builder)
+		        .offset(pageRequest.getOffset())
+		        .limit(pageRequest.getPageSize())
+		        .fetch();
+		}
+
 }

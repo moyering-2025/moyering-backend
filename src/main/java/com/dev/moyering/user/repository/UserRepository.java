@@ -20,8 +20,8 @@ public interface UserRepository extends JpaRepository<User, Integer>,  UserRepos
 	//feed
 	Optional<User> findByNickName(String nickName);
 	
-	@Transactional
-	@Modifying
-	@Query("update User u set u.fcm_token=:fcmToken where u.userId=:userId")
-	void updateFcmToken(@Param("userId") Integer userId, @Param("fcmToken") String fcmToken);
+	@Transactional  
+    @Modifying
+    @Query("UPDATE User u SET u.fcmToken = :fcmToken WHERE u.userId = :userId")
+    void updateFcmToken(@Param("userId") Integer userId, @Param("fcmToken") String fcmToken);
 }
