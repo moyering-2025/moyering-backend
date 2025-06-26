@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -362,8 +363,7 @@ public class HostClassServiceImpl implements HostClassService {
 	    	    .pageInfo(pageInfo)
 	    	    .build();
 	}
-	
-	
+
 
 	@Override
 	public HostClassDto getClassDetail(Integer classId, Integer calendarId, Integer hostId) {
@@ -391,5 +391,26 @@ public class HostClassServiceImpl implements HostClassService {
 		HostClassDto hostclass= hostClassRepository.findById(classId).orElseThrow(()-> new Exception("해당 클래스가 존재하지 않습니다.")).toDto();
 		return hostclass;
 	}
+
+
+
+	// 관리자 페이지 > 클래스 관리
+	@Override
+	public Page<AdminClassDto> getHostClassListForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
+		log.info("클래스 목록 관리 조회 - cond : {}, pageable : {}", cond, pageable );
+		try {
+			List<AdminClassDto> content = hostClassRepository.searchClassForAdmin(cond, pageable);
+			log.info("조회된 content 개수 : {}", content.size());
+
+			Long total = hostClassRepository.countClasses(cond); // 검색 조건에 따른 페이지 계산
+			log.info("전체 개수 : {}", total);
+
+			return new PageImpl<>(content, pageable, total);
+		} catch (Exception e) {
+				log.error("getClassList 에러 상새 : " , e);
+				throw e;
+		}
+	}
+
 }
 

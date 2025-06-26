@@ -19,8 +19,6 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	GatheringInquiryRepository gatheringInquiryRepository;
 	@Override
 	public Integer writeGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception {
-		System.out.println(gatheringInquiryDto);
-
 		GatheringInquiry gatheringInquiry = gatheringInquiryDto.toEntity();
 		gatheringInquiryRepository.save(gatheringInquiry);
 		return gatheringInquiry.getInquiryId();
@@ -32,12 +30,17 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 		gatheringInquiryList = gatheringInquiryRepository.gatheringInquiryListBygatheringId(gatheringId);
 		return gatheringInquiryList;
 	}
+	
 	@Override
-	public List<GatheringInquiryDto> findGatheringInquiriesByUserAndPeriod(PageInfo pageInfo, Map<String, Object> params) throws Exception {
-		List<GatheringInquiryDto> gatheringInquiryList = null;
-		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+	public void responseToGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception {
 
-		Long cnt = gatheringInquiryRepository.selectInquiryCount(params);
+		gatheringInquiryRepository.responseToGatheringInquiry(gatheringInquiryDto);
+	}
+	@Override
+	public List<GatheringInquiryDto> findInquiriesSentByUser(PageInfo pageInfo, Integer userId, Date startDate, Date endDate,
+			Boolean isAnswered) throws Exception {
+		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+		Long cnt = gatheringInquiryRepository.countInquiriesSentByUser(userId, startDate, endDate, isAnswered);
 		
 		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
 		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
@@ -46,13 +49,31 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 		pageInfo.setAllPage(allPage);
 		pageInfo.setStartPage(startPage);
 		pageInfo.setEndPage(endPage);
-        
-		gatheringInquiryList = gatheringInquiryRepository.findGatheringInquiriesByUserAndPeriod(pageRequest, params);
-		return gatheringInquiryList;
+		if(cnt > 0) {
+		return gatheringInquiryRepository.findInquiriesSentByUser(userId, startDate, endDate, isAnswered, pageRequest);
+		} else { 
+			System.out.println("등록된 문의 없음");
+			return null;
+		}
 	}
 	@Override
-	public void responseToGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception {
-
-		gatheringInquiryRepository.responseToGatheringInquiry(gatheringInquiryDto);
+	public List<GatheringInquiryDto> findInquiriesReceivedByOrganizer(PageInfo pageInfo, Integer userId, Date startDate, Date endDate,
+			Boolean isAnswered) throws Exception {
+		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+		Long cnt = gatheringInquiryRepository.countInquiriesReceivedByOrganizer(userId, startDate, endDate, isAnswered);
+		System.out.println("cnt : "+cnt);
+		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
+		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
+		Integer endPage = Math.min(startPage+10-1, allPage);
+		
+		pageInfo.setAllPage(allPage);
+		pageInfo.setStartPage(startPage);
+		pageInfo.setEndPage(endPage);
+		if(cnt > 0 ) { 
+			return gatheringInquiryRepository.findInquiriesReceivedByOrganizer(userId, startDate, endDate, isAnswered, pageRequest);			
+		} else { 
+			System.out.println("등록된 문의 없음");
+			return null;
+		}
 	}
 }

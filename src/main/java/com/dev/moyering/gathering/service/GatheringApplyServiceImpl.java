@@ -23,10 +23,14 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 	public List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId) throws Exception {
 		return gatheringApplyRepository.findApplyUserListByGatheringId(gatheringId);
 	}
+	@Override
+	public List<GatheringApplyDto> findApplyUserListByGatheringIdForOrganizer(Integer gatheringId) throws Exception {
+		return gatheringApplyRepository.findApplyUserListByGatheringIdForOrganizer(gatheringId);
+	}
 
 	@Override
 	public Integer findByGatheringIdAndUserId(Integer gatheringId, Integer userId) throws Exception {
-		return gatheringApplyRepository.findBygatheringIdAnduserId(gatheringId, userId);
+		return gatheringApplyRepository.findByGatheringIdAndUserId(gatheringId, userId);
 	} 
 	@Override
 	public Integer applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception {
@@ -34,5 +38,10 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 		GatheringApply gatheringApply = gatheringApplyDto.toEntity();
 		gatheringApplyRepository.save(gatheringApply);
 		return gatheringApply.getGatheringApplyId();
+	}
+
+	@Override
+	public void updateGatheringApplyApproval(Integer gatheringApplyId, boolean isApproved) throws Exception {
+		gatheringApplyRepository.updateGatheringApplyApproval(gatheringApplyId, isApproved);
 	}
 }

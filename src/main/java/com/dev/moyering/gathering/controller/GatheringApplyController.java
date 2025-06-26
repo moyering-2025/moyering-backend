@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,26 +61,23 @@ public class GatheringApplyController {
 			return String.valueOf(false);
 		}
 	}
+	
 	@PostMapping("/user/updateMemberApproval")
-	public ResponseEntity<GatheringApplyDto> updateMemberApproval(@AuthenticationPrincipal PrincipalDetails principal,
+	public ResponseEntity<Boolean> updateMemberApproval(@AuthenticationPrincipal PrincipalDetails principal,
 			@ModelAttribute GatheringApplyDto gatheringApplyDto) {
-		return null;
-//		try {
-//			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringApplyDto);
-//			if(gatheringInquiryId!=null) {
-//				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//			}
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
+		try {
+			gatheringApplyService.updateGatheringApplyApproval(gatheringApplyDto.getGatheringApplyId(), gatheringApplyDto.getIsApprove());
+			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 	@GetMapping("/getApplyListByGatheringId")
 	public ResponseEntity<Map<String,Object>> getApplyListOfGathering( @RequestParam("gatheringId") Integer gatheringId) {
 		 
 		try {
-			Map<String,Object> res = new HashMap();
+			Map<String, Object> res = new HashMap();
 			List<GatheringApplyDto> findApplyUserList = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
 			if(findApplyUserList!=null) {
 				return new ResponseEntity<>(null, HttpStatus.OK);
@@ -92,4 +90,17 @@ public class GatheringApplyController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	@GetMapping("/getApplyListByGatheringId/{gatheringId}")
+	public ResponseEntity<List<GatheringApplyDto>> getApplyListOfGatheringForOrganizer(@PathVariable("gatheringId") Integer gatheringId) {
+		
+		try {
+			List<GatheringApplyDto> findApplyUserList = null;
+			findApplyUserList = gatheringApplyService.findApplyUserListByGatheringIdForOrganizer(gatheringId);
+			return new ResponseEntity<>(findApplyUserList, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 }
+

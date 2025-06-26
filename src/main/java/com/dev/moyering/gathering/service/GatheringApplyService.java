@@ -10,8 +10,9 @@ import com.querydsl.core.Tuple;
 
 public interface GatheringApplyService {
 
-	public List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId)throws Exception;
-
-	public Integer findByGatheringIdAndUserId(Integer gatheringId, Integer userId)throws Exception;
-	public Integer applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception;
+	List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId)throws Exception;
+	Integer findByGatheringIdAndUserId(Integer gatheringId, Integer userId)throws Exception;
+	Integer applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception;
+	List<GatheringApplyDto> findApplyUserListByGatheringIdForOrganizer(Integer gatheringId) throws Exception;
+	void updateGatheringApplyApproval(Integer gatheringApplyId, boolean isApproved)throws Exception;
 }

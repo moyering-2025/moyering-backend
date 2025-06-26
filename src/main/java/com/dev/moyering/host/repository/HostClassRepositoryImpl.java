@@ -11,10 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
-import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.entity.*;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,7 +34,6 @@ import org.springframework.stereotype.Repository;
 
 import static com.dev.moyering.common.entity.QSubCategory.subCategory;
 import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
-import static com.dev.moyering.host.entity.QHost.host;
 import static com.dev.moyering.host.entity.QHostClass.hostClass;
 import static com.dev.moyering.user.entity.QUser.user;
 import static org.springframework.data.relational.core.sql.Functions.count;
@@ -79,84 +76,101 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 				.limit(4)
 				.fetch();
 	}
-	
-	public Map<Integer, List<ClassCalendarDto>> findHostClassWithCalendar(Integer hostId){
+
+	public Map<Integer, List<ClassCalendarDto>> findHostClassWithCalendar(Integer hostId) {
 		QHostClass hostClass = QHostClass.hostClass;
 		QClassCalendar calendar = QClassCalendar.classCalendar;
-		
+
 		List<Tuple> results = jpaQueryFactory
-				.select(hostClass.classId,calendar)
+				.select(hostClass.classId, calendar)
 				.from(hostClass)
 				.join(calendar).on(calendar.hostClass.classId.eq(hostClass.classId))
 				.where(hostClass.host.hostId.eq(hostId))
 				.fetch();
-		
-		Map<Integer,List<ClassCalendarDto>> resultMap = new HashMap<>();
-		for(Tuple tuple : results) {
+
+		Map<Integer, List<ClassCalendarDto>> resultMap = new HashMap<>();
+		for (Tuple tuple : results) {
 			Integer classId = tuple.get(hostClass.classId);
 			ClassCalendar calendarEntity = tuple.get(calendar);
-			
+
 			ClassCalendarDto calendarDto = calendarEntity.toDto();
-			
-			resultMap.computeIfAbsent(classId, k->new ArrayList<>()).add(calendarDto);
+
+			resultMap.computeIfAbsent(classId, k -> new ArrayList<>()).add(calendarDto);
 		}
 		return resultMap;
 	}
 
+	// 관리자 페이지 > 클래스 관리 검색
+	@Override
+	public List<AdminClassDto> searchClassForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
+		return jpaQueryFactory
+				// 클래스 관리에서 카테고리를 수정 + 삭제할 일은 없으므로, subcategoryId, categoryId 제외하기
+				.select(Projections.constructor(AdminClassDto.class,
+						hostClass.classId,                           // 클래스 아이디 (클래스 상세정보 볼 때 활용)
+						hostClass.subCategory.firstCategory.categoryName,    // 1차 카테고리명
+						hostClass.subCategory.subCategoryName,      // 2차 카테고리명
+						hostClass.host.userId,                      // 강사 id (강사 로그인 아이디 클릭해서 상세정보 볼 때 필요)
+						user.username,     							// 강사 로그인 아이디
+						hostClass.host.name,                        // 강사명
+						hostClass.name,                             // 클래스명
+						hostClass.price,                            // 가격
+						hostClass.recruitMin,                       // 최소인원
+						hostClass.recruitMax,                       // 최대인원
+						hostClass.regDate,                          // 클래스 개설 요청일자
+						classCalendar.status                        // 상태
+								 ))
+				.from(hostClass)
+//				.leftJoin(hostClass.subCategory, subCategory)
+//				.leftJoin(subCategory.firstCategory, subCategory.firstCategory)
+				.leftJoin(classCalendar).on(hostClass.classId.eq(classCalendar.hostClass.classId))
+				.leftJoin(user).on(hostClass.host.userId.eq(user.userId))
+				.where(
+						likeHostUserNameOrNameOrClassname(cond.getKeyword()),
+						eqClassStatus(cond.getStatusFilter()),
+						betweenDate(cond.getFromDate(), cond.getToDate())
+				)
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
+				.fetch();
+	}
+
+
+	// 관리자 페이지 > 클래스 관리 > 개수 조회
 	@Override
 	public Long countClasses(AdminClassSearchCond cond) throws Exception {
-		return 0L;
+		return jpaQueryFactory
+				.select(hostClass.count())
+				.from(hostClass)
+//				.leftJoin(hostClass.subCategory, subCategory)
+//				.leftJoin(subCategory.firstCategory, subCategory.firstCategory)
+				.leftJoin(classCalendar).on(hostClass.classId.eq(classCalendar.hostClass.classId))
+				.leftJoin(user).on(hostClass.host.userId.eq(user.userId))
+				.where(
+						likeHostUserNameOrNameOrClassname(cond.getKeyword()),
+						eqClassStatus(cond.getStatusFilter()),
+						betweenDate(cond.getFromDate(), cond.getToDate())
+				)
+				.fetchOne();
 	}
 
-	// 보류
-//	@Override
-//	public Page<AdminClassDto> searchClassForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
-//		return jpaQueryFactory
-//				.select(Projections.constructor(AdminClassDto.class,
-//						hostClass.host.hostId,
-//						hostClass.classId,
-//						hostClass.subCategory.firstCategory,
-//						hostClass.subCategory,
-//						hostClass.host.name,
-//						hostClass.name,
-//						hostClass.price,
-//						hostClass.recruitMin,
-//						hostClass.recruitMax,
-//						hostClass.regDate,
-//						classCalendar.status))
-//				.from(hostClass)
-//				.where(
-//						likeClassname(cond.getKeyword())
-//						eqClassStatus(cond.getStatusFilter())
-//						betweenDate(cond.getFromDate(), cond.getToDate())
-//				)
-//				.offset(pageable.getOffset())
-//				.limit(pageable.getPageSize())
-//				.fetch();
-//	}
-//
-//	@Override
-//	public Long countClasses(AdminClassSearchCond cond) throws Exception {
-//		return jpaQueryFactory
-//				.select(hostClass(count())
-//						.from(hostClass)
-//						.where(
-//								likeClassname(cond.getKeyword())
-//									.eqClassStatus(cond.getStatusFilter())
-//									.betweenDate(cond.getFromDate(), cond.getToDate())
-//						)
-//						.fetchOne();
-//	}
-//	private BooleanExpression likeClassname(String keyword) {
-//		return (keyword == null || keyword.isEmpty()) ? null : hostClass.name.containsIgnoreCase(keyword);
-//	}
-//	private BooleanExpression eqClassStatus(String status) {
-//		return (status == null || status.isEmpty()) ? null : classCalendar.status.eq(status);
-//	}
-//	private BooleanExpression betweenDate(Date fromDate, Date toDate) {
-//		if (fromDate == null || toDate == null) return null;
-//		//return user.regDate.between(fromDate, toDate);
-//		return null;
-//						)
+	// 클래스 검색
+	private BooleanExpression likeHostUserNameOrNameOrClassname(String keyword) {
+		if (keyword == null || keyword.isEmpty()) return null; // 검색어 없으면 전체 조회
+
+		// 대소문자 구분없이 문자열 포함해서 검색
+		return hostClass.name.containsIgnoreCase(keyword) // 클래스명
+				.or(hostClass.host.name.containsIgnoreCase(keyword)) // 강사 이름
+				.or(user.username.containsIgnoreCase(keyword)); // 강사 로그인 아이디
 	}
 
+	// 클래스 상태
+	private BooleanExpression eqClassStatus(String status) {
+		return (status == null || status.isEmpty()) ? null : classCalendar.status.eq(status);
+	}
+
+	// 개설일자
+	private BooleanExpression betweenDate(Date fromDate, Date toDate) {
+		if (fromDate == null || toDate == null) return null;
+		return hostClass.regDate.between(fromDate, toDate);
+	}
+}

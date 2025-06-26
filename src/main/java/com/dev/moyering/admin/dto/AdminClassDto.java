@@ -19,6 +19,7 @@ public class AdminClassDto {
     private String firstCategory;   // 1차 카테고리명
     private String secondCategory;  // 2차 카테고리명
     private Integer hostId;         // 강사 아이디
+    private String hostUserName;  // 강사 로그인 아이디
     private String hostName;        // 강사 이름
     private String className;       // 클래스명
     private Integer price;          // 가격
@@ -29,15 +30,16 @@ public class AdminClassDto {
 
     // Projections.constructor에서 사용할 생성자 (필드 순서 중요!)
     public AdminClassDto(Integer classId, String firstCategory, String secondCategory,
-                         Integer hostId, String hostName, String className,
+                         Integer hostId, String hostUserName, String hostName, String className,
                          Integer price, Integer recruitMin, Integer recruitMax,
                          Date regDate, String processStatus) {
         this.classId = classId;
         this.firstCategory = firstCategory;
         this.secondCategory = secondCategory;
-        this.hostId = hostId;
-        this.hostName = hostName;
-        this.className = className;
+        this.hostId = hostId; // host 테이블의 auto_increment key
+        this.hostUserName = hostUserName; // 강사 로그인 아이디
+        this.hostName = hostName; // 강사명
+        this.className = className; // 클래스명
         this.price = price;
         this.recruitMin = recruitMin;
         this.recruitMax = recruitMax;
@@ -45,7 +47,8 @@ public class AdminClassDto {
         this.processStatus = processStatus;
     }
 
-    // 기존 toEntity 메서드들은 그대로 유지...
+
+    // dto -> entity 변환
     public HostClass toEntity() {
         Host host = Host.builder()
                 .hostId(this.hostId)
