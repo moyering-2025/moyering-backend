@@ -1,6 +1,7 @@
 package com.dev.moyering.socialing.controller;
 
 import com.dev.moyering.auth.PrincipalDetails;
+import com.dev.moyering.config.jwt.JwtUtil;
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.entity.Feed;
@@ -30,31 +31,36 @@ public class FeedController {
     private final FeedService feedService;
     private final UserRepository userRepository;
     private final LikeListRepository likeListRepository;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/socialing/feeds")
     public ResponseEntity<List<FeedDto>> getFeeds(
             @RequestParam(defaultValue = "all") String sort,
-            @RequestParam(required = false) String userId
+//            @RequestParam(required = false) String userId
+            @RequestHeader(value = "Authorization",required = false) String header
     ) {
+        System.out.println("▶▶▶ Authorization header = " + header);
 
+//        try {
+//            Integer userId = principal != null ?
+//                    principal.getUser().getUserId() : null;
+//            List<FeedDto> feeds = feedService.getFeeds(sort, userId);
+//            return new ResponseEntity<>(feeds, HttpStatus.OK);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
         try {
+            Integer userId = jwtUtil.extractUserIdFromHeader(header); // ✅ 로그인한 경우만 값 나옴
+            System.out.println("▶▶▶ extracted userId = " + userId);
             List<FeedDto> feeds = feedService.getFeeds(sort, userId);
-           for (FeedDto feed : feeds) {
-                feed.toEntity();
-//              System.out.println(feed.toEntity().getUser().getNickName());
-            }
             return new ResponseEntity<>(feeds, HttpStatus.OK);
-//            return feeds.stream()
-//                    .map(feed ->{
-//                        boolean liked = likeListRepository.existsByFeedFeedIdAndUserUserId(feed.getFeedId(),userId);
-//                        long likesCount = likeListRepository.countByFeedFeedId(feed.getFeedId());
-//                        return new FeedDto(feed,liked,likesCount).toEntity();
-//                    }).collect(Collectors.toList());
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
 
 //    // ✔ 피드 상세 조회
 //    @GetMapping("/feeds/{feedId}")
@@ -158,5 +164,22 @@ public class FeedController {
         }
         feedService.updateFeed(feedId, feedDto, images, removeUrls);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/socialing/feeds/{feedId}/liked")
+    public ResponseEntity<Map<String, Boolean>> isFeedLiked(
+            @PathVariable Integer feedId,
+            @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        // 1) 로그인 안 된 경우 401
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 2) 서비스에 위임
+        Integer userId = principal.getUser().getUserId();
+        boolean liked = feedService.isLikedByUser(feedId, userId);
+
+        // 3) {"liked": true/false} 형태로 응답
+        return ResponseEntity.ok(Map.of("liked", liked));
     }
 }

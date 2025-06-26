@@ -4,12 +4,14 @@ import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.entity.Comment;
 import com.dev.moyering.socialing.entity.Feed;
+import com.dev.moyering.socialing.entity.LikeList;
 import com.dev.moyering.socialing.repository.CommentRepository;
 import com.dev.moyering.socialing.repository.FeedRepository;
 import com.dev.moyering.socialing.repository.LikeListRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FeedServiceImpl implements FeedService {
 
     private final FeedRepository feedRepository;
@@ -44,27 +47,29 @@ public class FeedServiceImpl implements FeedService {
     // 피드 전체
     @Override
     @Transactional
-    public List<FeedDto> getFeeds(String sortType, String userId) throws Exception {
-        return feedRepository.findFeeds(sortType, userId);
-        // 1) 먼저 모든 FeedDto 를 쿼리로 조회
-        /*List<FeedDto> feeds = feedRepository.findFeeds(sortType,userId);
+    public List<FeedDto> getFeeds(String sortType, Integer userId) throws Exception {
+        List<FeedDto> feeds;
+        Set<Integer> likedSet = Collections.emptySet();
 
         if (userId != null) {
-            // 2) 이 유저가 좋아요 누른 피드 ID 리스트 한 번만 조회
+            feeds = feedRepository.findFeeds(sortType, userId);
+            // 유저가 좋아요 누른 피드 ID 목록 조회
             List<Integer> likedIds = likeListRepository.findFeedIdsByUserId(userId);
-            Set<Integer> likedSet = new HashSet<>(likedIds);
-
-            // 3) 피드별 좋아요 여부, 총 좋아요 개수 채우기
-            for (FeedDto feed : feeds) {
-                feed.setLikedByUser(likedSet.contains(feed.getFeedId()));
-                feed.setLikesCount(likeListRepository.countByFeedFeedId(feed.getFeedId()));
-            }
+            likedSet = new HashSet<>(likedIds);
         } else {
-            // 비로그인 상태면 모두 false
-            feeds.forEach(f -> f.setLikedByUser(false));
+            // 로그인 안 되어 있으면 likedByUser 없는 단순 조회 쿼리 실행
+            feeds = feedRepository.findFeedsWithoutLiked(); // ← 이 메서드를 새로 만듦
         }
+        for (FeedDto feed : feeds) {
+            long latestLikeCount = likeListRepository.countByFeedFeedId(feed.getFeedId());
+            feed.setLikesCount(latestLikeCount);
 
-        return feeds;*/
+            // 로그인 한 경우에만 likedByUser 설정
+            if (userId != null) {
+                feed.setLikedByUser(likedSet.contains(feed.getFeedId()));
+            }
+        }
+        return feeds;
     }
 
     @Override
@@ -271,6 +276,13 @@ public class FeedServiceImpl implements FeedService {
 
         feedRepository.save(feed);
     }
+
+    @Override
+    public boolean isLikedByUser(Integer feedId, Integer userId) {
+        return likeListRepository.existsByFeedFeedIdAndUserUserId(feedId, userId);
+    }
+
+
 }
 
 

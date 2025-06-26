@@ -10,7 +10,7 @@ import java.util.List;
 public interface FeedService {
 
     // 전체 피드 목록 조회
-    List<FeedDto> getFeeds(String sortType, String userId) throws Exception;
+    List<FeedDto> getFeeds(String sortType, Integer userId) throws Exception;
     // 피드 상세 조회
     FeedDto getFeedDetail(Integer feedId, Integer currentUserId);
 
@@ -29,4 +29,6 @@ public interface FeedService {
     Integer createFeed(FeedDto feedDto, List<MultipartFile> images) throws Exception;
 
     void updateFeed(Integer feedId, FeedDto feedDto,List<MultipartFile> umages, List<String> removeUrls) throws Exception;
+
+    boolean isLikedByUser(Integer feedId, Integer userId);
 }
