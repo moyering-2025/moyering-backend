@@ -392,6 +392,44 @@ public class HostClassServiceImpl implements HostClassService {
 		return hostclass;
 	}
 
+//	@Override
+//	public Integer saveTempClass(HostClassDto hostClassDto, List<Date> dates) throws Exception {
+//		MultipartFile[] files = { hostClassDto.getImg1(), hostClassDto.getImg2(), hostClassDto.getImg3(),
+//				hostClassDto.getImg4(), hostClassDto.getImg5(), hostClassDto.getMaterial(),
+//				hostClassDto.getPortfolio() };
+//		for (MultipartFile file : files) {
+//			if (file != null && !file.isEmpty()) {
+//				File upFile = new File(iuploadPath, file.getOriginalFilename());
+//				file.transferTo(upFile);
+//			}
+//		}
+//		if (files[0] != null && !files[0].isEmpty())
+//			hostClassDto.setImgName1(files[0].getOriginalFilename());
+//		if (files[1] != null && !files[1].isEmpty())
+//			hostClassDto.setImgName2(files[1].getOriginalFilename());
+//		if (files[2] != null && !files[2].isEmpty())
+//			hostClassDto.setImgName3(files[2].getOriginalFilename());
+//		if (files[3] != null && !files[3].isEmpty())
+//			hostClassDto.setImgName4(files[3].getOriginalFilename());
+//		if (files[4] != null && !files[4].isEmpty())
+//			hostClassDto.setImgName5(files[4].getOriginalFilename());
+//		if (files[5] != null && !files[5].isEmpty())
+//			hostClassDto.setMaterialName(files[5].getOriginalFilename());
+//		if (files[6] != null && !files[6].isEmpty())
+//			hostClassDto.setPortfolioName(files[6].getOriginalFilename());
+//		HostClass hostClass = hostClassDto.toEntity();
+//		hostClassRepository.save(hostClass);
+//
+//		dates.forEach(date -> {
+//			ClassCalendar cc = ClassCalendar.builder().startDate(date).endDate(date).status("임시저장")
+//					.hostClass(HostClass.builder().classId(hostClass.getClassId()).build()).build();
+//
+//			classCalendarRepository.save(cc);
+//		});
+//
+//		return hostClass.getClassId();
+//	}
+
 	
 
 	

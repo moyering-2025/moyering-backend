@@ -6,15 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.admin.dto.AdminCouponDto;
-import com.dev.moyering.admin.entity.AdminCoupon;
 import com.dev.moyering.admin.service.AdminCouponService;
-import com.dev.moyering.common.dto.ClassSearchRequestDto;
-import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.service.HostClassService;
@@ -29,19 +25,7 @@ public class HostClassController {
     private final InquiryService inquiryService;
     private final AdminCouponService adminCouponService;
 
-    @PostMapping("/classList")
-    public ResponseEntity<PageResponseDto<HostClassDto>> searchClasses(
-            @RequestBody ClassSearchRequestDto dto) {
-    	PageResponseDto<HostClassDto> response;
-
-		try {
-			response = hostClassService.searchClasses(dto);
-	        return ResponseEntity.ok(response);
-		} catch (Exception e) {
-			e.printStackTrace();
-	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			
-		}
-    }
+   
     
     @GetMapping("/host/calendar")
     public ResponseEntity<List<HostClassDto>> selectClassCalendar(@RequestParam Integer hostId){
@@ -85,4 +69,7 @@ public class HostClassController {
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     	}
     }
+    
+   
+    
 }

@@ -1,19 +1,14 @@
 package com.dev.moyering.host.service;
 
-import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.dev.moyering.gathering.dto.GatheringDto;
-import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.entity.ClassCalendar;
-import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
@@ -61,8 +56,12 @@ public class ClassCalendarServiceImpl implements ClassCalendarService {
 
 	@Override
 	public List<ClassCalendarDto> selectCalednarByClassId(Integer classId) throws Exception {
-		
-		return null;
+		List<ClassCalendar> calendarList = classCalendarRepository.findByHostClassClassId(classId);
+		List<ClassCalendarDto> calDtoList = new ArrayList<>();
+		for(ClassCalendar cal : calendarList) {
+			calDtoList.add(cal.toDto());
+		}
+		return calDtoList;
 	}
 	public List<ClassCalendarDto> getClassCalendarByHostClassId(Integer classId) {
 		List<ClassCalendar> classes = classCalendarRepository.findAllByHostClass_ClassIdAndStatus(classId, "모집중");
