@@ -391,12 +391,5 @@ public class HostClassServiceImpl implements HostClassService {
 		HostClassDto hostclass= hostClassRepository.findById(classId).orElseThrow(()-> new Exception("해당 클래스가 존재하지 않습니다.")).toDto();
 		return hostclass;
 	}
-
-	
-
-	
-
-
-
 }
 
