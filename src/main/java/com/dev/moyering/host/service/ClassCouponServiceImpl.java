@@ -45,4 +45,10 @@ public class ClassCouponServiceImpl implements ClassCouponService {
 		
 	}
 
+	@Override
+	public void downloadClassCoupon(Integer userId, Integer classCouponId) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
