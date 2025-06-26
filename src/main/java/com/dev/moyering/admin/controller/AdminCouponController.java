@@ -68,7 +68,6 @@ public class AdminCouponController {
     @DeleteMapping("/{couponId}")
     public ResponseEntity<AdminCouponDto> deleteCoupon(@PathVariable Integer couponId, @RequestBody AdminCouponDto couponDto) {
         log.info("쿠폰 삭제 요청 : {}", couponId);
-
         try {
             AdminCouponDto deleteCoupon = adminCouponService.deleteCoupon(couponId);
             return ResponseEntity.ok(deleteCoupon);
