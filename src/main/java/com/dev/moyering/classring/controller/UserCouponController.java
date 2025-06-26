@@ -1,6 +1,4 @@
-package com.dev.moyering.user.controller;
-
-import java.util.Map;
+package com.dev.moyering.classring.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.dev.moyering.auth.PrincipalDetails;
+import com.dev.moyering.classring.service.UserCouponService;
 import com.dev.moyering.host.dto.ClassCouponDto;
 import com.dev.moyering.host.service.ClassCouponService;
 
@@ -20,19 +19,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserCouponController {
-	private ClassCouponService classCouponService;
+	private final UserCouponService userCouponService;
 	
 	@PostMapping("/classCoupons/download")
 	public ResponseEntity<?> downloadClassCoupon(@RequestBody ClassCouponDto dto,
             @AuthenticationPrincipal PrincipalDetails principal) {
-		System.out.println("ddddddddddddddddddddddddddddddclassCouponId"+dto.getClassCouponId());
+		
 	    Integer userId = principal.getUser().getUserId();
 	    Integer classCouponId = dto.getClassCouponId();
 
 	    try {
-	    	classCouponService.downloadClassCoupon(userId, classCouponId);
+	    	userCouponService.downloadClassCoupon(userId, classCouponId);
 	        return ResponseEntity.ok("쿠폰 다운로드 완료");
 	    } catch (Exception e) {
+	    	e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("다운로드 실패: " + e.getMessage());
 	    }
 	}

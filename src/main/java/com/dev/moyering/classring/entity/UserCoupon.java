@@ -1,4 +1,4 @@
-package com.dev.moyering.user.entity;
+package com.dev.moyering.classring.entity;
 
 import java.time.LocalDateTime;
 
@@ -12,9 +12,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.dev.moyering.admin.entity.AdminCoupon;
+import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.host.entity.ClassCoupon;
 import com.dev.moyering.host.entity.HostClass;
-import com.dev.moyering.user.dto.UserCouponDto;
+import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +26,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "user_coupon")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

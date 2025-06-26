@@ -4,7 +4,7 @@ import com.dev.moyering.admin.dto.AdminCouponDto;
 import com.dev.moyering.admin.dto.AdminCouponSearchCond;
 import com.dev.moyering.admin.entity.CouponStatus;
 import com.dev.moyering.admin.entity.QAdminCoupon;
-import com.dev.moyering.user.entity.QUserCoupon;
+import com.dev.moyering.classring.entity.QUserCoupon;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;

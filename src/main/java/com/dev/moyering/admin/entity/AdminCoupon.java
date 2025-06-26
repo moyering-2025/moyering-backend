@@ -3,7 +3,8 @@ import java.time.LocalDateTime;
 import javax.persistence.*;
 
 import com.dev.moyering.admin.dto.AdminCouponDto;
-import com.dev.moyering.user.entity.UserCoupon;
+import com.dev.moyering.classring.entity.UserCoupon;
+
 import lombok.*;
 
 @Entity
