@@ -339,3 +339,5 @@ gradle-app.setting
 src/main/generated/
 build/generated/
 src/main/resources/application.properties
+# .gitignore
+src/main/resources/firebase/*.json
