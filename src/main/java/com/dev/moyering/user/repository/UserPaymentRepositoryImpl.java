@@ -44,6 +44,7 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
                         userPayment.userCoupon.adminCoupon.couponType, // 쿠폰 유형 (관리자, 호스트)
                         userPayment.userCoupon.adminCoupon.discountType, // 쿠폰할인 타입 (금액, 비율)
                         userPayment.userCoupon.adminCoupon.discount, //할인 금액 / 비율
+                        com.querydsl.core.types.dsl.Expressions.constant(0), // calculatedDiscountAmount 초기값
                         userPayment.amount, // 총 결제금액 (totalAmount)
                         userPayment.paidAt, //결제일시 (LocalDateTime)
                         userPayment.paymentType, //결제타입 (카드, 간편결제)

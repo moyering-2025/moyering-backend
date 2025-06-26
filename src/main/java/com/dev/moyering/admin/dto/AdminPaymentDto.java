@@ -20,6 +20,7 @@ public class AdminPaymentDto {
     private String couponType;      // 쿠폰 유형
     private String discountType;    // 할인 유형
     private Integer discountAmount; // 할인금액 / 비율 (가변)
+    private Integer calculatedDiscountAmount;
     private Integer totalAmount;    // 총 결제 금액
     private LocalDateTime payDate;  // 결제일시
     private String paymentType;     // 결제 유형
@@ -27,7 +28,7 @@ public class AdminPaymentDto {
 
     public AdminPaymentDto(Integer paymentId, String orderNo, String studentId,
                            String className, Integer classAmount, String couponType,
-                           String discountType, Integer discountAmount, Integer totalAmount,
+                           String discountType, Integer discountAmount,  Integer calculatedDiscountAmount, Integer totalAmount,
                            LocalDateTime payDate, String paymentType, String status) {
         this.paymentId = paymentId;
         this.orderNo = orderNo;
@@ -37,6 +38,7 @@ public class AdminPaymentDto {
         this.couponType = couponType;
         this.discountType = discountType;
         this.discountAmount = discountAmount;
+        this.calculatedDiscountAmount = calculatedDiscountAmount;
         this.totalAmount = totalAmount;
         this.payDate = payDate;
         this.paymentType = paymentType;

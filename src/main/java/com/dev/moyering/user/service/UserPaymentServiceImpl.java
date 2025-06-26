@@ -46,7 +46,7 @@ public class UserPaymentServiceImpl implements UserPaymentService {
     private AdminPaymentDto calculateDiscountAmount(AdminPaymentDto adminPaymentDto) {
         // 쿠폰이 없는 경우
         if (adminPaymentDto.getCouponType() == null || adminPaymentDto.getDiscountType() == null) {
-            adminPaymentDto.setDiscountAmount(0); // 객세 생성 대신 setter 사용
+            adminPaymentDto.setCalculatedDiscountAmount(0); // 객세 생성 대신 setter 사용
             log.debug("쿠폰 없는 결제 - 주문번호: {}", adminPaymentDto.getOrderNo());
             return adminPaymentDto;
         }
@@ -71,13 +71,14 @@ public class UserPaymentServiceImpl implements UserPaymentService {
                         couponDiscountValue, calculatedDiscountAmount);
                 break;
 
+
             default:
                 log.warn("알 수 없는 할인 타입 - 주문번호: {}, 할인타입: {}",
                         adminPaymentDto.getOrderNo(), adminPaymentDto.getDiscountType());
                 calculatedDiscountAmount = 0;
                 break;
         }
-
+        adminPaymentDto.setCalculatedDiscountAmount(calculatedDiscountAmount);
         log.debug("최종 할인금액 계산 완료 - 주문번호: {}, 원래값: {}, 계산된값: {}, 최종값: {}",
                 adminPaymentDto.getOrderNo(), couponDiscountValue, calculatedDiscountAmount);
         return adminPaymentDto;
