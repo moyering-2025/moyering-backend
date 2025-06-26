@@ -335,9 +335,9 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/java,gradle,intellij,eclipse,macos,windows
 
 
+
 # querydsl
 src/main/generated/
 build/generated/
-src/main/resources/application.propertiessrc/main/resources/firebase/*.json
-src/main/resources/firebase/*.json
+src/main/resources/application.properties
 src/main/resources/firebase/*.json
