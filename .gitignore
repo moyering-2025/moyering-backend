@@ -340,4 +340,4 @@ src/main/generated/
 build/generated/
 src/main/resources/application.properties
 # .gitignore
-src/main/resources/firebase/*.json
+src/main/resources/firebase/*.jsonsrc/main/resources/firebase/*.json
