@@ -1,10 +1,10 @@
 package com.dev.moyering.user.dto;
 
 import com.dev.moyering.admin.entity.AdminCoupon;
+import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.ClassRegist;
 import com.dev.moyering.host.entity.HostClass;
-import com.dev.moyering.user.entity.UserCoupon;
 import com.dev.moyering.user.entity.UserPayment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.dev.moyering.user.controller;
+package com.dev.moyering.classring.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
