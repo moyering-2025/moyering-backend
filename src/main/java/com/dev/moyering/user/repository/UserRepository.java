@@ -22,6 +22,6 @@ public interface UserRepository extends JpaRepository<User, Integer>,  UserRepos
 	
 	@Transactional
 	@Modifying
-	@Query("update User u set u.fcm_token=:fcmToken where u.userId=:userId")
+	@Query("update User u set u.fcmToken=:fcmToken where u.userId=:userId")
 	void updateFcmToken(@Param("userId") Integer userId, @Param("fcmToken") String fcmToken);
 }
