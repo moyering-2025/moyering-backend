@@ -18,15 +18,17 @@ import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.repository.HostRepository;
 import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
 	private HostRepository hostRepository;
-	
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, HostRepository hostRepository) {
+	private UserRepository userRepository;
+	public JwtAuthenticationFilter(AuthenticationManager authenticationManager, HostRepository hostRepository, UserRepository userRepository) {
 		super(authenticationManager);
 		this.hostRepository=hostRepository;
+		this.userRepository = userRepository;
 	}
 	
 	private JwtToken jwtToken = new JwtToken();
@@ -38,6 +40,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			Authentication authResult) throws IOException, ServletException {
 		PrincipalDetails principalDetails = (PrincipalDetails)authResult.getPrincipal();
 		String username = principalDetails.getUsername();
+		Integer userId = principalDetails.getUser().getUserId();
+		//fcmToken 저장
+		String fcmToken = request.getParameter("fcmToken");
+		userRepository.updateFcmToken(userId, fcmToken);
 		
 		String accessToken = jwtToken.makeAccessToken(username);
 		String refreshToken = jwtToken.makeRefreshToken(username);
