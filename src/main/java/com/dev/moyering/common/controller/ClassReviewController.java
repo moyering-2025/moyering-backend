@@ -21,7 +21,7 @@ public class ClassReviewController {
 	private final ReviewService reviewService;
 
 	//클래스 상세 리뷰 더보기
-    @GetMapping("/class/classRingReviewList/{hostId}") 
+    @GetMapping("/classRingReviewList/{hostId}") 
     public ResponseEntity<PageResponseDto<ReviewDto>> classRingReviewList (
     		@PathVariable("hostId") Integer hostId,
     		@RequestParam(defaultValue = "0") int page,
