@@ -17,19 +17,20 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 
 public class UserPaymentDto {
     private Integer paymentId; // 결제 id
     private String orderNo; //주문번호
     private Integer amount; // 결제금액
     private String paymentType; // 결제유형 (카드결제, 간편결제)
-    private Date paidAt; // 결제일
+    private LocalDateTime paidAt; // 결제일
     private String status; // 상태 (주문, 취소, 환불)
     private ClassRegist classRegist; // 수강생 id
     private ClassCalendar classCalendar;  // 클래스 일정 id
     private UserCoupon userCoupon; // 사용한 쿠폰 id
 
-    public UserPaymentDto(Integer paymentId, String orderNo, Integer amount, String paymentType, Date paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer platformFee) {
+    public UserPaymentDto(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer platformFee) {
         this.paymentId = paymentId;
         this.orderNo = UUID.randomUUID().toString();
         this.amount = amount;

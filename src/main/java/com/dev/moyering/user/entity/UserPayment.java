@@ -10,6 +10,7 @@ import org.springframework.data.relational.core.sql.In;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,7 +32,7 @@ public class UserPayment {
     private String paymentType; // 결제유형
 
     @Column
-    private Date paidAt; // 결제일
+    private LocalDateTime paidAt; // 결제일
 
     @Column
     private String status; // 상태 (주문, 취소, 환불)
@@ -50,7 +51,7 @@ public class UserPayment {
 
 
     @Builder
-    public UserPayment(Integer paymentId, String orderNo, Integer amount, String paymentType, Date paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon) {
+    public UserPayment(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon) {
         this.paymentId = paymentId;
         this.orderNo = orderNo;
         this.amount = amount;

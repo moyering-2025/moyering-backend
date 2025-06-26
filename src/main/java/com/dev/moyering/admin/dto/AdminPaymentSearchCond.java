@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 @Builder
 @Getter
@@ -19,4 +20,34 @@ public class AdminPaymentSearchCond {
         this.toDate = toDate;
         this.status = status;
     }
+
+    // 안전한 LocalDate 변환 메서드들
+    public LocalDate getFromLocalDate() {
+        return fromDate != null ? fromDate.toLocalDate() : null;
+    }
+
+    public LocalDate getToLocalDate() {
+        return toDate != null ? toDate.toLocalDate() : null;
+    }
+
+    // 날짜 범위 검색 여부 확인
+    public boolean hasDateRange() {
+        return fromDate != null || toDate != null;
+    }
+
+    // 시작 날짜만 있는지 확인
+    public boolean hasFromDateOnly() {
+        return fromDate != null && toDate == null;
+    }
+
+    // 종료 날짜만 있는지 확인
+    public boolean hasToDateOnly() {
+        return fromDate == null && toDate != null;
+    }
+
+    // 시작~종료 날짜 모두 있는지 확인
+    public boolean hasFullDateRange() {
+        return fromDate != null && toDate != null;
+    }
 }
+

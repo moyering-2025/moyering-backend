@@ -1,19 +1,17 @@
 package com.dev.moyering.admin.dto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 
 @Getter
+@Setter
 @NoArgsConstructor
 @Slf4j
 
 // 수강생의 결제내역 조회이므로 수수료 X
-public class AdminPaymentDto {  // 클래스명 대문자로 수정
+public class AdminPaymentDto {
     private Integer paymentId;      // 결제번호
     private String orderNo;         // 주문번호
     private String studentId;       // 수강생 로그인 아이디
@@ -21,14 +19,16 @@ public class AdminPaymentDto {  // 클래스명 대문자로 수정
     private Integer classAmount;    // 클래스금액
     private String couponType;      // 쿠폰 유형
     private String discountType;    // 할인 유형
-    private Integer discountAmount; // 할인금액 / 비율
+    private Integer discountAmount; // 할인금액 / 비율 (가변)
     private Integer totalAmount;    // 총 결제 금액
-    private Date payDate;           // 결제일시
+    private LocalDateTime payDate;  // 결제일시
     private String paymentType;     // 결제 유형
     private String status;          // 결제 상태
 
-
-    public AdminPaymentDto(Integer paymentId, String orderNo, String studentId, String className, Integer classAmount, String couponType, String discountType, Integer discountAmount, Integer totalAmount, Date payDate, String paymentType, String status) {
+    public AdminPaymentDto(Integer paymentId, String orderNo, String studentId,
+                           String className, Integer classAmount, String couponType,
+                           String discountType, Integer discountAmount, Integer totalAmount,
+                           LocalDateTime payDate, String paymentType, String status) {
         this.paymentId = paymentId;
         this.orderNo = orderNo;
         this.studentId = studentId;
