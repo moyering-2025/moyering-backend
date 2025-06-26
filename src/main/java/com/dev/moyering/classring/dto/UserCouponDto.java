@@ -1,12 +1,12 @@
-package com.dev.moyering.user.dto;
+package com.dev.moyering.classring.dto;
 
 import java.time.LocalDateTime;
 
 import com.dev.moyering.admin.entity.AdminCoupon;
+import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.host.entity.ClassCoupon;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.user.entity.User;
-import com.dev.moyering.user.entity.UserCoupon;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,27 +34,14 @@ public class UserCouponDto {
     private String className;
     
     public UserCoupon toEntity() {
-    	UserCoupon entity = UserCoupon.builder()
-    			.ucId(ucId)
-    			.status(status)
-    			.downloadedAt(downloadedAt)
-    			.usedAt(usedAt)
-    			.build();
-    	if(userId!=null) {
-    		entity.setUser(User.builder()
-    				.userId(userId)
-    				.build());
-    	}
-    	if(classCouponId!=null) {
-    		entity.setClassCoupon(ClassCoupon.builder()
-    				.classCouponId(classCouponId)
-    				.build());
-    	}
-    	if(couponId!=null) {
-    		entity.setAdminCoupon(AdminCoupon.builder()
-    				.couponId(couponId)
-    				.build());
-    	}
-    	return entity;
+	    return UserCoupon.builder()
+	        .ucId(ucId)
+	        .status(status)
+	        .downloadedAt(downloadedAt)
+	        .usedAt(usedAt)
+	        .user(userId != null ? User.builder().userId(userId).build() : null)
+	        .classCoupon(classCouponId != null ? ClassCoupon.builder().classCouponId(classCouponId).build() : null)
+	        .adminCoupon(couponId != null ? AdminCoupon.builder().couponId(couponId).build() : null)
+	        .build();
     }
 }
