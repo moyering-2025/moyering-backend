@@ -11,6 +11,7 @@ import com.dev.moyering.common.entity.QSubCategory;
 import com.dev.moyering.common.entity.SubCategory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+@Repository
 public class CategoryRepositoryImpl implements CategoryRepositoryCustom {
 
 	@Autowired

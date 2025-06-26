@@ -32,6 +32,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import static com.dev.moyering.common.entity.QSubCategory.subCategory;
 import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
 import static com.dev.moyering.host.entity.QHostClass.hostClass;
 import static com.dev.moyering.user.entity.QUser.user;
@@ -119,6 +120,8 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 						classCalendar.status                        // 상태
 								 ))
 				.from(hostClass)
+//				.leftJoin(hostClass.subCategory, subCategory)
+//				.leftJoin(subCategory.firstCategory, subCategory.firstCategory)
 				.leftJoin(classCalendar).on(hostClass.classId.eq(classCalendar.hostClass.classId))
 				.leftJoin(user).on(hostClass.host.userId.eq(user.userId))
 				.where(
@@ -138,6 +141,8 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		return jpaQueryFactory
 				.select(hostClass.count())
 				.from(hostClass)
+//				.leftJoin(hostClass.subCategory, subCategory)
+//				.leftJoin(subCategory.firstCategory, subCategory.firstCategory)
 				.leftJoin(classCalendar).on(hostClass.classId.eq(classCalendar.hostClass.classId))
 				.leftJoin(user).on(hostClass.host.userId.eq(user.userId))
 				.where(

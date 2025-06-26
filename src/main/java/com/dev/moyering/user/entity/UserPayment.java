@@ -22,6 +22,9 @@ public class UserPayment {
     private Integer paymentId; // 결제 id
 
     @Column
+    private String orderNo; // 주문 id
+
+    @Column
     private Integer amount; // 결제금액
 
     @Column
@@ -45,13 +48,11 @@ public class UserPayment {
     @JoinColumn(name = "uc_id") // 사용한 쿠폰 id
     private UserCoupon userCoupon;
 
-    @Column
-    private Integer platformFee; // 수수료
-    // 관리자쿠폰일 경우, 강의 원가의 10%, 강사쿠폰일 경우, 전체 결제금액의 10%
 
     @Builder
-    public UserPayment(Integer paymentId, Integer amount, String paymentType, Date paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer platformFee) {
+    public UserPayment(Integer paymentId, String orderNo, Integer amount, String paymentType, Date paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon) {
         this.paymentId = paymentId;
+        this.orderNo = orderNo;
         this.amount = amount;
         this.paymentType = paymentType;
         this.paidAt = paidAt;
@@ -59,21 +60,7 @@ public class UserPayment {
         this.classRegist = classRegist;
         this.classCalendar = classCalendar;
         this.userCoupon = userCoupon;
-        this.platformFee = platformFee;
-    }
-
-    // Entity -> DTO 변환
-    public UserPaymentDto toDto() {
-        return UserPaymentDto.builder()
-                .paymentId(this.paymentId)
-                .amount(this.amount)
-                .paymentType(this.paymentType)
-                .paidAt(this.paidAt)
-                .status(this.status)
-                .classRegist(this.classRegist)
-                .classCalendar(this.classCalendar)
-                .userCoupon(this.userCoupon)
-                .platformFee(this.platformFee)
-                .build();
     }
 }
+
+
