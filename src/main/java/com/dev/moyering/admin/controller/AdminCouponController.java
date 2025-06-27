@@ -25,8 +25,7 @@ public class AdminCouponController {
     @GetMapping
     public ResponseEntity<Page<AdminCouponDto>> getCouponList(
             @ModelAttribute AdminCouponSearchCond cond, // 쿼리 파라미터나 폼데이터에서 데이터 가져오기
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         try {
             Page<AdminCouponDto> result = adminCouponService.getCouponList(cond, pageable);
             return ResponseEntity.ok(result);
