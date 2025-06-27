@@ -392,8 +392,6 @@ public class HostClassServiceImpl implements HostClassService {
 		return hostclass;
 	}
 
-
-
 	// 관리자 페이지 > 클래스 관리
 	@Override
 	public Page<AdminClassDto> getHostClassListForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {

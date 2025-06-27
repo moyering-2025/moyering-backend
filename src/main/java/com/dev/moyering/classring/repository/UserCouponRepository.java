@@ -1,5 +1,7 @@
 package com.dev.moyering.classring.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.dev.moyering.classring.entity.UserCoupon;

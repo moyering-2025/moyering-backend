@@ -143,7 +143,6 @@ public class GatheringInquiryController {
 					endDate = (Date)param.get("endDate");
 				} 
 			}
-			param.put("userId", principal.getUser().getUserId());
 			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findInquiriesReceivedByOrganizer(pageInfo, loginId, startDate, endDate, isAnswered);
 			System.out.println("gatheringInquiryList : "+gatheringInquiryList);
 			Map<String,Object> res = new HashMap<>();
@@ -183,7 +182,7 @@ public class GatheringInquiryController {
 			
 			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findInquiriesSentByUser(pageInfo, loginId, startDate, endDate, isAnswered);
 			Map<String,Object> res = new HashMap<>();
-			System.out.println("findInquiriesSentByUser : " + gatheringInquiryList);
+			System.out.println("findInquiriesSentByUser " + gatheringInquiryList);
 			res.put("findInquiriesSentByUser", gatheringInquiryList);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {

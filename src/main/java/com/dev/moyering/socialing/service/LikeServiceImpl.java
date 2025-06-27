@@ -1,6 +1,7 @@
 package com.dev.moyering.socialing.service;
 
 
+import com.dev.moyering.socialing.dto.LikeListDto;
 import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.socialing.entity.LikeList;
 import com.dev.moyering.socialing.repository.FeedRepository;
@@ -23,7 +24,7 @@ public class LikeServiceImpl implements LikeService {
         boolean exists = likeListRepository.existsByFeedFeedIdAndUserUserId(feedId, userId);
 
         if (exists) {
-            likeListRepository.deleteByFeed_FeedIdAndUser_Username(feedId, userId);
+            likeListRepository.deleteByFeedFeedIdAndUserUserId(feedId, userId);
         }else {
             Feed feed = feedRepository.findById(feedId).orElseThrow(
                     () -> new Exception("피드가 존재하지 않습니다.")

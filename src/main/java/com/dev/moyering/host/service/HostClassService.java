@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 public interface HostClassService {
 	List<HostClassDto> getRecommendHostClassesForUser(Integer userId) throws Exception;
 	Integer registClass(HostClassDto hostClassDto, List<Date> dates) throws Exception;
+//	Integer saveTempClass(HostClassDto hostClassDto, List<Date> dates) throws Exception;
 	PageResponseDto<HostClassDto> searchClasses(ClassSearchRequestDto dto) throws Exception;
 	Map<Integer,List<ClassCalendarDto>> getHostClassesWithCalendars(Integer hostId) throws Exception;
 	List<HostClassDto> selectHostClassByHostId(Integer hostId) throws Exception;

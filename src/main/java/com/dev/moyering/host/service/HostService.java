@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.entity.Host;
+import com.dev.moyering.user.entity.User;
 
 
 public interface HostService {
@@ -13,4 +14,5 @@ public interface HostService {
 	Host updateHost(Integer hostId,String name,String publicTel,String email,String intro,MultipartFile profile) throws Exception;
 	Host updateHostSettlement(Integer hostId,String bankName,String accName,String accNum,MultipartFile idCard) throws Exception;
 	HostDto getHostById(Integer hostId) throws Exception;
+	
 }

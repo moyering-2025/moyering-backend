@@ -62,7 +62,7 @@ public class FeedDto {
                 .tag4(tag4)
                 .tag5(tag5)
                 .isDeleted(false)
-                .user(User.builder().username(writerId).profile(writerProfile).userBadgeId(writerBadge).build())
+                .user(User.builder().nickName(writerId).profile(writerProfile).userBadgeId(writerBadge).build())
                 .build();
         return entity;
     }

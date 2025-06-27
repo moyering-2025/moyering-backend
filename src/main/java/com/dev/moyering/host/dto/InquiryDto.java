@@ -25,7 +25,7 @@ public class InquiryDto {
 	private Integer calendarId;
 	private Integer hostId;
 	private Integer userId; 
-	
+	private Integer state;
 	private String studentName;
 	private String className;
 	private String hostName;
@@ -37,6 +37,7 @@ public class InquiryDto {
 				.inquiryDate(inquiryDate)
 				.iqResContent(iqResContent)
 				.responseDate(responseDate)
+				.state(state)
 				.content(content)
 				.build();
 		if(calendarId!=null) {

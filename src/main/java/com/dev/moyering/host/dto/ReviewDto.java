@@ -2,6 +2,8 @@ package com.dev.moyering.host.dto;
 
 import java.sql.Date;
 
+import javax.persistence.Column;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.host.entity.ClassCalendar;
@@ -27,6 +29,7 @@ public class ReviewDto {
 	private Integer star;
 	private String reviewImgName;
 	private Integer calendarId;
+	private Integer state;
 	private Integer userId;
 	private Integer hostId;
 	
@@ -43,6 +46,7 @@ public class ReviewDto {
 				.content(content)
 				.reviewDate(reviewDate)
 				.revRegCotnent(revRegCotnent)
+				.state(state)
 				.responseDate(responseDate)
 				.star(star)
 				.reviewImg(reviewImgName)

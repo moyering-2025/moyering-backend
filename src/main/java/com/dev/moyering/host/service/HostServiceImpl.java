@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.repository.HostRepository;
+import com.dev.moyering.user.entity.User;
 
 @Service
 public class HostServiceImpl implements HostService {
@@ -112,5 +113,7 @@ public class HostServiceImpl implements HostService {
 		return hostRepository.findById(hostId)
 				.orElseThrow(() -> new Exception("해당 강사가 존재하지 않습니다.")).toDto();
 	}
+
+	
 
 }

@@ -2,7 +2,10 @@ package com.dev.moyering.host.service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -13,8 +16,10 @@ import org.springframework.stereotype.Service;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.entity.ClassCalendar;
+import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.Inquiry;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
+import com.dev.moyering.host.repository.HostClassRepository;
 import com.dev.moyering.host.repository.InquiryRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
@@ -27,6 +32,7 @@ public class InquiryServiceImpl implements InquiryService {
 	private final InquiryRepository inquiryRepository;
 	private final UserRepository userRepository;
 	private final ClassCalendarRepository calendarRepository;
+	private final HostClassRepository hostClassRepository;
 	
 	@Override
 	public PageResponseDto<InquiryDto> getInquiryListByClassId(Integer classId, int page, int size) {
@@ -60,6 +66,40 @@ public class InquiryServiceImpl implements InquiryService {
 	    inquiryRepository.save(inquiry);
 	    
 		return inquiry.getInquiryId();
+	}
+	@Override
+	public List<InquiryDto> selectInquiryByHostId(Integer hostId) throws Exception {
+		List<HostClass> hostClassList = hostClassRepository.findByHostHostId(hostId);
+		Set<Integer> classIdList = hostClassList.stream()
+				.map(HostClass::getClassId)
+				.collect(Collectors.toSet());
+		List<ClassCalendar> calendarList = calendarRepository.findByHostClassClassIdIn(classIdList);
+		List<Integer> calendarIdList = new ArrayList<>();
+		for(ClassCalendar cCalendar : calendarList) {
+			calendarIdList.add(cCalendar.getCalendarId());
+		}
+		List<Inquiry> inquiryList = inquiryRepository.findByClassCalendarCalendarIdIn(calendarIdList);
+		List<InquiryDto> inquiryDtoList = new ArrayList<>();
+		for(Inquiry entity : inquiryList) {
+			inquiryDtoList.add(entity.toDto());
+		}
+		for(InquiryDto dto : inquiryDtoList) {
+			String studentName = userRepository.findById(dto.getUserId()).get().getNickName();
+			dto.setStudentName(studentName);
+		}
+		return inquiryDtoList;
+	}
+	@Override
+	public void replyInquiry(Integer inquiryId, Integer hostId, String iqResContent) throws Exception {
+		Inquiry inquiry = inquiryRepository.findById(inquiryId).get();
+		InquiryDto inquiryDto = inquiry.toDto();
+		if(hostId != null && iqResContent != null) {
+			inquiryDto.setHostId(hostId);
+			inquiryDto.setIqResContent(iqResContent);
+			inquiryDto.setResponseDate(new Date(System.currentTimeMillis()));
+			inquiryDto.setState(1);
+		}
+		inquiryRepository.save(inquiryDto.toEntity());
 	}
 
 }
