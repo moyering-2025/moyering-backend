@@ -84,11 +84,12 @@ public class GatheringController {
 			res.put("gathering", nGatheringDto);
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
 			List<GatheringApplyDto> member = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
-//			Integer totalLikeNum = gatheringLikesService.getTotalLikesOfGatheringByGatheringId(gatheringId);
+			List<GatheringDto> recommendations = gatheringService.findGatheringWithCategory(nGatheringDto.getSubCategoryId(), nGatheringDto.getCategoryId());
+			
 			userDto.setPassword(null);
 			res.put("organizer", userDto);
 			res.put("member", member);
-//			res.put("totalLikeNum", totalLikeNum);
+			res.put("recommendations", recommendations);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -138,11 +139,10 @@ public class GatheringController {
 	public ResponseEntity<GatheringDto> detailForModifyGathering(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestParam("gatheringId") Integer gatheringId) {
 		try {
-	        System.out.println("API 호출됨!");
 	        System.out.println("gatheringId: " + gatheringId);
-	        System.out.println("로그인 정보 : "+principal.getUser().getUserId());
+//	        System.out.println("로그인 정보 : "+principal.getUser().getUserId());
 			GatheringDto gatheringDto = gatheringService.detailGathering(gatheringId);
-			System.out.println("조회된 게더링 : " + gatheringDto);
+//			System.out.println("조회된 게더링 : " + gatheringDto);
 			if(gatheringDto==null) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			} else {
@@ -178,12 +178,25 @@ public class GatheringController {
                     status = null; // 전체인 경우 null로 처리
                 }
 			}
+			Integer allCnt = 0, scheduled = 0, inProgress = 0, cancelled = 0;
+			allCnt = gatheringService.selectMyGatheringListCount(userId, word, "전체");
+			scheduled = gatheringService.selectMyGatheringListCount(userId, word, "전체");
+			inProgress = gatheringService.selectMyGatheringListCount(userId, word, "전체");
+			cancelled = gatheringService.selectMyGatheringListCount(userId, word, "전체");
 			
-			List<GatheringDto> myGatheringList = gatheringService.myGatheringList(userId, pageInfo, word, status);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("list", myGatheringList);
-            response.put("pageInfo", pageInfo);
+			Map<String, Object> response = new HashMap<>();
+			List<GatheringDto> myGatheringList = null;
+			if(allCnt > 0) {
+				myGatheringList = gatheringService.myGatheringList(userId, pageInfo, word, status);
+				response.put("list", myGatheringList);				
+				response.put("pageInfo", pageInfo);
+			} else {
+				response.put("list", "조회된 리스트 없음");
+			}
+			response.put("allCnt", allCnt);
+			response.put("scheduled", scheduled);
+			response.put("inProgress", inProgress);
+			response.put("cancelled", cancelled);
             
             return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch(Exception e) {

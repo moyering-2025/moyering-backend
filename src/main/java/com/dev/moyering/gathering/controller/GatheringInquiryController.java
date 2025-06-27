@@ -56,8 +56,7 @@ public class GatheringInquiryController {
 	        List<Map<String, Object>> transformedQnaList = new ArrayList<>();
 	        
 	        for (GatheringInquiryDto inquiry : gatheringInquiryList) {
-	            Map<String, Object> qnaItem = new HashMap<>();
-	            
+	            Map<String, Object> qnaItem = new HashMap<>();	            
 	            qnaItem.put("id", inquiry.getInquiryId());
 	            qnaItem.put("status", inquiry.getResponseState()); // "답변대기" 또는 "답변완료"
 	            qnaItem.put("content", inquiry.getInquiryContent());
@@ -82,6 +81,7 @@ public class GatheringInquiryController {
 	        }
 	        
 	        // 응답 데이터 구성
+	        res.put("organizer", nGatheringDto.getUserId());
 	        res.put("qnaList", transformedQnaList);
 	        res.put("gatheringTitle", nGatheringDto.getTitle());
 	        res.put("gatheringThumbnailFileName", nGatheringDto.getThumbnailFileName());
