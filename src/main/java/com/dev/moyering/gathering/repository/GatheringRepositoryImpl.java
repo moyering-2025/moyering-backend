@@ -131,10 +131,11 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		clause.execute();
 	}
 	@Override
-	public void updateGatheringStatus(Integer gatheringId, Boolean status) throws Exception{
+
+	public void updateGatheringStatus(Integer gatheringId, Boolean canceled) throws Exception{
 		QGathering gathering = QGathering.gathering;
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
-				.set(gathering.canceled, status)
+				.set(gathering.canceled, canceled)
 				.where(gathering.gatheringId.eq(gatheringId));
 		clause.execute();
 	}
