@@ -69,10 +69,18 @@ public class UserCoupon {
     		dto.setClassCouponId(classCoupon.getClassCouponId());
     		dto.setCouponName(classCoupon.getCouponName());
     		dto.setClassName(classCoupon.getHostClass().getName());
+    		dto.setValidFrom(classCoupon.getValidFrom());
+    		dto.setValidUntil(classCoupon.getValidUntil());
+    		dto.setDiscountType(classCoupon.getDiscountType());
+    		dto.setDiscount(classCoupon.getDiscount());
     	}
     	if (adminCoupon!= null) {
     		dto.setCouponId(adminCoupon.getCouponId());
     		dto.setCouponName(adminCoupon.getCouponCode());
+    		dto.setValidFrom(adminCoupon.getValidFrom());
+    		dto.setValidUntil(adminCoupon.getValidUntil());
+    		dto.setDiscountType(adminCoupon.getDiscountType());
+    		dto.setDiscount(adminCoupon.getDiscount());
     	}
     	
     	return dto;
