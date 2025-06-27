@@ -54,6 +54,28 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	    return count != null ? count : 0L;
 	}
 	@Override
+//	public List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word, String status){	
+//	    QGathering gathering = QGathering.gathering;
+//	    List<Gathering> gatheringList = null;
+//	    BooleanExpression condition = gathering.user.userId.eq(loginId);
+//	    if (word != null && word.trim().length() > 0) {
+//	        condition = condition.and(gathering.title.contains(word));
+//	    }
+//	    BooleanExpression statusCondition = getStatusCondition(gathering, status);
+//	    if (statusCondition != null) {
+//	        condition = condition.and(statusCondition); 
+//	    }
+//	    gatheringList = jpaQueryFactory.selectFrom(gathering)
+//	            .where(condition)  
+//	            .orderBy(gathering.gatheringId.desc())
+//	            .offset(pageRequest.getOffset())
+//	            .limit(pageRequest.getPageSize())
+//	            .fetch();
+//	    
+//	    return gatheringList.stream()
+//	            .map(Gathering::toDto)
+//	            .collect(Collectors.toList());
+//	}
 	public List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word, String status){	
 	    QGathering gathering = QGathering.gathering;
 	    List<Gathering> gatheringList = null;
@@ -65,9 +87,23 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	    if (statusCondition != null) {
 	        condition = condition.and(statusCondition); 
 	    }
-	    gatheringList = jpaQueryFactory.selectFrom(gathering)
-	            .where(condition)  
-	            .orderBy(gathering.gatheringId.desc())
+	    
+	    // 정렬 조건 설정
+	    JPAQuery<Gathering> query = jpaQueryFactory.selectFrom(gathering)
+	            .where(condition);
+	    
+	    // status가 "진행예정"인 경우 특별한 정렬 적용
+	    if ("진행예정".equals(status)) {
+	        query = query.orderBy(
+	            gathering.meetingDate.asc(),      // 날짜 오름차순 (가까운 날짜부터)
+	            gathering.startTime.asc(),        // 시간 오름차순 (이른 시간부터)
+	            gathering.gatheringId.desc()      // ID 내림차순 (같은 시간이면 최신 등록순)
+	        );
+	    } else {
+	        query = query.orderBy(gathering.gatheringId.desc());
+	    }
+	    
+	    gatheringList = query
 	            .offset(pageRequest.getOffset())
 	            .limit(pageRequest.getPageSize())
 	            .fetch();
