@@ -55,7 +55,6 @@ public class AdminNoticeController {
         }
 
          // 검증 후 정상로직 수행
-
         try {
             AdminNoticeDto updatedNotice = noticeService.updateNotice(noticeId, noticeDto);
             return ResponseEntity.ok(updatedNotice);
@@ -85,7 +84,6 @@ public class AdminNoticeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500
         }
     }
-
 
 
 

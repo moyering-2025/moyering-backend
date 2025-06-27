@@ -24,6 +24,7 @@ import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
 import com.dev.moyering.user.entity.User;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
@@ -35,53 +36,70 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word){	
-		QGathering gathering = QGathering.gathering;
-		if(word==null || word.trim().length()==0) {//검색어 없는 경우
-			return jpaQueryFactory.select(gathering.count())
-					.where(gathering.user.userId.eq(loginId)
-							.and(gathering.title.contains(word))) // 제목에서 검색
-					.from(gathering)
-					.fetchOne();
-		}
-		Long cnt = 0L;
-		cnt = jpaQueryFactory.select(gathering.count())
-				.where(gathering.user.userId.eq(loginId)
-						.and(gathering.title.contains(word))) // 제목에서 검색
-				.from(gathering)
-				.fetchOne();
-		return cnt;
+	public Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word, String status) {
+	    QGathering gathering = QGathering.gathering;
+	    
+	    BooleanExpression condition = gathering.user.userId.eq(loginId);
+	    if (word != null && word.trim().length() > 0) {
+	        condition = condition.and(gathering.title.contains(word));
+	    }
+	    BooleanExpression statusCondition = getStatusCondition(gathering, status);
+	    if (statusCondition != null) {
+	        condition = condition.and(statusCondition);
+	    }
+	    Long count = jpaQueryFactory.select(gathering.count())
+	            .from(gathering)
+	            .where(condition)
+	            .fetchOne();
+	    return count != null ? count : 0L;
 	}
-	
-	
 	@Override
-	public List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word){	
+	public List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word, String status){	
 	    QGathering gathering = QGathering.gathering;
 	    List<Gathering> gatheringList = null;
+	    BooleanExpression condition = gathering.user.userId.eq(loginId);
+	    if (word != null && word.trim().length() > 0) {
+	        condition = condition.and(gathering.title.contains(word));
+	    }
+	    BooleanExpression statusCondition = getStatusCondition(gathering, status);
+	    if (statusCondition != null) {
+	        condition = condition.and(statusCondition); 
+	    }
+	    gatheringList = jpaQueryFactory.selectFrom(gathering)
+	            .where(condition)  
+	            .orderBy(gathering.gatheringId.desc())
+	            .offset(pageRequest.getOffset())
+	            .limit(pageRequest.getPageSize())
+	            .fetch();
 	    
-	    if(word == null || word.trim().length() == 0) {
-	        gatheringList = jpaQueryFactory.selectFrom(gathering)
-	                .where(gathering.user.userId.eq(loginId))
-	                .orderBy(gathering.gatheringId.desc())
-	                .offset(pageRequest.getOffset())
-	                .limit(pageRequest.getPageSize())
-	                .fetch();
-
-	        return gatheringList.stream()
-	            .map(Gathering::toDto)  // ModelMapper 대신 toDto() 사용
+	    return gatheringList.stream()
+	            .map(Gathering::toDto)
 	            .collect(Collectors.toList());
-	    } else {
-	    	   gatheringList = jpaQueryFactory.selectFrom(gathering)
-		                .where(gathering.user.userId.eq(loginId)
-		                		.and(gathering.title.contains(word))) // 제목에서 검색
-		                .orderBy(gathering.gatheringId.desc())
-		                .offset(pageRequest.getOffset())
-		                .limit(pageRequest.getPageSize())
-		                .fetch();
+	}
 
-		        return gatheringList.stream()
-		            .map(Gathering::toDto) 
-		            .collect(Collectors.toList());
+	private BooleanExpression getStatusCondition(QGathering gathering, String status) {
+	    
+	    if (status == null || "전체".equals(status)) {
+	        return null;
+	    }
+	    LocalDate today = LocalDate.now();         
+	    LocalTime currentTime = LocalTime.now();    
+	    Date todaySqlDate = Date.valueOf(today);   
+	    
+	    switch (status) {
+	        case "진행예정":
+	            return gathering.meetingDate.gt(todaySqlDate)
+	                    .or(gathering.meetingDate.eq(todaySqlDate)   
+	                            .and(gathering.startTime.gt(currentTime)));
+	        case "진행완료":
+	            return (gathering.meetingDate.lt(todaySqlDate) 
+	                    .or(gathering.meetingDate.eq(todaySqlDate)    
+	                            .and(gathering.startTime.lt(currentTime))))  
+	                    .and(gathering.status.ne("취소됨")); 
+	        case "취소된 모임":
+	            return gathering.status.eq("취소됨"); 
+	        default:
+	            return null;
 	    }
 	}
 	
@@ -103,6 +121,9 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 				.set(gathering.startTime, LocalTime.parse(gatheringDto.getStartTime()))
 				.set(gathering.endTime, LocalTime.parse(gatheringDto.getEndTime()))
 				.set(gathering.applyDeadline, gatheringDto.getApplyDeadline())
+				.set(gathering.latitude, gatheringDto.getLatitude())
+				.set(gathering.locName, gatheringDto.getLocName())
+				.set(gathering.longitude, gatheringDto.getLongitude())
 				.where(gathering.gatheringId.eq(gatheringDto.getGatheringId()));
 		if(gatheringDto.getThumbnailFileName()!=null && !gatheringDto.getThumbnailFileName().equals("")) {
 			clause.set(gathering.thumbnail, gatheringDto.getThumbnailFileName());

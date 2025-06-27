@@ -1,5 +1,6 @@
 package com.dev.moyering.gathering.controller;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.Map;
 import com.querydsl.core.Tuple;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
@@ -38,9 +41,8 @@ public class GatheringInquiryController {
 	@Autowired
 	private UserService userService;
 	@Autowired
-	private GatheringApplyService gatheringApplyService;
-	@Autowired
 	private GatheringInquiryService gatheringInquiryService;
+	
 	@GetMapping("/getGatheringInquiries")
 	public ResponseEntity<Map<String, Object>> inquiriesByGatheringId(@RequestParam("gatheringId") Integer gatheringId) {
 	    try {
@@ -97,22 +99,6 @@ public class GatheringInquiryController {
 	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 	    }
 	}
-	@GetMapping("/user/getGatheringInquiriesByUserId")
-	public ResponseEntity<Map<String, Object>> inquiriesByUserId(@AuthenticationPrincipal PrincipalDetails principal, 
-			@RequestParam("gatheringId") Integer gatheringId) {
-		//마이페이지를 위한 문의내역 불러오기
-		try {
-			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.gatheringInquiryListBygatheringId(gatheringId);
-			Map<String,Object> res = new HashMap<>();
-			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
-			res.put("gathering", gatheringInquiryList);
-			res.put("nGatheringDto", nGatheringDto);
-			return new ResponseEntity<>(res, HttpStatus.OK);
-		} catch(Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}	
 	@PostMapping("/user/writeGatheringInquiry")
 	public ResponseEntity<Integer> writeGatheringInquiry(@AuthenticationPrincipal PrincipalDetails principal, 
 		@RequestBody  Map<String, Object> requestData) {
@@ -121,7 +107,6 @@ public class GatheringInquiryController {
 			gatheringInquiryDto.setGatheringId(Integer.valueOf(requestData.get("gatheringId").toString()));
 			gatheringInquiryDto.setInquiryContent(requestData.get("inquiryContent").toString());
 			gatheringInquiryDto.setUserId(principal.getUser().getUserId());
-			System.out.println("여기까지는 옴 : "+ gatheringInquiryDto);
 			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringInquiryDto);
 			if(gatheringInquiryId!=null) {
 				return new ResponseEntity<>(gatheringInquiryId, HttpStatus.OK);
@@ -133,20 +118,88 @@ public class GatheringInquiryController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	@GetMapping("/user/getGatheringInquiriesByOrganizerUserId")
+	public ResponseEntity<Map<String,Object>> getGatheringInquiriesByOrganizerUserId(@AuthenticationPrincipal PrincipalDetails principal, 
+			@RequestBody(required=false) Map<String, Object> param) {
+		//마이페이지를 위한 문의내역 불러오기(주최자 입장)
+		try {
+			PageInfo pageInfo = new PageInfo(1);
+			Integer loginId = principal.getUser().getUserId();
+			System.out.println("내가 게더링에 등록된 문의+로그인한 유저 " + loginId);
+		    Date startDate = null;
+		    Date endDate = null;
+		    Boolean isAnswered=null;
+			if(param != null) {
+				if(param.get("page")!=null) {
+					pageInfo.setCurPage((Integer) param.get("page"));
+				}
+				if(param.get("isAnswered")!=null) {
+					isAnswered = (Boolean)param.get("isAnswered");
+				} 
+				if(param.get("startDate")!=null) {
+					startDate = (Date)param.get("startDate");
+				} 
+				if(param.get("endDate")!=null) {
+					endDate = (Date)param.get("endDate");
+				} 
+			}
+			param.put("userId", principal.getUser().getUserId());
+			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findInquiriesReceivedByOrganizer(pageInfo, loginId, startDate, endDate, isAnswered);
+			System.out.println("gatheringInquiryList : "+gatheringInquiryList);
+			Map<String,Object> res = new HashMap<>();
+			res.put("gatheringInquiryList", gatheringInquiryList);
+			return new ResponseEntity<>(res, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}	
 	
+	@GetMapping("/user/getGatheringInquiriesByUserId")
+	public ResponseEntity<Map<String,Object>> getGatheringInquiriesByUserId(@AuthenticationPrincipal PrincipalDetails principal, 
+			@RequestBody(required=false) Map<String, Object> params) {
+		//마이페이지를 위한 문의내역 불러오기(문의자 입장)
+		try {
+			PageInfo pageInfo = new PageInfo(1);
+			Integer loginId = principal.getUser().getUserId();
+			System.out.println("내가 등록한 문의+로그인한 유저 " + loginId);
+		    Date startDate = null;
+		    Date endDate = null;
+		    Boolean isAnswered=null;
+			if(params != null) {
+				if(params.get("page")!=null) {
+					pageInfo.setCurPage((Integer) params.get("page"));
+				}
+				if(params.get("isAnswered")!=null) {
+					isAnswered = (Boolean)params.get("isAnswered");
+				} 
+				if(params.get("startDate")!=null) {
+					startDate = (Date)params.get("startDate");
+				} 
+				if(params.get("endDate")!=null) {
+					endDate = (Date)params.get("endDate");
+				} 
+			}
+			
+			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findInquiriesSentByUser(pageInfo, loginId, startDate, endDate, isAnswered);
+			Map<String,Object> res = new HashMap<>();
+			System.out.println("findInquiriesSentByUser : " + gatheringInquiryList);
+			res.put("findInquiriesSentByUser", gatheringInquiryList);
+			return new ResponseEntity<>(res, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}	
 	@PostMapping("/user/responseToGatheringInquiry")
 	public ResponseEntity<GatheringInquiryDto> responseToGatheringInquiry(@AuthenticationPrincipal PrincipalDetails principal, 
 			@ModelAttribute GatheringInquiryDto gatheringInquiryDto) {
-		return null;
-//		try {
-//			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringInquiryDto);
-//			if(gatheringInquiryId!=null) {
-//				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//			}
-//			return new ResponseEntity<>(HttpStatus.OK);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
+		try {
+			gatheringInquiryService.responseToGatheringInquiry(gatheringInquiryDto);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 }

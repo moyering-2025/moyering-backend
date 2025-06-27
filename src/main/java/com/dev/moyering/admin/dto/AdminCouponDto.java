@@ -2,7 +2,9 @@ package com.dev.moyering.admin.dto;
 
 import com.dev.moyering.admin.entity.AdminCoupon;
 import com.dev.moyering.admin.entity.CouponStatus;
-import com.dev.moyering.host.entity.ClassCalendar;
+import com.dev.moyering.classring.entity.UserCoupon;
+import com.dev.moyering.host.entity.HostClass;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,8 +14,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor // 매개변수 없는 기본 생성자 생성
+@AllArgsConstructor // 모든 필드를 매개변수로 받는 생성자를 생성
 public class AdminCouponDto {
     private Integer couponId; // 쿠폰 아이디
     private String couponType; // 쿠폰 유형 (관리자면 'MG' 강사면 'HT")
@@ -24,16 +26,25 @@ public class AdminCouponDto {
     private LocalDateTime validFrom; //쿠폰 시작일
     private LocalDateTime validUntil; //쿠폰 종료일
     private LocalDateTime createdAt; // 쿠폰 생성일
-    private String couponName; // 쿠폰 이름
-    private ClassCalendar calendar; // 일정 아이디
 
     // 동적으로 계산되는 필드
     private CouponStatus status; // 쿠폰 상태
-    private Integer actualIssuedCount; // 실제 발급된 쿠폰 수 (user_coupon 테이블 기준)
-    private Integer usedCount; // 사용된 쿠폰 수 (user_coupon.status='사용')
-    private Integer remainingCount; // 남은 발급 가능 쿠폰 수
 
-
+    public AdminCouponDto(Integer couponId, String couponType, String couponCode,
+                          String discountType, Integer discount, Integer issueCount,
+                          LocalDateTime validFrom, LocalDateTime validUntil,
+                          LocalDateTime createdAt) {
+        this.couponId = couponId;
+        this.couponType = couponType;
+        this.couponCode = couponCode;
+        this.discountType = discountType;
+        this.discount = discount;
+        this.issueCount = issueCount;
+        this.validFrom = validFrom;
+        this.validUntil = validUntil;
+        this.createdAt = createdAt;
+        // status는 null로 초기화 (나중에 설정)
+    }
 
 
     // DTO -> Entity 변환
@@ -48,26 +59,6 @@ public class AdminCouponDto {
                 .validFrom(this.validFrom)
                 .validUntil(this.validUntil)
                 .createdAt(this.createdAt)
-                .couponName(this.couponName)
-                .calendar(this.calendar)
                 .build();
-    }
-
-    // 쿠폰 상태 계산 메서드
-    public CouponStatus calculateStatus() {
-        return CouponStatus.determineCouponStatus(
-                this.validFrom,
-                this.validUntil,
-                this.issueCount,
-                this.actualIssuedCount,
-                this.usedCount
-        );
-    }
-
-    // 남은 발급 가능 쿠폰 수 계산
-    public Integer calculateRemainingCount() {
-        if (this.issueCount == null) return 0;
-        if (this.actualIssuedCount == null) return this.issueCount;
-        return Math.max(0, this.issueCount - this.actualIssuedCount);
     }
 }

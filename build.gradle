@@ -47,11 +47,14 @@ dependencies {
 	implementation "org.apache.tomcat.embed:tomcat-embed-jasper"
 	implementation "jakarta.servlet:jakarta.servlet-api"
 	implementation "jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api"
-	implementation "org.glassfish.web:jakarta.servlet.jsp.jstl"		
+	implementation "org.glassfish.web:jakarta.servlet.jsp.jstl"
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
 	
 	// https://mvnrepository.com/artifact/org.modelmapper/modelmapper
 	implementation("org.modelmapper:modelmapper:2.4.4")	
 	implementation 'org.mariadb.jdbc:mariadb-java-client:3.1.4'
+
 	//쿼리DSL 추가
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
@@ -65,7 +68,15 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-oauth2-client
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")	
+    implementation 'com.google.firebase:firebase-admin:9.2.0'           // Google Firebase Admin		
 
 }
 

@@ -33,7 +33,6 @@ public class AdminCouponServiceImpl implements AdminCouponService {
 
         AdminCoupon coupon = adminCouponRepository.findById(couponId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 쿠폰입니다. ID: " + couponId));
-
         return coupon.toDto();
     }
 
@@ -57,8 +56,6 @@ public class AdminCouponServiceImpl implements AdminCouponService {
                     .issueCount(couponDto.getIssueCount())
                     .validFrom(couponDto.getValidFrom())
                     .validUntil(couponDto.getValidUntil())
-                    .couponName(couponDto.getCouponName())
-                    .calendar(couponDto.getCalendar())
                     .build();
         }
 
@@ -93,8 +90,6 @@ public class AdminCouponServiceImpl implements AdminCouponService {
                 .validFrom(dto.getValidFrom())
                 .validUntil(dto.getValidUntil())
                 .createdAt(existingCoupon.getCreatedAt()) // 기존 생성일시 유지
-                .couponName(dto.getCouponName())
-                .calendar(dto.getCalendar())
                 .build();
 
         AdminCoupon savedCoupon = adminCouponRepository.save(updatedCoupon);

@@ -28,7 +28,7 @@ public class Inquiry {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Integer InquiryId;
-	@Column
+    @Column(nullable = false)
 	private String content;
 	@Column
 	private Date inquiryDate;

@@ -34,7 +34,30 @@ public class GatheringInquiryDto {
 	private Date meetingDate;
 	private String responseContent;
 	private String responseState;
-    
+	// QueryDSL용 생성자 추가
+    public GatheringInquiryDto(Integer inquiryId, Integer gatheringId, String title, 
+                              Integer userId, String nickName, String profile,
+                              String inquiryContent, Date inquiryDate, Date responseDate,
+                              Date meetingDate, String responseContent) {
+        this.inquiryId = inquiryId;
+        this.gatheringId = gatheringId;
+        this.title = title;
+        this.userId = userId;
+        this.nickName = nickName;
+        this.profile = profile;
+        this.inquiryContent = inquiryContent;
+        this.inquiryDate = inquiryDate;
+        this.responseDate = responseDate;
+        this.meetingDate = meetingDate;
+        this.responseContent = responseContent;
+        
+        // 응답 상태 설정
+        if (responseDate != null && responseContent != null) {
+            this.responseState = "답변완료";
+        } else {
+            this.responseState = "답변대기";
+        }
+    }
     public GatheringInquiry toEntity() {
 	    GatheringInquiry.GatheringInquiryBuilder builder = GatheringInquiry.builder()
 	    		.inquiryId(inquiryId)

@@ -16,12 +16,13 @@ public interface GatheringRepositoryCustom {
 
 	void updateGathering(GatheringDto gatheringDto) throws Exception;
 
-	//메인 페이지에 추천 게더링 4개
+	// 메인 페이지에 추천 게더링 4개
 	List<Gathering> findRecommendGatherRingForUser(User user) throws Exception;
+
 	void updateGatheringStatus(Integer gatheringId, String status) throws Exception;
 
-	public Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word);
-	
-	 List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word);
-	
+	Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word, String status);
+
+	List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word, String status);
+
 }
