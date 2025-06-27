@@ -77,7 +77,7 @@ public class Feed {
                .tag4(tag4)
                .tag5(tag5)
                .isDeleted(isDeleted)
-               .writerId(user.getUsername())
+               .writerId(user.getNickName())
                .writerProfile(user.getProfile())
                .writerBadge(user.getUserBadgeId())
                .build();

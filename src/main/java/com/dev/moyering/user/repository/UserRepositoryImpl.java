@@ -17,7 +17,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 
 	// 관리자페이지 회원관리 내 키워드 검색 + 가입기간 필터 + 사용자 구분(전체, 일반, 강사) 필터 조회
 	@Override
-	public List<AdminMemberDto> searchMembers(AdminMemberSearchCond cond, Pageable pageable) throws Exception {
+	public List<AdminMemberDto> searchMembers(AdminMemberSearchCond cond, Pageable pageable) {
 		return jpaQueryFactory
 				.select(Projections.constructor(AdminMemberDto.class,
 						user.userId, // 회원 번호

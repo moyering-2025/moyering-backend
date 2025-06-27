@@ -18,4 +18,8 @@ public interface UserService {
 	void updateMemberStatus(Integer userId, String status);
 	// 관리자페이지 > 회원조회 > 상세 조회 페이지
 	AdminMemberDto getMemberDetail(Integer userId);
+
+
+	//feed
+	UserDto getByNickname(String nickname) throws Exception;
 }
