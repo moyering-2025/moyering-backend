@@ -106,8 +106,9 @@ public class Gathering {
     @Column()
     private String intrOnln;//한줄 소개
 
-    @Column()
-    private String status;
+    @Column(columnDefinition = "TINYINT")
+	@ColumnDefault("0")
+    private Boolean canceled; //true : 취소됨 / false : 취소 안 됨. 
     
     public GatheringDto toDto() {
     	 GatheringDto.GatheringDtoBuilder builder = GatheringDto.builder()
@@ -136,10 +137,15 @@ public class Gathering {
     		        .latitude(latitude)
     		        .longitude(longitude)
     		        .intrOnln(intrOnln)
-    		        .status(status);
+    		        .canceled(canceled);
     	 if(subCategory.getFirstCategory()!=null) {
     		 builder.categoryId(subCategory.getFirstCategory().getCategoryId());
     		 builder.categoryName(subCategory.getFirstCategory().getCategoryName());
+    	 }
+    	 if(canceled) {
+    		 builder.status("취소됨");
+    	 } else {
+    		 builder.status("취소되지 않음");
     	 }
 	    return builder.build();
     }

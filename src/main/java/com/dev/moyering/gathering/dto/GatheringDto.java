@@ -58,9 +58,10 @@ public class GatheringDto {
     private BigDecimal longitude;
     private String intrOnln;
     private String status;
+    private Boolean canceled; 
     
     public Gathering toEntity() {
-    	return Gathering.builder()
+   	 Gathering.GatheringBuilder builder = Gathering.builder()
     			.gatheringId(gatheringId)
     			.title(title)
     			.user(User.builder().userId(userId).build())
@@ -80,8 +81,13 @@ public class GatheringDto {
     			.createDate(createDate)
     			.subCategory(SubCategory.builder().subCategoryId(subCategoryId).build())
     			.latitude(latitude)
-    			.longitude(longitude)
-    			.status(status)
-    			.build();
+    			.longitude(longitude);
+			   	 if(canceled || status.equals("취소됨")) {
+			   		builder.canceled(true);
+			   	 } else {
+			   		 builder.canceled(false);
+			   	 }
+    		    return builder.build();
     }
+    
 }
