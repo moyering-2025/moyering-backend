@@ -154,48 +154,36 @@ public class HostClassServiceImpl implements HostClassService {
 		if (dto.getPriceMax() != null) {
 			builder.and(hostClass.price.loe(dto.getPriceMax()));
 		}
-	    if (dto.getCategory2() != null) {
-	        builder.and(hostClass.subCategory.subCategoryId.eq(dto.getCategory2()));
-	    }
-	    if (dto.getStartDate() != null) {
-	        builder.and(calendar.startDate.goe(Date.valueOf(dto.getStartDate())));
-	    }
-	    if (dto.getEndDate() != null) {
-	        builder.and(calendar.startDate.loe(Date.valueOf(dto.getEndDate())));
-	    }
-	    if (dto.getPriceMin() != null) {
-	        builder.and(hostClass.price.goe(dto.getPriceMin()));
-	    }
-	    if (dto.getPriceMax() != null) {
-	        builder.and(hostClass.price.loe(dto.getPriceMax()));
-	    }
-		if (dto.getName() != null) {
-			 builder.and(hostClass.name.contains(dto.getName()));
+		if (dto.getCategory2() != null) {
+			builder.and(hostClass.subCategory.subCategoryId.eq(dto.getCategory2()));
 		}
-	    // 가장 빠른 모집중 일정 1건만 JOIN된 클래스만 조회
-	    List<HostClass> result = jpaQueryFactory
-	            .select(calendar.hostClass)
-	            .from(calendar)
-	            .join(calendar.hostClass, hostClass)
-	            .where(builder)
-	            .groupBy(hostClass.classId)
-	            .orderBy(calendar.startDate.min().asc())
-	            .offset(pageable.getOffset())
-	            .limit(pageable.getPageSize())
-	            .fetch();
-	    //총 개수 (distinct count!)
-	    Long total = jpaQueryFactory
-	            .select(calendar.hostClass.classId.countDistinct())
-	            .from(calendar)
-	            .where(builder)
-	            .fetchOne();
-	    
-	    //날짜만 얻어오기
-		List<Integer> classIds = result.stream()
-		        .map(HostClass::getClassId)
-		        .collect(Collectors.toList());
-	    Map<Integer, Date> startDateMap = classCalendarRepository.findEarliestStartDatesByClassIds(classIds);
+		if (dto.getStartDate() != null) {
+			builder.and(calendar.startDate.goe(Date.valueOf(dto.getStartDate())));
+		}
+		if (dto.getEndDate() != null) {
+			builder.and(calendar.startDate.loe(Date.valueOf(dto.getEndDate())));
+		}
+		if (dto.getPriceMin() != null) {
+			builder.and(hostClass.price.goe(dto.getPriceMin()));
+		}
+		if (dto.getPriceMax() != null) {
+			builder.and(hostClass.price.loe(dto.getPriceMax()));
+		}
+		if (dto.getName() != null) {
+			builder.and(hostClass.name.contains(dto.getName()));
+		}
+		// 가장 빠른 모집중 일정 1건만 JOIN된 클래스만 조회
+		List<HostClass> result = jpaQueryFactory.select(calendar.hostClass).from(calendar)
+				.join(calendar.hostClass, hostClass).where(builder).groupBy(hostClass.classId)
+				.orderBy(calendar.startDate.min().asc()).offset(pageable.getOffset()).limit(pageable.getPageSize())
+				.fetch();
+		// 총 개수 (distinct count!)
+		Long total = jpaQueryFactory.select(calendar.hostClass.classId.countDistinct()).from(calendar).where(builder)
+				.fetchOne();
 
+		// 날짜만 얻어오기
+		List<Integer> classIds = result.stream().map(HostClass::getClassId).collect(Collectors.toList());
+		Map<Integer, Date> startDateMap = classCalendarRepository.findEarliestStartDatesByClassIds(classIds);
 
 		// DTO로 변환
 		List<HostClassDto> dtoList = result.stream().map(h -> {
@@ -223,179 +211,169 @@ public class HostClassServiceImpl implements HostClassService {
 
 	}
 
-
-
 	@Override
 	public List<HostClassDto> selectHostClassByHostId(Integer hostId) throws Exception {
-	    // hostID에 맞는 hostClass정보 list에 담기
-	    List<HostClass> classListEntity = hostClassRepository.findByHostHostId(hostId);
-	    List<HostClassDto> classList = new ArrayList<>();
-	    for (HostClass hostClass : classListEntity) {
-	        classList.add(hostClass.toDto());
-	    }
+		// hostID에 맞는 hostClass정보 list에 담기
+		List<HostClass> classListEntity = hostClassRepository.findByHostHostId(hostId);
+		List<HostClassDto> classList = new ArrayList<>();
+		for (HostClass hostClass : classListEntity) {
+			classList.add(hostClass.toDto());
+		}
 
-	    // classList에 있는 hostClass의 id들 추출 후 classIds에 저장
-	    Set<Integer> classIds = classList.stream()
-	            .map(HostClassDto::getClassId)
-	            .collect(Collectors.toSet());
+		// classList에 있는 hostClass의 id들 추출 후 classIds에 저장
+		Set<Integer> classIds = classList.stream().map(HostClassDto::getClassId).collect(Collectors.toSet());
 
-	    // classId가 일치하는 일정들을 List에 담기
-	    List<ClassCalendar> calendarEntityList = classCalendarRepository.findByHostClassClassIdIn(classIds);
-	    List<ClassCalendarDto> calendarList = new ArrayList<>();
-	    for (ClassCalendar calendar : calendarEntityList) {
-	        calendarList.add(calendar.toDto());
-	    }
+		// classId가 일치하는 일정들을 List에 담기
+		List<ClassCalendar> calendarEntityList = classCalendarRepository.findByHostClassClassIdIn(classIds);
+		List<ClassCalendarDto> calendarList = new ArrayList<>();
+		for (ClassCalendar calendar : calendarEntityList) {
+			calendarList.add(calendar.toDto());
+		}
 
-	    // 일정에 있는 시작날짜와 상태를 담을 List 생성
-	    List<HostClassDto> result = new ArrayList<>();
+		// 일정에 있는 시작날짜와 상태를 담을 List 생성
+		List<HostClassDto> result = new ArrayList<>();
 
-	    for (HostClassDto hostClass : classList) {
-	        // 해당 클래스에 맞는 일정을 필터링
-	        List<ClassCalendarDto> matchingCalendars = calendarList.stream()
-	                .filter(calendar -> calendar.getClassId().equals(hostClass.getClassId()))
-	                .collect(Collectors.toList());
+		for (HostClassDto hostClass : classList) {
+			// 해당 클래스에 맞는 일정을 필터링
+			List<ClassCalendarDto> matchingCalendars = calendarList.stream()
+					.filter(calendar -> calendar.getClassId().equals(hostClass.getClassId()))
+					.collect(Collectors.toList());
 
-	        // 일정이 여러 개 있을 경우, 각 일정을 가진 클래스 정보를 중복해서 생성
-	        for (ClassCalendarDto calendar : matchingCalendars) {
-	            // 새로운 HostClassDto 객체 생성
-	            HostClassDto classWithCalendar = new HostClassDto();
-	            BeanUtils.copyProperties(hostClass, classWithCalendar); // 객체 복사
+			// 일정이 여러 개 있을 경우, 각 일정을 가진 클래스 정보를 중복해서 생성
+			for (ClassCalendarDto calendar : matchingCalendars) {
+				// 새로운 HostClassDto 객체 생성
+				HostClassDto classWithCalendar = new HostClassDto();
+				BeanUtils.copyProperties(hostClass, classWithCalendar); // 객체 복사
 
-	            // 일정 정보 추가
-	            classWithCalendar.setStartDate(calendar.getStartDate());
-	            classWithCalendar.setStatus(calendar.getStatus());
-	            classWithCalendar.setCalendarId(calendar.getCalendarId());
+				// 일정 정보 추가
+				classWithCalendar.setStartDate(calendar.getStartDate());
+				classWithCalendar.setStatus(calendar.getStatus());
+				classWithCalendar.setCalendarId(calendar.getCalendarId());
 
-	            result.add(classWithCalendar); // 중복된 클래스를 여러 번 추가
-	        }
-	    }
+				result.add(classWithCalendar); // 중복된 클래스를 여러 번 추가
+			}
+		}
 
-	    return result; // 여러 일정을 포함한 클래스 리스트 반환
+		return result; // 여러 일정을 포함한 클래스 리스트 반환
 	}
-	
+
 	@Override
-	public HostPageResponseDto<HostClassDto> selectHostClassByHostIdWithPagination(HostClassSearchRequestDto dto) throws Exception {
-	    Integer hostId = dto.getHostId();
-	    int page = dto.getPage();
-	    int size = dto.getSize();
+	public HostPageResponseDto<HostClassDto> selectHostClassByHostIdWithPagination(HostClassSearchRequestDto dto)
+			throws Exception {
+		Integer hostId = dto.getHostId();
+		int page = dto.getPage();
+		int size = dto.getSize();
 
-	    List<HostClass> classListEntity = hostClassRepository.findByHostHostId(hostId);
-	    List<HostClassDto> classList = classListEntity.stream()
-	        .map(HostClass::toDto)
-	        .collect(Collectors.toList());
+		List<HostClass> classListEntity = hostClassRepository.findByHostHostId(hostId);
+		List<HostClassDto> classList = classListEntity.stream().map(HostClass::toDto).collect(Collectors.toList());
 
-	    Set<Integer> classIds = classList.stream()
-	        .map(HostClassDto::getClassId)
-	        .collect(Collectors.toSet());
+		Set<Integer> classIds = classList.stream().map(HostClassDto::getClassId).collect(Collectors.toSet());
 
-	    List<ClassCalendar> calendarEntityList = classCalendarRepository.findByHostClassClassIdIn(classIds);
-	    List<ClassCalendarDto> calendarList = calendarEntityList.stream()
-	        .map(ClassCalendar::toDto)
-	        .collect(Collectors.toList());
+		List<ClassCalendar> calendarEntityList = classCalendarRepository.findByHostClassClassIdIn(classIds);
+		List<ClassCalendarDto> calendarList = calendarEntityList.stream().map(ClassCalendar::toDto)
+				.collect(Collectors.toList());
 
-	    List<HostClassDto> mergedList = new ArrayList<>();
+		List<HostClassDto> mergedList = new ArrayList<>();
 
-	    for (HostClassDto hostClass : classList) {
-	        List<ClassCalendarDto> matchingCalendars = calendarList.stream()
-	            .filter(calendar -> calendar.getClassId().equals(hostClass.getClassId()))
-	            .collect(Collectors.toList());
+		for (HostClassDto hostClass : classList) {
+			List<ClassCalendarDto> matchingCalendars = calendarList.stream()
+					.filter(calendar -> calendar.getClassId().equals(hostClass.getClassId()))
+					.collect(Collectors.toList());
 
-	        for (ClassCalendarDto calendar : matchingCalendars) {
-	            HostClassDto classWithCalendar = new HostClassDto();
-	            BeanUtils.copyProperties(hostClass, classWithCalendar);
-	            classWithCalendar.setStartDate(calendar.getStartDate());
-	            classWithCalendar.setStatus(calendar.getStatus());
-	            classWithCalendar.setCalendarId(calendar.getCalendarId());
-	            mergedList.add(classWithCalendar);
-	        }
-	    }
+			for (ClassCalendarDto calendar : matchingCalendars) {
+				HostClassDto classWithCalendar = new HostClassDto();
+				BeanUtils.copyProperties(hostClass, classWithCalendar);
+				classWithCalendar.setStartDate(calendar.getStartDate());
+				classWithCalendar.setStatus(calendar.getStatus());
+				classWithCalendar.setCalendarId(calendar.getCalendarId());
+				mergedList.add(classWithCalendar);
+			}
+		}
 
-	    // 🔍 필터링 조건 처리
-	    Stream<HostClassDto> stream = mergedList.stream();
+		// 🔍 필터링 조건 처리
+		Stream<HostClassDto> stream = mergedList.stream();
 
-	    if (dto.getKeyword() != null && !dto.getKeyword().isEmpty()) {
-	        stream = stream.filter(c -> c.getName() != null && c.getName().contains(dto.getKeyword()));
-	    }
+		if (dto.getKeyword() != null && !dto.getKeyword().isEmpty()) {
+			stream = stream.filter(c -> c.getName() != null && c.getName().contains(dto.getKeyword()));
+		}
 
-	    if (dto.getCategory1() != null) {
-	        stream = stream.filter(c -> c.getCategory1() != null && c.getCategory1().equals(dto.getCategory1()));
-	    }
+		if (dto.getCategory1() != null) {
+			stream = stream.filter(c -> c.getCategory1() != null && c.getCategory1().equals(dto.getCategory1()));
+		}
 
-	    if (dto.getCategory2() != null) {
-	        stream = stream.filter(c -> c.getCategory2() != null && c.getCategory2().equals(dto.getCategory2()));
-	    }
+		if (dto.getCategory2() != null) {
+			stream = stream.filter(c -> c.getCategory2() != null && c.getCategory2().equals(dto.getCategory2()));
+		}
 
-	    if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
-	        stream = stream.filter(c -> c.getStatus() != null && c.getStatus().equals(dto.getStatus()));
-	    }
+		if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
+			stream = stream.filter(c -> c.getStatus() != null && c.getStatus().equals(dto.getStatus()));
+		}
 
-	    if (dto.getStartDate() != null && !dto.getStartDate().isEmpty() &&
-	    	    dto.getStartDate() != null && !dto.getStartDate().isEmpty()) {
+		if (dto.getStartDate() != null && !dto.getStartDate().isEmpty() && dto.getStartDate() != null
+				&& !dto.getStartDate().isEmpty()) {
 
-	    	    LocalDate start = LocalDate.parse(dto.getStartDate());
-	    	    LocalDate end = LocalDate.parse(dto.getStartDate());
+			LocalDate start = LocalDate.parse(dto.getStartDate());
+			LocalDate end = LocalDate.parse(dto.getStartDate());
 
-	    	    stream = stream.filter(c -> {
-	    	        if (c.getStartDate() == null) return false;
-	    	        LocalDate classStart = c.getStartDate().toLocalDate();
-	    	        return !classStart.isBefore(start) && !classStart.isAfter(end);
-	    	    });
-	    	}
+			stream = stream.filter(c -> {
+				if (c.getStartDate() == null)
+					return false;
+				LocalDate classStart = c.getStartDate().toLocalDate();
+				return !classStart.isBefore(start) && !classStart.isAfter(end);
+			});
+		}
 
-	    List<HostClassDto> filteredList = stream.collect(Collectors.toList());
+		List<HostClassDto> filteredList = stream.collect(Collectors.toList());
 
-	    // 📦 페이지네이션 적용
-	    int total = filteredList.size();
-	    int start = (page - 1) * size;
-	    int end = Math.min(start + size, total);
-	    List<HostClassDto> pageList = (start < end) ? filteredList.subList(start, end) : new ArrayList<>();
+		// 📦 페이지네이션 적용
+		int total = filteredList.size();
+		int start = (page - 1) * size;
+		int end = Math.min(start + size, total);
+		List<HostClassDto> pageList = (start < end) ? filteredList.subList(start, end) : new ArrayList<>();
 
-	    // 페이지 정보 계산
-	    PageInfo pageInfo = new PageInfo();
-	    pageInfo.setCurPage(page);
-	    int allPage = (int) Math.ceil((double) total / size);
-	    pageInfo.setAllPage(allPage);
-	    pageInfo.setStartPage(Math.max(1, page - 2));
-	    pageInfo.setEndPage(Math.min(allPage, page + 2));
-	    
-	    return HostPageResponseDto.<HostClassDto>builder()
-	    	    .content(pageList)
-	    	    .pageInfo(pageInfo)
-	    	    .build();
+		// 페이지 정보 계산
+		PageInfo pageInfo = new PageInfo();
+		pageInfo.setCurPage(page);
+		int allPage = (int) Math.ceil((double) total / size);
+		pageInfo.setAllPage(allPage);
+		pageInfo.setStartPage(Math.max(1, page - 2));
+		pageInfo.setEndPage(Math.min(allPage, page + 2));
+
+		return HostPageResponseDto.<HostClassDto>builder().content(pageList).pageInfo(pageInfo).build();
 	}
-
 
 	@Override
 	public HostClassDto getClassDetail(Integer classId, Integer calendarId, Integer hostId) {
-		 // 1. 클래스 조회 (host 검증 포함)
-        HostClass hostClass = hostClassRepository.findByClassIdAndHost_HostId(classId, hostId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 클래스에 접근할 수 없습니다."));
+		// 1. 클래스 조회 (host 검증 포함)
+		HostClass hostClass = hostClassRepository.findByClassIdAndHost_HostId(classId, hostId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 클래스에 접근할 수 없습니다."));
 
-        // 2. 일정 조회 (classId 일치 여부 확인)
-        ClassCalendar calendar = classCalendarRepository.findByCalendarIdAndHostClass_ClassId(calendarId, classId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 정보가 클래스와 일치하지 않습니다."));
+		// 2. 일정 조회 (classId 일치 여부 확인)
+		ClassCalendar calendar = classCalendarRepository.findByCalendarIdAndHostClass_ClassId(calendarId, classId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "일정 정보가 클래스와 일치하지 않습니다."));
 
-     // 3. HostClass → HostClassDto
-        HostClassDto dto = hostClass.toDto();
+		// 3. HostClass → HostClassDto
+		HostClassDto dto = hostClass.toDto();
 
-        // 4. 일정 정보 추가 주입
-        dto.setCalendarId(calendar.getCalendarId());
-        dto.setStartDate(calendar.getStartDate());
-        dto.setStatus(calendar.getStatus());
+		// 4. 일정 정보 추가 주입
+		dto.setCalendarId(calendar.getCalendarId());
+		dto.setStartDate(calendar.getStartDate());
+		dto.setStatus(calendar.getStatus());
 
-        return dto;
+		return dto;
 	}
 
 	@Override
 	public HostClassDto getClassDetailByClassID(Integer classId) throws Exception {
-		HostClassDto hostclass= hostClassRepository.findById(classId).orElseThrow(()-> new Exception("해당 클래스가 존재하지 않습니다.")).toDto();
+		HostClassDto hostclass = hostClassRepository.findById(classId)
+				.orElseThrow(() -> new Exception("해당 클래스가 존재하지 않습니다.")).toDto();
 		return hostclass;
 	}
 
 	// 관리자 페이지 > 클래스 관리
 	@Override
 	public Page<AdminClassDto> getHostClassListForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
-		log.info("클래스 목록 관리 조회 - cond : {}, pageable : {}", cond, pageable );
+		log.info("클래스 목록 관리 조회 - cond : {}, pageable : {}", cond, pageable);
 		try {
 			List<AdminClassDto> content = hostClassRepository.searchClassForAdmin(cond, pageable);
 			log.info("조회된 content 개수 : {}", content.size());
@@ -405,10 +383,144 @@ public class HostClassServiceImpl implements HostClassService {
 
 			return new PageImpl<>(content, pageable, total);
 		} catch (Exception e) {
-				log.error("getClassList 에러 상새 : " , e);
-				throw e;
+			log.error("getClassList 에러 상새 : ", e);
+			throw e;
 		}
 	}
 
-}
+	@Override
+	public Integer updateClass(HostClassDto hostClassDto) throws Exception {
+		HostClassDto classDto = hostClassRepository.findByClassId(hostClassDto.getClassId()).toDto();
+		MultipartFile[] files = { hostClassDto.getImg1(), hostClassDto.getImg2(), hostClassDto.getImg3(),
+				hostClassDto.getImg4(), hostClassDto.getImg5(), hostClassDto.getMaterial(),
+				hostClassDto.getPortfolio() };
+		for (MultipartFile file : files) {
+			if (file != null && !file.isEmpty()) {
+				File upFile = new File(iuploadPath, file.getOriginalFilename());
+				file.transferTo(upFile);
+			}
+		}
 
+		if (files[0] != null && !files[0].isEmpty()) {
+			hostClassDto.setImgName1(files[0].getOriginalFilename());
+		} else {
+			hostClassDto.setImgName1(classDto.getImgName1());
+		}
+		if (files[1] != null && !files[1].isEmpty()) {
+			hostClassDto.setImgName2(files[1].getOriginalFilename());
+		} else {
+			hostClassDto.setImgName2(classDto.getImgName2());
+		}
+			
+		if (files[2] != null && !files[2].isEmpty()) {
+			hostClassDto.setImgName3(files[2].getOriginalFilename());
+		} else {
+			hostClassDto.setImgName3(classDto.getImgName3());	
+		}
+		if (files[3] != null && !files[3].isEmpty()) {
+			hostClassDto.setImgName4(files[3].getOriginalFilename());
+		} else {
+			hostClassDto.setImgName4(classDto.getImgName4());
+		}
+		if (files[4] != null && !files[4].isEmpty()) {
+			hostClassDto.setImgName5(files[4].getOriginalFilename());
+		} else {
+			hostClassDto.setImgName5(classDto.getImgName5());
+		}
+		if (files[5] != null && !files[5].isEmpty()) {
+			hostClassDto.setMaterialName(files[5].getOriginalFilename());
+		} else {
+			hostClassDto.setMaterialName(classDto.getMaterialName());
+		}
+
+		hostClassRepository.save(hostClassDto.toEntity());
+		
+		return hostClassDto.getClassId();
+		
+		
+//		HostClassDto classDto = hostClassRepository.findByClassId(hostClassDto.getClassId()).toDto();
+//		MultipartFile[] files = { hostClassDto.getImg1(), hostClassDto.getImg2(), hostClassDto.getImg3(),
+//				hostClassDto.getImg4(), hostClassDto.getImg5(), hostClassDto.getMaterial(),
+//				hostClassDto.getPortfolio() };
+//		for (MultipartFile file : files) {
+//			if (file != null && !file.isEmpty()) {
+//				File upFile = new File(iuploadPath, file.getOriginalFilename());
+//				file.transferTo(upFile);
+//			}
+//		}
+//
+//		if (files[0] != null && !files[0].isEmpty() && files[0] instanceof MultipartFile)
+//			classDto.setImgName1(files[0].getOriginalFilename());
+//		if (files[1] != null && !files[1].isEmpty() && files[1] instanceof MultipartFile)
+//			classDto.setImgName2(files[1].getOriginalFilename());
+//		if (files[2] != null && !files[2].isEmpty() && files[2] instanceof MultipartFile)
+//			classDto.setImgName3(files[2].getOriginalFilename());
+//		if (files[3] != null && !files[3].isEmpty() && files[3] instanceof MultipartFile)
+//			classDto.setImgName4(files[3].getOriginalFilename());
+//		if (files[4] != null && !files[4].isEmpty() && files[4] instanceof MultipartFile)
+//			classDto.setImgName5(files[4].getOriginalFilename());
+//		if (files[5] != null && !files[5].isEmpty() && files[5] instanceof MultipartFile)
+//			classDto.setMaterialName(files[5].getOriginalFilename());
+//		if (files[6] != null && !files[6].isEmpty() && files[6] instanceof MultipartFile)
+//			classDto.setPortfolioName(files[6].getOriginalFilename());
+//
+//		if (hostClassDto.getCategory1() != null && !hostClassDto.getCategory1().isEmpty()
+//				&& !hostClassDto.getCategory1().equals(classDto.getCategory1())) {
+//			classDto.setCategory1(hostClassDto.getCategory1());
+//		}
+//
+//		if (hostClassDto.getCategory2() != null && !hostClassDto.getCategory2().isEmpty()
+//				&& !hostClassDto.getCategory2().equals(classDto.getCategory2())) {
+//			classDto.setCategory2(hostClassDto.getCategory2());
+//		}
+//		
+//		if (hostClassDto.getSubCategoryId() != null && !hostClassDto.getSubCategoryId().equals(classDto.getSubCategoryId())) {
+//			classDto.setSubCategoryId(hostClassDto.getSubCategoryId());
+//		}
+//
+//		if (hostClassDto.getName() != null && !hostClassDto.getName().isEmpty()
+//				&& !hostClassDto.getName().equals(classDto.getName())) {
+//			classDto.setName(hostClassDto.getName());
+//		}
+//
+//		if (hostClassDto.getRecruitMin() != null && !hostClassDto.getRecruitMin().equals(classDto.getRecruitMin())) {
+//			classDto.setRecruitMin(hostClassDto.getRecruitMin());
+//		}
+//
+//		if (hostClassDto.getDetailDescription() != null && !hostClassDto.getDetailDescription().isEmpty()
+//				&& !hostClassDto.getDetailDescription().equals(classDto.getDetailDescription())) {
+//			classDto.setDetailDescription(hostClassDto.getDetailDescription());
+//		}
+//
+//		if (hostClassDto.getIncluision() != null && !hostClassDto.getIncluision().isEmpty()
+//				&& !hostClassDto.getIncluision().equals(classDto.getIncluision())) {
+//			classDto.setIncluision(hostClassDto.getIncluision());
+//		}
+//
+//		if (hostClassDto.getPreparation() != null && !hostClassDto.getPreparation().isEmpty()
+//				&& !hostClassDto.getPreparation().equals(classDto.getPreparation())) {
+//			classDto.setPreparation(hostClassDto.getPreparation());
+//		}
+//
+//		if (hostClassDto.getKeywords() != null && !hostClassDto.getKeywords().isEmpty()
+//				&& !hostClassDto.getKeywords().equals(classDto.getKeywords())) {
+//			classDto.setKeywords(hostClassDto.getKeywords());
+//		}
+//
+//		if (hostClassDto.getPrice() != null && !hostClassDto.getPrice().equals(classDto.getPrice())) {
+//			classDto.setPrice(hostClassDto.getPrice());
+//		}
+//
+//		if (hostClassDto.getCaution() != null && !hostClassDto.getCaution().isEmpty()
+//				&& !hostClassDto.getCaution().equals(classDto.getCaution())) {
+//			classDto.setCaution(hostClassDto.getCaution());
+//		}
+//
+//		HostClass hostClass = classDto.toEntity();
+//		hostClassRepository.save(hostClass);
+//		
+//		return hostClass.getClassId();
+
+	}
+
+}

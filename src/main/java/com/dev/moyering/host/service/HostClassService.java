@@ -25,7 +25,7 @@ public interface HostClassService {
 	HostClassDto getClassDetail(Integer classId, Integer calendarId, Integer hostId);
 	HostClassDto getClassDetailByClassID(Integer classId) throws Exception;
 	HostPageResponseDto<HostClassDto> selectHostClassByHostIdWithPagination(HostClassSearchRequestDto dto) throws Exception;
-
+	Integer updateClass(HostClassDto hostClassDto) throws Exception;
 
 	// 관리자 > 클래스 관리 (검색 조회 + 페이징)
 	Page<AdminClassDto> getHostClassListForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception;
