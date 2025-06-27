@@ -38,6 +38,8 @@ public class FeedDto {
     private Long commentsCount;
     private Long likesCount;
 
+    private Integer writerUserId;
+
     // 피드 상세 페이지용
     private LocalDateTime createdAt;
     private Boolean likedByUser;       // 로그인 유저가 좋아요 눌렀는지
@@ -62,7 +64,7 @@ public class FeedDto {
                 .tag4(tag4)
                 .tag5(tag5)
                 .isDeleted(false)
-                .user(User.builder().nickName(writerId).profile(writerProfile).userBadgeId(writerBadge).build())
+                .user(User.builder().nickName(writerId).profile(writerProfile).userBadgeId(writerBadge).userId(writerUserId).build())
                 .build();
         return entity;
     }

@@ -67,6 +67,8 @@ public class FeedServiceImpl implements FeedService {
             // 로그인 한 경우에만 likedByUser 설정
             if (userId != null) {
                 feed.setLikedByUser(likedSet.contains(feed.getFeedId()));
+            }else{
+                feed.setLikedByUser(false);
             }
         }
         return feeds;
