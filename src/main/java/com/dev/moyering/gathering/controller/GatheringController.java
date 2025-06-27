@@ -159,23 +159,33 @@ public class GatheringController {
 		}
 	}
 	
-	@GetMapping("/user/myGatheringList")
-	public ResponseEntity<List<GatheringDto>> myGatheringList(@AuthenticationPrincipal PrincipalDetails principal, 
-//			@RequestParam Integer userId, 
+	@PostMapping("/user/myGatheringList")
+	public ResponseEntity<Map<String, Object>> myGatheringList(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestBody(required=false) Map<String,String> param){
 		try {
 			Integer userId = principal.getUser().getUserId();
+			System.out.println("로그인 유저 : "+ userId);
 			String word = null;	
 			PageInfo pageInfo = new PageInfo(1);
+			String status = null;
 			if(param != null) {
 				if(param.get("page")!=null) {
 					pageInfo.setCurPage(Integer.parseInt(param.get("page")));
 				}
 				word = param.get("word");
+                status = param.get("status");
+                if ("전체".equals(status)) {
+                    status = null; // 전체인 경우 null로 처리
+                }
 			}
-			List<GatheringDto> myGatheringList = gatheringService.myGatheringList(userId, pageInfo, word);
 			
-			return new ResponseEntity<>(myGatheringList, HttpStatus.OK);
+			List<GatheringDto> myGatheringList = gatheringService.myGatheringList(userId, pageInfo, word, status);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("list", myGatheringList);
+            response.put("pageInfo", pageInfo);
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

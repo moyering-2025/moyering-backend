@@ -1,6 +1,9 @@
 package com.dev.moyering.classring.service;
 
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,4 +32,10 @@ public class ClassLikesServiceImpl implements ClassLikesService {
                 }
             );	
     }
+
+	@Override
+	public List<ClassLikesDto> getClasslikeListByUserId(Integer userId) throws Exception {
+		return classLikesRepository.findAllByUser_userId(userId).stream()
+				.map(cl-> cl.toDto()).collect(Collectors.toList());
+	}
 }

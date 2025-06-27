@@ -19,4 +19,6 @@ public interface UserService {
 	// 관리자페이지 > 회원조회 > 상세 조회 페이지
 	AdminMemberDto getMemberDetail(Integer userId);
 	void updateUserRole(Integer userId)throws Exception;
+	//feed
+	UserDto getByNickname(String nickname) throws Exception;
 }

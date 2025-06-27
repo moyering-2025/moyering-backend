@@ -64,7 +64,7 @@ public class User {
 	private String category5;
 	@Column
 	private String intro;
-	@Column
+	@Column(name = "fcm_token")
 	private String fcmToken;
 	@Column
 	private String useYn;

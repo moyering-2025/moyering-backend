@@ -2,6 +2,7 @@ package com.dev.moyering.common.dto;
 
 import java.util.List;
 
+import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.ClassCouponDto;
 import com.dev.moyering.host.dto.HostClassDto;
@@ -10,10 +11,12 @@ import com.dev.moyering.host.dto.ReviewDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,4 +27,5 @@ public class ClassRingDetailResponseDto {
     private HostDto host;
     private List<ReviewDto> reviews;
     private List<ClassCouponDto> coupons;
+    private List<UserCouponDto> userCoupons;
 }

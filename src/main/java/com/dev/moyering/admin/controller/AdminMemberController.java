@@ -28,7 +28,6 @@ public class AdminMemberController {
             @PageableDefault(size = 20, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable) {
 
         log.info("회원 목록 조회 요청: keyword={}, page={}", keyword, pageable.getPageNumber());
-
         try {
             // 검색 조건 객체 생성 (keyword 활용)
             AdminMemberSearchCond searchCond = AdminMemberSearchCond.builder()

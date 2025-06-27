@@ -1,4 +1,6 @@
 package com.dev.moyering.classring.controller;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,4 +33,15 @@ public class ClassLikesController {
 		}
     }
 	
+	@GetMapping("/class-like-list")
+	public ResponseEntity<List<ClassLikesDto>> userClassLikes( @AuthenticationPrincipal PrincipalDetails principal) {
+		try {
+			List<ClassLikesDto> classLikes = classLikesService.getClasslikeListByUserId(principal.getUser().getUserId());
+			
+	        return ResponseEntity.ok(classLikes);
+		} catch (Exception e) {
+			e.printStackTrace();
+	        return ResponseEntity.internalServerError().build(); // 500 에러 응답
+		}
+	}
 }

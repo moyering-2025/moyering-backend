@@ -112,5 +112,11 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 	}
 	
-	
+	//feed
+	@Override
+	public UserDto getByNickname(String nickname) throws Exception {
+		User user = userRepository.findByNickName(nickname)
+				.orElseThrow(() -> new IllegalArgumentException("없는 닉네임입니다: " + nickname));
+		return user.toDto();
+	}
 }

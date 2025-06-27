@@ -73,15 +73,24 @@ public class GatheringServiceImpl implements GatheringService {
 	}
 	
 	@Override
-	public List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word) throws Exception {
+	public List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception {
 		// 내가 등록한 게더링 목록 + 페이지네이션, 제목으로 검색 
 		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
-		return gatheringRepository.selectMyGatheringList(pageRequest, userId, word);
+		Long cnt = gatheringRepository.selectMyGatheringListCount(pageRequest, userId, word, status);
+		
+		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
+		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
+		Integer endPage = Math.min(startPage+10-1, allPage);
+		
+		pageInfo.setAllPage(allPage);
+		pageInfo.setStartPage(startPage);
+		pageInfo.setEndPage(endPage);
+		return gatheringRepository.selectMyGatheringList(pageRequest, userId, word, status);
 	}
 	
 
 	@Override
-	public List<GatheringDto> myGatheringApplyList(Integer userId, PageInfo pageInfo, String word) throws Exception {
+	public List<GatheringDto> myGatheringApplyList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception {
 		// 내가 지원한 게더링 목록 + 페이지네이션, 제목으로 검색 
 		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
 		return null;

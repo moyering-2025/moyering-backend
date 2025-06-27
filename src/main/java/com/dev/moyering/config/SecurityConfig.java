@@ -57,7 +57,7 @@ public class SecurityConfig {
 		
 		http.formLogin().disable()  //로그인 폼 비활성화
 			.httpBasic().disable() //httpBasic은 header에 username,password를 암호화하지 않은 상태로 주고받는다. 이를 사용하지 않겠다는 것.
-			.addFilterAt(new JwtAuthenticationFilter(authenticationManager,hostRepository), UsernamePasswordAuthenticationFilter.class);
+			.addFilterAt(new JwtAuthenticationFilter(authenticationManager,hostRepository,userRepository), UsernamePasswordAuthenticationFilter.class);
 			
 		http.oauth2Login()
 			.authorizationEndpoint().baseUri("/oauth2/authorization") //front로그인 uri

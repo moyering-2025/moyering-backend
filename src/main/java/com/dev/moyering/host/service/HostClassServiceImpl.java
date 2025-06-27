@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -362,8 +363,7 @@ public class HostClassServiceImpl implements HostClassService {
 	    	    .pageInfo(pageInfo)
 	    	    .build();
 	}
-	
-	
+
 
 	@Override
 	public HostClassDto getClassDetail(Integer classId, Integer calendarId, Integer hostId) {
@@ -392,49 +392,23 @@ public class HostClassServiceImpl implements HostClassService {
 		return hostclass;
 	}
 
-//	@Override
-//	public Integer saveTempClass(HostClassDto hostClassDto, List<Date> dates) throws Exception {
-//		MultipartFile[] files = { hostClassDto.getImg1(), hostClassDto.getImg2(), hostClassDto.getImg3(),
-//				hostClassDto.getImg4(), hostClassDto.getImg5(), hostClassDto.getMaterial(),
-//				hostClassDto.getPortfolio() };
-//		for (MultipartFile file : files) {
-//			if (file != null && !file.isEmpty()) {
-//				File upFile = new File(iuploadPath, file.getOriginalFilename());
-//				file.transferTo(upFile);
-//			}
-//		}
-//		if (files[0] != null && !files[0].isEmpty())
-//			hostClassDto.setImgName1(files[0].getOriginalFilename());
-//		if (files[1] != null && !files[1].isEmpty())
-//			hostClassDto.setImgName2(files[1].getOriginalFilename());
-//		if (files[2] != null && !files[2].isEmpty())
-//			hostClassDto.setImgName3(files[2].getOriginalFilename());
-//		if (files[3] != null && !files[3].isEmpty())
-//			hostClassDto.setImgName4(files[3].getOriginalFilename());
-//		if (files[4] != null && !files[4].isEmpty())
-//			hostClassDto.setImgName5(files[4].getOriginalFilename());
-//		if (files[5] != null && !files[5].isEmpty())
-//			hostClassDto.setMaterialName(files[5].getOriginalFilename());
-//		if (files[6] != null && !files[6].isEmpty())
-//			hostClassDto.setPortfolioName(files[6].getOriginalFilename());
-//		HostClass hostClass = hostClassDto.toEntity();
-//		hostClassRepository.save(hostClass);
-//
-//		dates.forEach(date -> {
-//			ClassCalendar cc = ClassCalendar.builder().startDate(date).endDate(date).status("임시저장")
-//					.hostClass(HostClass.builder().classId(hostClass.getClassId()).build()).build();
-//
-//			classCalendarRepository.save(cc);
-//		});
-//
-//		return hostClass.getClassId();
-//	}
+	// 관리자 페이지 > 클래스 관리
+	@Override
+	public Page<AdminClassDto> getHostClassListForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
+		log.info("클래스 목록 관리 조회 - cond : {}, pageable : {}", cond, pageable );
+		try {
+			List<AdminClassDto> content = hostClassRepository.searchClassForAdmin(cond, pageable);
+			log.info("조회된 content 개수 : {}", content.size());
 
-	
+			Long total = hostClassRepository.countClasses(cond); // 검색 조건에 따른 페이지 계산
+			log.info("전체 개수 : {}", total);
 
-	
-
-
+			return new PageImpl<>(content, pageable, total);
+		} catch (Exception e) {
+				log.error("getClassList 에러 상새 : " , e);
+				throw e;
+		}
+	}
 
 }
 
