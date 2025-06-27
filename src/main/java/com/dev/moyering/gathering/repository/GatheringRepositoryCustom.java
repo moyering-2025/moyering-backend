@@ -19,7 +19,7 @@ public interface GatheringRepositoryCustom {
 	// 메인 페이지에 추천 게더링 4개
 	List<Gathering> findRecommendGatherRingForUser(User user) throws Exception;
 
-	void updateGatheringStatus(Integer gatheringId, String status) throws Exception;
+	void updateGatheringStatus(Integer gatheringId, Boolean status) throws Exception;
 
 	Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word, String status);
 

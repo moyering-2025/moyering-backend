@@ -95,9 +95,9 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	            return (gathering.meetingDate.lt(todaySqlDate) 
 	                    .or(gathering.meetingDate.eq(todaySqlDate)    
 	                            .and(gathering.startTime.lt(currentTime))))  
-	                    .and(gathering.status.ne("취소됨")); 
+	                    .and(gathering.canceled.isFalse()); 
 	        case "취소된 모임":
-	            return gathering.status.eq("취소됨"); 
+	            return gathering.canceled.isTrue(); 
 	        default:
 	            return null;
 	    }
@@ -131,10 +131,10 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		clause.execute();
 	}
 	@Override
-	public void updateGatheringStatus(Integer gatheringId, String status) throws Exception{
+	public void updateGatheringStatus(Integer gatheringId, Boolean status) throws Exception{
 		QGathering gathering = QGathering.gathering;
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
-				.set(gathering.status, status)
+				.set(gathering.canceled, status)
 				.where(gathering.gatheringId.eq(gatheringId));
 		clause.execute();
 	}
@@ -142,7 +142,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	public List<Gathering> findRecommendGatherRingForUser(User user) throws Exception {
 		QGathering gathering = QGathering.gathering;
 		BooleanBuilder builder = new BooleanBuilder();
-	    builder.and(gathering.status.eq("모집중"));
+	    builder.and(gathering.canceled.isFalse());
 		builder.and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())));
 		
 		if (user != null) {
@@ -174,7 +174,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 			    List<Gathering> fallback = jpaQueryFactory
 			        .selectFrom(gathering)
 			        .where(
-			            gathering.status.eq("모집중")
+			            gathering.canceled.isFalse()
 			                .and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())))
 			                .and(preferredIds.isEmpty() ? null : gathering.gatheringId.notIn(preferredIds))
 			        )

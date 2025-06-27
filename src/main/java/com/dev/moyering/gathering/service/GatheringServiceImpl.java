@@ -130,7 +130,7 @@ public class GatheringServiceImpl implements GatheringService {
 		BooleanBuilder builder = new BooleanBuilder();
 		
 		//모집 중이면서~~ 오늘 이후의 일정
-		builder.and(gathering.status.eq("모집중"));
+		builder.and(gathering.canceled.isFalse());
 		builder.and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())));
 		
 		//검색 조건 필터 추가
