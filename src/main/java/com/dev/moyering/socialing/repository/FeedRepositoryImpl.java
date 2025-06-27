@@ -59,7 +59,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     }
 
     @Override
-    public List<FeedDto> findFeeds(String sortType, String userId) {
+    public List<FeedDto> findFeeds(String sortType, Integer userId) {
         QFeed feed = QFeed.feed;
         QComment comment = QComment.comment;
         QLikeList likeList = QLikeList.likeList;
@@ -78,7 +78,19 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                         user.profile.as("writerProfile"),
                         user.userBadgeId.as("writerBadge"),
                         comment.countDistinct().as("commentsCount"),
-                        likeList.countDistinct().as("likesCount")
+                        likeList.countDistinct().as("likesCount"),
+
+                        // 로그인 유저가 해당 피드에 좋아요 눌렀는지 여부
+                        ExpressionUtils.as(
+                                JPAExpressions.selectOne()
+                                        .from(likeList)
+                                        .where(
+                                                likeList.feed.feedId.eq(feed.feedId)
+                                                        .and(likeList.user.userId.eq(userId))
+                                        )
+                                        .exists(),
+                                "likedByUser"
+                        )
                 ))
                 .from(feed)
                 .leftJoin(feed.user, user)
@@ -90,7 +102,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                                         ? feed.user.userId.in(
                                         JPAExpressions.select(follow.following.userId)
                                                 .from(follow)
-                                                .where(follow.follower.username.eq(userId))
+                                                .where(follow.follower.userId.eq(userId))
                                 )
                                         : null
                         )
@@ -110,6 +122,37 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                         .and(f.isDeleted.isFalse()))
                 .orderBy(f.createDate.desc())
                 .limit(3)
+                .fetch();
+    }
+
+    @Override
+    public List<FeedDto> findFeedsWithoutLiked() {
+        QFeed feed = QFeed.feed;
+        QComment comment = QComment.comment;
+        QLikeList likeList = QLikeList.likeList;
+        QUser user = QUser.user;
+
+        return jpaQueryFactory
+                .select(Projections.fields(FeedDto.class,
+                        feed.feedId,
+                        feed.content,
+                        feed.img1, feed.img2, feed.img3, feed.img4, feed.img5,
+                        feed.tag1, feed.tag2, feed.tag3, feed.tag4, feed.tag5,
+                        feed.isDeleted,
+                        user.userId,
+                        user.username.as("writerId"),
+                        user.profile.as("writerProfile"),
+                        user.userBadgeId.as("writerBadge"),
+                        comment.countDistinct().as("commentsCount"),
+                        likeList.countDistinct().as("likesCount")
+                ))
+                .from(feed)
+                .leftJoin(feed.user, user)
+                .leftJoin(comment).on(comment.feed.feedId.eq(feed.feedId))
+                .leftJoin(likeList).on(likeList.feed.feedId.eq(feed.feedId))
+                .where(feed.isDeleted.eq(false))
+                .groupBy(feed.feedId)
+                .orderBy(feed.createDate.desc()) // 기본 정렬
                 .fetch();
     }
 

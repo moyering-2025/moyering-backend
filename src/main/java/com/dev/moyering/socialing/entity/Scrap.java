@@ -11,6 +11,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.dev.moyering.socialing.dto.ScrapDto;
 import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
@@ -21,19 +22,28 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name="scrap", uniqueConstraints = {@UniqueConstraint(columnNames = {"userId","postId"})})
+@Builder
+@AllArgsConstructor
+@Table(name="scrap", uniqueConstraints = {@UniqueConstraint(columnNames = {"userId","feedId"})})
 public class Scrap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
     private Integer scrapId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "postId", nullable = false)
-    private Feed post;
+    @JoinColumn(name = "feedId", nullable = false)
+    private Feed feed;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private User user;
+
+    public ScrapDto toDto() {
+        return ScrapDto.builder()
+                .scrapId(scrapId)
+                .userId(user.getUserId())
+                .feedId(feed.getFeedId())
+                .build();
+    }
 }

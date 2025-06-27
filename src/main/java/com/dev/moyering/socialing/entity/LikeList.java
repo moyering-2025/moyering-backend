@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.dev.moyering.socialing.dto.LikeListDto;
 import com.dev.moyering.user.entity.User;
 
 import lombok.AllArgsConstructor;
@@ -34,4 +35,12 @@ public class LikeList {
     @ManyToOne
     @JoinColumn(name = "feedId",nullable = false)
     private Feed feed;
+
+    public LikeListDto toDto() {
+        return LikeListDto.builder()
+                .likeid(likeid)
+                .userid(user.getUserId())
+                .feedid(feed.getFeedId())
+                .build();
+    }
 }

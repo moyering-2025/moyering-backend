@@ -10,9 +10,11 @@ public interface FeedRepositoryCustom {
     List<FeedDto> findAllWithCounts();
 
     // 전체피드 조회
-    List<FeedDto> findFeeds(String sortType, String userId); //userid는 팔로우용
+    List<FeedDto> findFeeds(String sortType, Integer userId); //userid는 팔로우용
 
 
     // 작성자(userId)의 최신 3개 피드 img1만 조회
     List<String> findTop3Img1ByUserId(Integer userId);
+
+    List<FeedDto> findFeedsWithoutLiked();
 }
