@@ -43,17 +43,19 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 			chain.doFilter(request, response);
 			return;
 		}
-		if(uri.contains("/main")) {
+
+		if(uri.contains("/main") || uri.contains("/class")) {
 			if(request.getHeader(JwtProperties.HEADER_STRING)== null) {
 		        chain.doFilter(request, response);
 		        return;
 			}
 		}
-		if (!(uri.contains("/host") || uri.contains("/admin") ||  uri.contains("/main") ||  uri.contains("/user"))) {
+		
+		if (!(uri.contains("/host") || uri.contains("/admin") ||  uri.contains("/main") ||  uri.contains("/user") ||uri.contains("/class"))) {
 	        chain.doFilter(request, response);
 	        return;
 	    }
-		
+
 		String authentication = request.getHeader(JwtProperties.HEADER_STRING);
 		if(authentication==null) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"로그인 필요");
