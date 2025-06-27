@@ -32,6 +32,10 @@ public class UserCouponDto {
     //부가 정보
     private String couponName;
     private String className;
+    private LocalDateTime validFrom;
+    private LocalDateTime validUntil;
+    private String discountType;
+    private Integer discount; // 예: 10 (%), 5000 (금액)
     
     public UserCoupon toEntity() {
 	    return UserCoupon.builder()
