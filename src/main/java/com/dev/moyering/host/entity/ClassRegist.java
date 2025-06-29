@@ -23,13 +23,13 @@ import lombok.NoArgsConstructor;
 public class ClassRegist {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer sudentId;
+	private Integer studentId;
 	@Column
 	private Integer attCount;
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "calendarId")
+    @JoinColumn(name = "calendar_id")
     private ClassCalendar calendar;
 }

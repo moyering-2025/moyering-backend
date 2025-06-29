@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.dev.moyering.classring.dto.ClassPaymentRequestDto;
 import com.dev.moyering.classring.dto.ClassPaymentResponseDto;
 import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.classring.entity.UserCoupon;
@@ -57,6 +58,11 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
             		.hostName(hostDto.getName())
             		.userCoupons(couponDtos)
             		.build();
+	}
+	@Override
+	public void approvePayment(Integer userId, ClassPaymentRequestDto dto) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

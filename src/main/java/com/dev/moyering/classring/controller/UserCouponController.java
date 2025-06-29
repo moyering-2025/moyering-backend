@@ -29,8 +29,12 @@ public class UserCouponController {
 	    Integer classCouponId = dto.getClassCouponId();
 
 	    try {
-	    	userCouponService.downloadClassCoupon(userId, classCouponId);
-	        return ResponseEntity.ok("쿠폰 다운로드 완료");
+	    	if (userId != null ) {
+		    	userCouponService.downloadClassCoupon(userId, classCouponId);
+		        return ResponseEntity.ok("쿠폰 다운로드 완료");
+	    	} else {
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("다운로드 실패: 로그인필요" );
+	    	}
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("다운로드 실패: " + e.getMessage());

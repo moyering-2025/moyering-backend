@@ -1,14 +1,17 @@
 package com.dev.moyering.classring.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.auth.PrincipalDetails;
+import com.dev.moyering.classring.dto.ClassPaymentRequestDto;
 import com.dev.moyering.classring.dto.ClassPaymentResponseDto;
 import com.dev.moyering.classring.service.ClassPaymentService;
 
@@ -32,6 +35,23 @@ public class ClassPaymentController {
 			response = classPaymentService.getClassPaymentInfo(principal.getUser().getUserId(), classId, selectedCalendarId);
 	        return ResponseEntity.ok(response);
 		} catch (Exception e) {
+			e.printStackTrace();
+	        return ResponseEntity.internalServerError().build(); // 500 에러 응답
+		}
+    }
+    
+    //결제 처리
+    @PostMapping("/approve")
+    public ResponseEntity<Void> approve(@RequestBody ClassPaymentRequestDto dto, @AuthenticationPrincipal PrincipalDetails principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Integer userId = principal.getUser().getUserId();
+        try {
+			classPaymentService.approvePayment(userId, dto);
+	    	return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 	        return ResponseEntity.internalServerError().build(); // 500 에러 응답
 		}
