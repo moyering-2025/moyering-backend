@@ -14,6 +14,7 @@ public class FollowDto {
     private Integer followerId;
     private Integer followingId;
 
+
     public Follow toentity() {
         Follow entity = Follow.builder()
                 .id(id)

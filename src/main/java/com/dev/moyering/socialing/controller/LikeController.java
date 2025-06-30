@@ -22,6 +22,7 @@ public class LikeController {
             likeService.toggleLike(feedId, userId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -2,6 +2,7 @@ package com.dev.moyering.socialing.service;
 
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
+import com.dev.moyering.socialing.dto.LikeListDto;
 import com.dev.moyering.socialing.entity.Comment;
 import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.socialing.entity.LikeList;
@@ -67,7 +68,7 @@ public class FeedServiceImpl implements FeedService {
             // 로그인 한 경우에만 likedByUser 설정
             if (userId != null) {
                 feed.setLikedByUser(likedSet.contains(feed.getFeedId()));
-            }else{
+            } else {
                 feed.setLikedByUser(false);
             }
         }
@@ -154,6 +155,27 @@ public class FeedServiceImpl implements FeedService {
                 })
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public Map<String ,Object> getFeedsByUserId(Integer userId) throws Exception {
+        List<Feed> feedList = feedRepository.findByUserUserId(userId);
+        List<FeedDto> dtoList = new ArrayList<>();
+        List<LikeList> likeList = new ArrayList<>();
+        List<LikeListDto> likeListDtos = new ArrayList<>();
+
+        for (Feed feed : feedList) {
+            dtoList.add(feed.toDto());
+            likeList = likeListRepository.findByFeedFeedId(feed.getFeedId());
+        }
+        for(LikeList like : likeList){
+            likeListDtos.add(like.toDto());
+        }
+        Map<String ,Object> map = new HashMap<>();
+        map.put("likeList",likeListDtos);
+        map.put("feedList",dtoList);
+
+        return map;
     }
 
     @Override
@@ -250,7 +272,7 @@ public class FeedServiceImpl implements FeedService {
             for (MultipartFile img : images) {
                 if (img.isEmpty()) continue;
                 String orig = img.getOriginalFilename();
-                String fname = /*System.currentTimeMillis() + "_" +*/iuploadPath+ orig;
+                String fname = /*System.currentTimeMillis() + "_" +*/iuploadPath + orig;
                 Path target = dir.resolve(fname);
                 try {
                     Files.copy(img.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);

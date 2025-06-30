@@ -186,4 +186,14 @@ public class FeedController {
         // 3) {"liked": true/false} 형태로 응답
         return ResponseEntity.ok(Map.of("liked", liked));
     }
+
+    @GetMapping("/socialing/feeds/myFeeds")
+    public ResponseEntity<Map<String ,Object>> getMyFeeds(@RequestParam Integer userId ) {
+        try{
+            Map<String, Object> feedsByUserId = feedService.getFeedsByUserId(userId);
+            return new ResponseEntity<>(feedsByUserId, HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 }

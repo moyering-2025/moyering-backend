@@ -1,6 +1,7 @@
 package com.dev.moyering.socialing.service;
 
 import com.dev.moyering.socialing.dto.FollowDto;
+import com.dev.moyering.user.dto.UserDto;
 
 import java.util.List;
 
@@ -14,5 +15,7 @@ public interface FollowService {
 
     List<FollowDto> getFollowings(Integer followerId);
 
-    List<FollowDto> getFollowers(Integer followingId);
+    List<UserDto> getFollowers(Integer followingId,Integer pagem,Integer size,String search);
+
+    List<UserDto> getFollowings(Integer followerId,Integer pagem,Integer size,String search);
 }

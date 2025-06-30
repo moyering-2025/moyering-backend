@@ -8,13 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FollowRepository extends JpaRepository<Follow, Integer> {
+public interface FollowRepository extends JpaRepository<Follow, Integer>, FollowRepositoryCustom {
 
     Optional<Follow> findByFollowerUserIdAndFollowingUserId(Integer followerId, Integer followingId);
 
     List<Follow> findAllByFollowerUserId(Integer followerId);
-
-    List<Follow> findAllByFollowingUserId(Integer followingId);
 
     void deleteByFollowerUserIdAndFollowingUserId(Integer followerId, Integer followingId);
 }

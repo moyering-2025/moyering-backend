@@ -75,4 +75,10 @@ public class UserDto {
 		
 		return entity;
 	}
+	public UserDto(Integer userId, String username, String nickName, String profile) {
+		this.userId = userId;
+		this.username = username;
+		this.nickName = nickName;
+		this.profile = profile;
+	}
 }

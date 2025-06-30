@@ -15,4 +15,6 @@ public interface FeedRepository extends JpaRepository<Feed, Integer>, FeedReposi
     List<Feed> findAllByUserUserIdOrderByCreateDateDesc(Integer userId);
 
     List<Feed> findByUserNickName(String nickname);
+
+    List<Feed> findByUserUserId(Integer userId);
 }
