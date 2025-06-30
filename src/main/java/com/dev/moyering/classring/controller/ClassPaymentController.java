@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.auth.PrincipalDetails;
-import com.dev.moyering.classring.dto.ClassPaymentRequestDto;
 import com.dev.moyering.classring.dto.ClassPaymentResponseDto;
+import com.dev.moyering.classring.dto.PaymentApproveRequestDto;
 import com.dev.moyering.classring.service.ClassPaymentService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,19 +39,18 @@ public class ClassPaymentController {
 	        return ResponseEntity.internalServerError().build(); // 500 에러 응답
 		}
     }
-    
+  
     //결제 처리
     @PostMapping("/approve")
-    public ResponseEntity<Void> approve(@RequestBody ClassPaymentRequestDto dto, @AuthenticationPrincipal PrincipalDetails principal) {
+    public ResponseEntity<Void> approve(@RequestBody PaymentApproveRequestDto dto, @AuthenticationPrincipal PrincipalDetails principal) {
         if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Integer userId = principal.getUser().getUserId();
+        System.out.println("dododspfopsufwesnljslfjslk");
         try {
-			classPaymentService.approvePayment(userId, dto);
+			classPaymentService.approvePayment(dto,principal.getUser());
 	    	return ResponseEntity.ok().build();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 	        return ResponseEntity.internalServerError().build(); // 500 에러 응답
 		}

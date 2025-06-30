@@ -31,5 +31,5 @@ public class ClassRegist {
     private User user;
     @ManyToOne
     @JoinColumn(name = "calendar_id")
-    private ClassCalendar calendar;
+    private ClassCalendar classCalendar;
 }
