@@ -38,20 +38,11 @@ public class UserClassServiceImpl implements UserClassService {
         List<ReviewDto>  reviews      = reviewService.getReviewByHostId(hostclass.getHostId());
         List<ClassCouponDto> classCoupons = classCouponService.getCouponByClassId(classId);
 
+        List<UserCouponDto> userCoupons = null;
         // ① 이미 다운로드한 쿠폰만
-//        List<UserCouponDto> userCoupons  = userCouponService.getByUserIdAndClassId(userId, classId);
-//        Set<Integer> downloadedIds = userCoupons.stream()
-//            .map(UserCouponDto::getClassCouponId)
-//            .collect(Collectors.toSet());
-
-        // ② 플래그 추가된 Dto 리스트로 변환
-//        List<ClassCouponDto> couponDtos = classCoupons.stream()
-//          .map(c -> {
-//             boolean already = downloadedIds.contains(c.getClassCouponId());
-//             c.setAlreadyDownloaded(already);
-//             return c;
-//          })
-//          .collect(Collectors.toList());
+        if (userId != null) {
+        	userCoupons  = userCouponService.getByUserIdAndClassId(userId, classId);
+        }
 
         return ClassRingDetailResponseDto.builder()
             .hostClass(hostclass)
@@ -60,6 +51,7 @@ public class UserClassServiceImpl implements UserClassService {
             .host(host)
             .reviews(reviews)
             .coupons(classCoupons)
+            .userCoupons(userCoupons)
             .build();
     }
 
