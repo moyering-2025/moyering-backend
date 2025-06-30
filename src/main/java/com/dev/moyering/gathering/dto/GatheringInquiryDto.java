@@ -34,6 +34,9 @@ public class GatheringInquiryDto {
 	private Date meetingDate;
 	private String responseContent;
 	private String responseState;
+	private String organizerNicknNme;
+	private String organizerProfile;
+	
 	// QueryDSL용 생성자 추가
     public GatheringInquiryDto(Integer inquiryId, Integer gatheringId, String title, 
                               Integer userId, String nickName, String profile,

@@ -67,7 +67,9 @@ public class GatheringInquiry {
    			 .userId(user.getUserId())
    			 .nickName(user.getNickName())
    			 .profile(user.getProfile())
-   			 .inquiryDate(inquiryDate);
+   			 .inquiryDate(inquiryDate)
+   			 .organizerNicknNme(gathering.getUser().getNickName())
+   			 .organizerProfile(gathering.getUser().getProfile());
 	    if (responseDate != null && responseContent != null) {
 	        builder.responseDate(responseDate);
 	    	builder.responseContent(responseContent);

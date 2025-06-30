@@ -16,19 +16,9 @@ public interface GatheringInquiryRepositoryCustom {
 
 	void responseToGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception;
 
-	List<GatheringInquiryDto> findInquiriesSentByUser(Integer userId,
-            Date startDate,
-            Date endDate,
-            Boolean isAnswered,
-            PageRequest pageRequest) throws Exception;
-
-	Long countInquiriesSentByUser(Integer userId,
-			Date startDate,
-			Date endDate,
-	Boolean isAnswered) throws Exception;
+	Long countInquiriesSentByUser(Integer userId, Date startDate, Date endDate, Boolean isAnswered) throws Exception;
+	List<GatheringInquiryDto> findInquiriesSentByUser(Integer userId,Date startDate, Date endDate, Boolean isAnswered, PageRequest pageRequest) throws Exception;
 
 	Long countInquiriesReceivedByOrganizer(Integer userId, Date startDate, Date endDate, Boolean isAnswered);
-
-	List<GatheringInquiryDto> findInquiriesReceivedByOrganizer(Integer userId, Date startDate, Date endDate,
-			Boolean isAnswered, PageRequest pageRequest);
+	List<GatheringInquiryDto> findInquiriesReceivedByOrganizer(Integer userId, Date startDate, Date endDate, Boolean isAnswered, PageRequest pageRequest);
 }
