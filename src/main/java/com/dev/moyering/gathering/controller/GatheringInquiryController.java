@@ -56,8 +56,7 @@ public class GatheringInquiryController {
 	        List<Map<String, Object>> transformedQnaList = new ArrayList<>();
 	        
 	        for (GatheringInquiryDto inquiry : gatheringInquiryList) {
-	            Map<String, Object> qnaItem = new HashMap<>();
-	            
+	            Map<String, Object> qnaItem = new HashMap<>();	            
 	            qnaItem.put("id", inquiry.getInquiryId());
 	            qnaItem.put("status", inquiry.getResponseState()); // "답변대기" 또는 "답변완료"
 	            qnaItem.put("content", inquiry.getInquiryContent());
@@ -82,6 +81,7 @@ public class GatheringInquiryController {
 	        }
 	        
 	        // 응답 데이터 구성
+	        res.put("organizer", nGatheringDto.getUserId());
 	        res.put("qnaList", transformedQnaList);
 	        res.put("gatheringTitle", nGatheringDto.getTitle());
 	        res.put("gatheringThumbnailFileName", nGatheringDto.getThumbnailFileName());
@@ -107,6 +107,7 @@ public class GatheringInquiryController {
 			gatheringInquiryDto.setGatheringId(Integer.valueOf(requestData.get("gatheringId").toString()));
 			gatheringInquiryDto.setInquiryContent(requestData.get("inquiryContent").toString());
 			gatheringInquiryDto.setUserId(principal.getUser().getUserId());
+			
 			Integer gatheringInquiryId = gatheringInquiryService.writeGatheringInquiry(gatheringInquiryDto);
 			if(gatheringInquiryId!=null) {
 				return new ResponseEntity<>(gatheringInquiryId, HttpStatus.OK);
@@ -143,9 +144,16 @@ public class GatheringInquiryController {
 					endDate = (Date)param.get("endDate");
 				} 
 			}
+			Integer findInquirieCntReceivedByOrganizer = gatheringInquiryService.findInquirieCntReceivedByOrganizer(loginId, startDate, endDate, isAnswered);
+			Integer findInquirieCntSentByUser = gatheringInquiryService.findInquirieCntSentByUser(loginId, startDate, endDate, isAnswered);
+			
 			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findInquiriesReceivedByOrganizer(pageInfo, loginId, startDate, endDate, isAnswered);
+			
 			System.out.println("gatheringInquiryList : "+gatheringInquiryList);
 			Map<String,Object> res = new HashMap<>();
+			res.put("findInquirieCntReceivedByOrganizer", findInquirieCntReceivedByOrganizer);
+			res.put("findInquirieCntSentByUser", findInquirieCntSentByUser);
+			
 			res.put("gatheringInquiryList", gatheringInquiryList);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
@@ -156,34 +164,39 @@ public class GatheringInquiryController {
 	
 	@GetMapping("/user/getGatheringInquiriesByUserId")
 	public ResponseEntity<Map<String,Object>> getGatheringInquiriesByUserId(@AuthenticationPrincipal PrincipalDetails principal, 
-			@RequestBody(required=false) Map<String, Object> params) {
+			@RequestBody(required=false) Map<String, Object> param) {
 		//마이페이지를 위한 문의내역 불러오기(문의자 입장)
 		try {
 			PageInfo pageInfo = new PageInfo(1);
 			Integer loginId = principal.getUser().getUserId();
-			System.out.println("내가 등록한 문의+로그인한 유저 " + loginId);
 		    Date startDate = null;
 		    Date endDate = null;
 		    Boolean isAnswered=null;
-			if(params != null) {
-				if(params.get("page")!=null) {
-					pageInfo.setCurPage((Integer) params.get("page"));
+			if(param != null) {
+				if(param.get("page")!=null) {
+					pageInfo.setCurPage((Integer) param.get("page"));
 				}
-				if(params.get("isAnswered")!=null) {
-					isAnswered = (Boolean)params.get("isAnswered");
+				if(param.get("isAnswered")!=null) {
+					isAnswered = (Boolean)param.get("isAnswered");
 				} 
-				if(params.get("startDate")!=null) {
-					startDate = (Date)params.get("startDate");
+				if(param.get("startDate")!=null) {
+					startDate = (Date)param.get("startDate");
 				} 
-				if(params.get("endDate")!=null) {
-					endDate = (Date)params.get("endDate");
+				if(param.get("endDate")!=null) {
+					endDate = (Date)param.get("endDate");
 				} 
 			}
-			
 			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findInquiriesSentByUser(pageInfo, loginId, startDate, endDate, isAnswered);
+
+			Integer findInquirieCntReceivedByOrganizer = gatheringInquiryService.findInquirieCntReceivedByOrganizer(loginId, startDate, endDate, isAnswered);
+			Integer findInquirieCntSentByUser = gatheringInquiryService.findInquirieCntSentByUser(loginId, startDate, endDate, isAnswered);
+			
+			System.out.println("gatheringInquiryList : "+gatheringInquiryList);
 			Map<String,Object> res = new HashMap<>();
-			System.out.println("findInquiriesSentByUser " + gatheringInquiryList);
-			res.put("findInquiriesSentByUser", gatheringInquiryList);
+			res.put("findInquirieCntReceivedByOrganizer", findInquirieCntReceivedByOrganizer);
+			res.put("findInquirieCntSentByUser", findInquirieCntSentByUser);
+			
+			res.put("gatheringInquiryList", gatheringInquiryList);
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();

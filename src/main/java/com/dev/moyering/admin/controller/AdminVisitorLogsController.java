@@ -15,17 +15,17 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class AdminVisitorLogsController {
 
-    private final AdminVisitorLogsService visitorLogsService; // 인터페이스로 주입!
+//    private final AdminVisitorLogsService visitorLogsService; // 인터페이스로 주입!
 
     /**
      * 메인 페이지 (방문 기록)
      */
-    @GetMapping("/")
-    public ResponseEntity<String> home(HttpServletRequest request) {
-        // 방문 기록
-//        visitorLogsService.recordVisit(request);
-        return ResponseEntity.ok("메인 페이지입니다!");
-    }
+//    @GetMapping("/")
+//    public ResponseEntity<String> home(HttpServletRequest request) {
+//        // 방문 기록
+////        visitorLogsService.recordVisit(request);
+//        return ResponseEntity.ok("메인 페이지입니다!");
+//    }
 
 //    /**
 //     * 대시보드용 - 오늘 방문자 통계

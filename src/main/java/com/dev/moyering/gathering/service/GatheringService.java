@@ -16,8 +16,10 @@ public interface GatheringService {
 	Integer writeGathering(GatheringDto gatheringDto, MultipartFile thumbnail) throws Exception;
 	void modifyGathering(GatheringDto gatheringDto, MultipartFile thumbnail) throws Exception;
 	GatheringDto detailGathering (Integer gatheringId) throws Exception;
+	List<GatheringDto> findGatheringWithCategory(Integer subCategoryId, Integer categoryId) throws Exception;
 	List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception;
 
+	Integer selectMyGatheringListCount(Integer userId, String word, String status) throws Exception;
 	List<GatheringDto> myGatheringApplyList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception;
 	
 	//메인페이지 게더링
