@@ -11,10 +11,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PaymentApproveRequestDto {
+public class PaymentInitRequestDto {
     private String orderNo;
-    private Integer amount;
-    private String paymentType;
     private Integer calendarId;
     private Integer userCouponId;
+    private Integer amount;
+    private String paymentType;
 }
