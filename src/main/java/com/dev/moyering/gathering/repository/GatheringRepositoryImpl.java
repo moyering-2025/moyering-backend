@@ -99,16 +99,17 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	    Date todaySqlDate = Date.valueOf(today);   
 	    
 	    switch (status) {
-	        case "진행예정":
+	        case "모집중":
 	            return gathering.meetingDate.gt(todaySqlDate)
 	                    .or(gathering.meetingDate.eq(todaySqlDate)   
-	                            .and(gathering.startTime.gt(currentTime)));
+	                            .and(gathering.startTime.gt(currentTime)))
+	                    .and(gathering.canceled.isFalse()); 
 	        case "진행완료":
 	            return (gathering.meetingDate.lt(todaySqlDate) 
 	                    .or(gathering.meetingDate.eq(todaySqlDate)    
 	                            .and(gathering.startTime.lt(currentTime))))  
 	                    .and(gathering.canceled.isFalse()); 
-	        case "취소된 모임":
+	        case "취소됨":
 	            return gathering.canceled.isTrue(); 
 	        default:
 	            return null;

@@ -3,33 +3,46 @@ package com.dev.moyering.gathering.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.dev.moyering.common.dto.AlarmDto;
+import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
-import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringApply;
 import com.dev.moyering.gathering.repository.GatheringApplyRepository;
-import com.dev.moyering.util.PageInfo;
-import com.querydsl.core.Tuple;
+import com.dev.moyering.gathering.repository.GatheringRepository;
+import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.repository.UserRepository;
 @Service
 public class GatheringApplyServiceImpl implements GatheringApplyService {
 
 	@Autowired
 	public GatheringApplyRepository gatheringApplyRepository;
+	
+	@Autowired
+	private GatheringRepository gatheringRepository;
+	
+	@Autowired
+	private AlarmService alarmService;
+	
+	@Autowired
+	private UserRepository userRepository;
 
 	@Override
 	public List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId) throws Exception {
+		//상세보기용
 		return gatheringApplyRepository.findApplyUserListByGatheringId(gatheringId);
 	}
 	@Override
 	public List<GatheringApplyDto> findApplyUserListByGatheringIdForOrganizer(Integer gatheringId) throws Exception {
+		//주최자 시점
 		return gatheringApplyRepository.findApplyUserListByGatheringIdForOrganizer(gatheringId);
 	}
 
 	@Override
 	public Integer findByGatheringIdAndUserId(Integer gatheringId, Integer userId) throws Exception {
+		//상세보기용, 신청여부 조회 
 		return gatheringApplyRepository.findByGatheringIdAndUserId(gatheringId, userId);
 	} 
 	@Override
@@ -37,11 +50,31 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 		
 		GatheringApply gatheringApply = gatheringApplyDto.toEntity();
 		gatheringApplyRepository.save(gatheringApply);
-		return gatheringApply.getGatheringApplyId();
+		Integer no = gatheringApply.getGatheringApplyId();
+		
+		Gathering gathering = gatheringRepository.findById(gatheringApplyDto.getGatheringId()).get();
+		User user =userRepository.findById(gatheringApplyDto.getUserId()).get(); 
+		
+		AlarmDto alarmDto = AlarmDto.builder()
+				.alarmType(3)
+				.title("모임가입")
+				.receiverId(gathering.getUser().getUserId())
+				.receiverNickname(gathering.getUser().getNickName())
+				.senderId(gatheringApplyDto.getUserId())
+				.senderNickname(user.getNickName())
+				.content(gathering.getTitle() +"에 "+user.getNickName()+"이 가입하였습니다")
+				.build();
+		
+		alarmService.sendAlarm(alarmDto);
+		
+		return no;
 	}
 
 	@Override
 	public void updateGatheringApplyApproval(Integer gatheringApplyId, boolean isApproved) throws Exception {
+		//주최자 시점 수락여부 결정
 		gatheringApplyRepository.updateGatheringApplyApproval(gatheringApplyId, isApproved);
 	}
+
+	
 }

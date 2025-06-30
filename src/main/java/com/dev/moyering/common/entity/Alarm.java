@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.dev.moyering.common.dto.AlarmDto;
 import com.dev.moyering.user.entity.User;
 
@@ -35,17 +37,16 @@ public class Alarm {
     //'1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
 
     // 발신자 (sender)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "s_user_id", nullable = false)
-    private User sender;
-
-	@Column
-	private String senderNickName;
-	
+    @Column
+    private Integer senderId;
+    @Column
+    private String senderNickname;
+    
     // 수신자 (receiver)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "r_user_id", nullable = false)
-    private User receiver;
+    @Column
+    private Integer receiverId;
+    @Column
+    private String receiverNickname;
 
 	@Column
 	private String title;
@@ -57,14 +58,17 @@ public class Alarm {
 	private Boolean confirm;
 	
     @Column(nullable = false)
+	@CreationTimestamp
     private Date alarmDate;
+    
     public AlarmDto toDto() {
     	return AlarmDto.builder()
 				.alarmId(alarmId)
 				.alarmType(alarmType)
-				.senderUserId(sender.getUserId())
-				.senderUserNickName(sender.getNickName())
-				.receiverUserId(receiver.getUserId())
+				.senderId(senderId)
+				.senderNickname(senderNickname)
+				.receiverId(receiverId)
+				.receiverNickname(receiverNickname)
 				.title(title)
 				.content(content)
 				.confirm(confirm)

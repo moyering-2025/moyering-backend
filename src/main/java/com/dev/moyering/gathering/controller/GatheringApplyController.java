@@ -73,23 +73,7 @@ public class GatheringApplyController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	@GetMapping("/getApplyListByGatheringId")
-	public ResponseEntity<Map<String,Object>> getApplyListOfGathering( @RequestParam("gatheringId") Integer gatheringId) {
-		 
-		try {
-			Map<String, Object> res = new HashMap();
-			List<GatheringApplyDto> findApplyUserList = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
-			if(findApplyUserList!=null) {
-				return new ResponseEntity<>(null, HttpStatus.OK);
-			} else {
-				res.put("findApplyUserList", findApplyUserList);
-			}
-			return new ResponseEntity<>(res, HttpStatus.OK);
-		} catch(Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}
+
 	@GetMapping("/getApplyListByGatheringId/{gatheringId}")
 	public ResponseEntity<List<GatheringApplyDto>> getApplyListOfGatheringForOrganizer(@PathVariable("gatheringId") Integer gatheringId) {
 		

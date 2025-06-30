@@ -159,6 +159,19 @@ public class GatheringController {
 		}
 	}
 	
+	@PostMapping("/user/cancelGathering/{gatheringId}")
+	public ResponseEntity<Boolean> cancelGathering(@AuthenticationPrincipal PrincipalDetails principal, 
+			@RequestParam Integer gatheringId){
+		try {
+			Integer userId = principal.getUser().getUserId();
+			System.out.println("로그인 유저 : "+ userId);
+			
+            return new ResponseEntity<>(HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 	@PostMapping("/user/myGatheringList")
 	public ResponseEntity<Map<String, Object>> myGatheringList(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestBody(required=false) Map<String,String> param){

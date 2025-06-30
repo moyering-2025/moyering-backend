@@ -28,11 +28,12 @@ public class AlarmDto {
 	// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
 
 	// 발신자 (sender)
-	private String senderUserNickName;
-	private Integer senderUserId;
+	private String senderNickname;
+	private Integer senderId;
 
 	// 수신자 (receiver)
-	private Integer receiverUserId;
+	private Integer receiverId;
+	private String receiverNickname;
 	private String title;
 	private String content;
 	private Boolean confirm;
@@ -42,8 +43,10 @@ public class AlarmDto {
 		return Alarm.builder()
 				.alarmId(alarmId)
 				.alarmType(alarmType)
-				.sender(User.builder().userId(senderUserId).build())
-				.receiver(User.builder().userId(receiverUserId).build())
+				.senderId(senderId)
+				.senderNickname(senderNickname)
+				.receiverId(receiverId)
+				.receiverNickname(receiverNickname)
 				.title(title)
 				.content(content)
 				.confirm(confirm)
