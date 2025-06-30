@@ -50,6 +50,7 @@ public class FollowController {
             @AuthenticationPrincipal PrincipalDetails principal) {
         Integer followingId = principal.getUser().getUserId();
         List<FollowDto> followers = followService.getFollowers(followingId);
+        System.out.println(followers);
         return ResponseEntity.ok(followers);
     }
 
