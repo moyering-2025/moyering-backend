@@ -18,6 +18,7 @@ public class AdminCoupon {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer couponId; // 쿠폰 아이디
 
+
     @Column(nullable = false)
     private String couponType; // 관리자 쿠폰인지, 강사 쿠폰인지
 

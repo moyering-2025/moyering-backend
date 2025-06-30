@@ -1,7 +1,6 @@
 package com.dev.moyering.admin.controller;
 
 import com.dev.moyering.admin.dto.BannerDto;
-import com.dev.moyering.admin.entity.Banner;
 import com.dev.moyering.admin.service.BannerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

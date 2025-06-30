@@ -20,7 +20,7 @@ public class AdminPaymentDto {
     private String couponType;      // 쿠폰 유형
     private String discountType;    // 할인 유형
     private Integer discountAmount; // 할인금액 / 비율 (가변)
-    private Integer calculatedDiscountAmount;
+    private Integer calculatedDiscountAmount; // 할인금액 (원)
     private Integer totalAmount;    // 총 결제 금액
     private LocalDateTime payDate;  // 결제일시
     private String paymentType;     // 결제 유형

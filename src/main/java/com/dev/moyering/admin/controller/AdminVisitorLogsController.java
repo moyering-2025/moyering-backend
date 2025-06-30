@@ -9,23 +9,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-
-@RestController
-@RequestMapping("/api")
-@RequiredArgsConstructor
-public class AdminVisitorLogsController {
-
-    private final AdminVisitorLogsService visitorLogsService; // 인터페이스로 주입!
-
-    /**
-     * 메인 페이지 (방문 기록)
-     */
-    @GetMapping("/")
-    public ResponseEntity<String> home(HttpServletRequest request) {
-        // 방문 기록
-//        visitorLogsService.recordVisit(request);
-        return ResponseEntity.ok("메인 페이지입니다!");
-    }
+//
+//@RestController
+//@RequestMapping("/api")
+//@RequiredArgsConstructor
+//public class AdminVisitorLogsController {
+//
+//    private final AdminVisitorLogsService visitorLogsService; // 인터페이스로 주입!
+//
+//    /**
+//     * 메인 페이지 (방문 기록)
+//     */
+//    @GetMapping("/")
+//    public ResponseEntity<String> home(HttpServletRequest request) {
+//        // 방문 기록
+////        visitorLogsService.recordVisit(request);
+//        return ResponseEntity.ok("메인 페이지입니다!");
+//    }
 
 //    /**
 //     * 대시보드용 - 오늘 방문자 통계
@@ -44,4 +44,4 @@ public class AdminVisitorLogsController {
 //        long count = visitorLogsService.getMonthlyVisitorCount();
 //        return ResponseEntity.ok(count);
 //    }
-}
+//}
