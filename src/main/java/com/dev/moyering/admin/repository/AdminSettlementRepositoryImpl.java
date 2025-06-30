@@ -33,16 +33,18 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
         AdminSettlementDto content = queryFactory
                 .select(Projections.constructor(AdminSettlementDto.class,
                         adminSettlement.settlementId,
+                        adminSettlement.classCalendar.calendarId,
                         adminSettlement.hostId,
+                        adminSettlement.userPayment.paymentId,
                         adminSettlement.settlementDate,
                         adminSettlement.settledAt,
                         adminSettlement.settlementStatus,
+                        adminSettlement.bankType,
                         adminSettlement.bankAccount,
                         adminSettlement.totalIncome,
                         adminSettlement.platformFee,
-                        adminSettlement.settlementAmount,
-                        adminSettlement.userPayment.paymentId,
-                        adminSettlement.classCalendar.calendarId))
+                        adminSettlement.settlementAmount
+                        ))
                 .from(adminSettlement)
                 .where(adminSettlement.settlementId.eq(settlementId))
                 .fetchOne();
@@ -55,16 +57,17 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
         return queryFactory
                 .select(Projections.constructor(AdminSettlementDto.class,
                         adminSettlement.settlementId,
+                        adminSettlement.classCalendar.calendarId,
                         adminSettlement.hostId,
+                        adminSettlement.userPayment.paymentId,
                         adminSettlement.settlementDate,
                         adminSettlement.settledAt,
                         adminSettlement.settlementStatus,
+                        adminSettlement.bankType,
                         adminSettlement.bankAccount,
                         adminSettlement.totalIncome,
                         adminSettlement.platformFee,
-                        adminSettlement.settlementAmount,
-                        adminSettlement.userPayment.paymentId,
-                        adminSettlement.classCalendar.calendarId))
+                        adminSettlement.settlementAmount))
                 .from(adminSettlement)
                 .where(
                         searchSettlement(searchKeyword), // 검색 조건

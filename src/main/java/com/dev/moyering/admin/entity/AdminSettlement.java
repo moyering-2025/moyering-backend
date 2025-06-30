@@ -16,77 +16,95 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString(exclude = {"userPayment", "classCalendar"})
-
 @Table(name = "settlement")
 public class AdminSettlement {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer settlementId; // 정산 id
+    private Integer settlementId; // 정산 ID
 
+    @Column(nullable = false)
+    private Integer hostId; // 강사 ID
 
-    @Column
-    private Integer hostId; // 강사 id
-
-    @Column
+    @Column(nullable = false)
     private LocalDate settlementDate; // 정산 예정일
 
     @Column
     private LocalDateTime settledAt; // 실제 지급일
 
-    @Column
-    private String settlementStatus; // 정산 상태
+    @Column(nullable = false, length = 20)
+    private String settlementStatus; // 정산 상태 (PENDING/COMPLETED/CANCELLED)
 
     @Column
-    private String bankAccount; //지급계좌
+    private String bankType;
 
     @Column
-    private BigDecimal totalIncome; // 총 입금액
+    private String bankAccount; // 지급계좌
 
-    @Column
-    private BigDecimal platformFee; // 정산 수수료
+    @Column(precision = 15, scale = 2)
+    private BigDecimal totalIncome; // 총 수입 (뷰에서 가져온 값)
 
-    @Column
-    private BigDecimal settlementAmount; // 실제 지급액
+    @Column(precision = 15, scale = 2)
+    private BigDecimal platformFee; // 정산 수수료 (뷰에서 계산된 값)
+
+    @Column(precision = 15, scale = 2, nullable = false)
+    private BigDecimal settlementAmount; // 실제 지급액 (뷰에서 계산된 값)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "paymentId")  // 결제 id
-    private UserPayment userPayment;
+    @JoinColumn(name = "payment_id", nullable = false)
+    private UserPayment userPayment; // 결제 정보
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "calendarId") // 클래스 일정 id
-    private ClassCalendar classCalendar;
+    @JoinColumn(name = "calendar_id", nullable = false)
+    private ClassCalendar classCalendar; // 클래스 일정 정보
 
     @Builder
-    public AdminSettlement(Integer settlementId, Integer hostId, LocalDate settlementDate, LocalDateTime settledAt, String settlementStatus, String bankAccount, BigDecimal totalIncome, BigDecimal platformFee, BigDecimal settlementAmount, UserPayment userPayment, ClassCalendar classCalendar) {
+    public AdminSettlement(Integer settlementId, Integer hostId, LocalDate settlementDate,
+                           LocalDateTime settledAt, String settlementStatus, String bankType,  String bankAccount,
+                           BigDecimal totalIncome, BigDecimal platformFee, BigDecimal settlementAmount,
+                           UserPayment userPayment, ClassCalendar classCalendar) {
         this.settlementId = settlementId;
+        this.classCalendar = classCalendar;
         this.hostId = hostId;
+        this.userPayment = userPayment;
+
         this.settlementDate = settlementDate;
         this.settledAt = settledAt;
         this.settlementStatus = settlementStatus;
+        this.bankType = bankType;
         this.bankAccount = bankAccount;
         this.totalIncome = totalIncome;
         this.platformFee = platformFee;
         this.settlementAmount = settlementAmount;
-        this.userPayment = userPayment;
-        this.classCalendar = classCalendar;
     }
 
-
-    // 엔티티 -> toDto
+    /**
+     * 엔티티 → DTO 변환
+     */
     public AdminSettlementDto toDto() {
-        AdminSettlementDto dto = AdminSettlementDto.builder()
+        return AdminSettlementDto.builder()
                 .settlementId(settlementId)
+                .calendarId(classCalendar != null ? classCalendar.getCalendarId() : null)
                 .hostId(hostId)
+                .paymentId(userPayment != null ? userPayment.getPaymentId() : null)
                 .settlementDate(settlementDate)
                 .settledAt(settledAt)
                 .settlementStatus(settlementStatus)
+                .bankType(bankType)
                 .bankAccount(bankAccount)
                 .totalIncome(totalIncome)
                 .platformFee(platformFee)
                 .settlementAmount(settlementAmount)
-                .paymentId(userPayment != null ? userPayment.getPaymentId() : null)
-                .calendarId(classCalendar != null ? classCalendar.getCalendarId() : null)
                 .build();
-        return dto;
+    }
+
+    /**
+     * 정산 상태 업데이트
+     */
+    public void updateStatus(String status) {
+        this.settlementStatus = status;
+        if ("COMPLETED".equals(status)) {
+            this.settledAt = LocalDateTime.now();
+        }
     }
 }
