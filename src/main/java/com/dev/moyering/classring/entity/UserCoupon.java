@@ -85,4 +85,10 @@ public class UserCoupon {
     	
     	return dto;
     }
+    
+    
+    public void useCoupon() {
+    	this.status = "사용";
+    	this.usedAt = LocalDateTime.now();
+    }
 }
