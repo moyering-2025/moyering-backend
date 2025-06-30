@@ -103,9 +103,15 @@ public class UserServiceImpl implements UserService {
 		return null;
 	}
 
-
-
-
+	@Override
+	public void updateUserRole(Integer userId) throws Exception {
+		User user = userRepository.findById(userId).get();
+		if(userId != null) {
+			user.setUserType("ROLE_HT");
+		}
+		userRepository.save(user);
+	}
+	
 	//feed
 	@Override
 	public UserDto getByNickname(String nickname) throws Exception {

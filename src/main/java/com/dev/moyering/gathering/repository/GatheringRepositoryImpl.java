@@ -3,28 +3,26 @@ package com.dev.moyering.gathering.repository;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.transaction.Transactional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
-import com.dev.moyering.gathering.dto.GatheringApplyDto;
+import com.dev.moyering.common.entity.QCategory;
+import com.dev.moyering.common.entity.QSubCategory;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
 import com.dev.moyering.user.entity.User;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
@@ -36,7 +34,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word, String status) {
+	public Long selectMyGatheringListCount(Integer loginId, String word, String status) {
 	    QGathering gathering = QGathering.gathering;
 	    
 	    BooleanExpression condition = gathering.user.userId.eq(loginId);
@@ -65,9 +63,23 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	    if (statusCondition != null) {
 	        condition = condition.and(statusCondition); 
 	    }
-	    gatheringList = jpaQueryFactory.selectFrom(gathering)
-	            .where(condition)  
-	            .orderBy(gathering.gatheringId.desc())
+	    
+	    // 정렬 조건 설정
+	    JPAQuery<Gathering> query = jpaQueryFactory.selectFrom(gathering)
+	            .where(condition);
+	    
+	    // status가 "진행예정"인 경우 특별한 정렬 적용
+	    if ("진행예정".equals(status)) {
+	        query = query.orderBy(
+	            gathering.meetingDate.asc(),      // 날짜 오름차순 (가까운 날짜부터)
+	            gathering.startTime.asc(),        // 시간 오름차순 (이른 시간부터)
+	            gathering.gatheringId.desc()      // ID 내림차순 (같은 시간이면 최신 등록순)
+	        );
+	    } else {
+	        query = query.orderBy(gathering.gatheringId.desc());
+	    }
+	    
+	    gatheringList = query
 	            .offset(pageRequest.getOffset())
 	            .limit(pageRequest.getPageSize())
 	            .fetch();
@@ -131,6 +143,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		clause.execute();
 	}
 	@Override
+
 	public void updateGatheringStatus(Integer gatheringId, Boolean canceled) throws Exception{
 		QGathering gathering = QGathering.gathering;
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
@@ -187,37 +200,39 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 
 		return preferred;
 	}
-  
-//  @Override
-//	public List<GatheringDto> selectGatheringByUserIdAndPaging(PageRequest pageRequest, Integer loginId, String word){	
-//		QGathering gathering = QGathering.gathering;
-//		List<Tuple> gatheringList = null;
-//		if(word==null || word.trim().length()==0) {//검색어 없는 경우
-//			gatheringList = jpaQueryFactory.selectFrom(gathering)
-//					.where(gathering.user.userId.eq(loginId))//등록한 사람이 로그인 아이디와 일치하는 경우에만.
-//					.orderBy(gathering.gatheringId.desc())
-//					.offset(pageRequest.getOffset())
-//					.limit(pageRequest.getPageSize())
-//					.fetch();
-//		} else { // 검색어 있는 경우
-//		    gatheringList = jpaQueryFactory.selectFrom(gathering)
-//		            .where(gathering.user.userId.eq(loginId)
-//		                .and(gathering.title.contains(word))) // 제목에서 검색
-//		            .orderBy(gathering.gatheringId.desc())
-//		            .offset(pageRequest.getOffset())
-//		            .limit(pageRequest.getPageSize())
-//		            .fetch();
-//		}
-//
-//		return gatheringList.stream()
-//				.map(t-> {
-//					Gathering g = t.get(0,Gathering.class);
-//					GatheringDto gatheringDto = modelMapper.map(g, GatheringDto.class);
-//					return gatheringDto;
-//				}).collect(Collectors.toList());
-//	}
-//  
-  
-  
-  
+	@Override
+	public List<GatheringDto> findRecommendGatheringForUser(Integer subCategoryId, Integer categoryId) throws Exception {
+	    QGathering gathering = QGathering.gathering;
+	    QCategory category = QCategory.category;
+	    QSubCategory subCategory = QSubCategory.subCategory;
+	    
+	    BooleanBuilder baseCondition = new BooleanBuilder()
+	        .and(gathering.canceled.isFalse())
+	        .and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())));
+	    
+	    if (subCategoryId != null) {
+	        baseCondition.and(gathering.subCategory.subCategoryId.eq(subCategoryId));
+	    }
+	    if (categoryId != null) {
+	        baseCondition.and(gathering.subCategory.firstCategory.categoryId.eq(categoryId));
+	    }
+	    
+	    return jpaQueryFactory
+	        .select(Projections.bean(GatheringDto.class,
+	            gathering.gatheringId,
+	            gathering.title,
+	            gathering.thumbnail,
+	            gathering.meetingDate,
+	            gathering.locName,
+	            category.categoryName,
+	            subCategory.subCategoryName
+	        ))
+	        .from(gathering)
+	        .leftJoin(gathering.subCategory.firstCategory, category)
+	        .leftJoin(gathering.subCategory, subCategory)
+	        .where(baseCondition)
+	        .orderBy(gathering.meetingDate.asc())
+	        .limit(3)
+	        .fetch();
+	}
 }

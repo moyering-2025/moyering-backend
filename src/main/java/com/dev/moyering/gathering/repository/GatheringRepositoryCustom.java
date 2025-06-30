@@ -21,8 +21,11 @@ public interface GatheringRepositoryCustom {
 
 	void updateGatheringStatus(Integer gatheringId, Boolean canceled) throws Exception;
 
-	Long selectMyGatheringListCount(PageRequest pageRequest, Integer loginId, String word, String status);
+	Long selectMyGatheringListCount(Integer loginId, String word, String status);
 
 	List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word, String status);
+
+	// 상세 페이지에 추천 게더링 3개
+	List<GatheringDto> findRecommendGatheringForUser(Integer subCategoryId, Integer categoryId) throws Exception;
 
 }
