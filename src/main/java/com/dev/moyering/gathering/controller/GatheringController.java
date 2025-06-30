@@ -165,6 +165,7 @@ public class GatheringController {
 		try {
 			Integer userId = principal.getUser().getUserId();
 			System.out.println("로그인 유저 : "+ userId);
+			System.out.println("param : "+param);
 			String word = null;	
 			PageInfo pageInfo = new PageInfo(1);
 			String status = null;
@@ -178,11 +179,11 @@ public class GatheringController {
                     status = null; // 전체인 경우 null로 처리
                 }
 			}
-			Integer allCnt = 0, scheduled = 0, inProgress = 0, cancelled = 0;
+			Integer allCnt = 0, scheduled = 0, inProgress = 0, canceled = 0;
 			allCnt = gatheringService.selectMyGatheringListCount(userId, word, "전체");
-			scheduled = gatheringService.selectMyGatheringListCount(userId, word, "전체");
-			inProgress = gatheringService.selectMyGatheringListCount(userId, word, "전체");
-			cancelled = gatheringService.selectMyGatheringListCount(userId, word, "전체");
+			scheduled = gatheringService.selectMyGatheringListCount(userId, word, "모집중");
+			inProgress = gatheringService.selectMyGatheringListCount(userId, word, "진행완료");
+			canceled = gatheringService.selectMyGatheringListCount(userId, word, "취소됨");
 			
 			Map<String, Object> response = new HashMap<>();
 			List<GatheringDto> myGatheringList = null;
@@ -194,9 +195,9 @@ public class GatheringController {
 				response.put("list", "조회된 리스트 없음");
 			}
 			response.put("allCnt", allCnt);
-			response.put("scheduled", scheduled);
-			response.put("inProgress", inProgress);
-			response.put("cancelled", cancelled);
+			response.put("scheduledCnt", scheduled);
+			response.put("inProgressCnt", inProgress);
+			response.put("canceledCnt", canceled);
             
             return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch(Exception e) {
