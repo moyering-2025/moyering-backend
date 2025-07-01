@@ -78,7 +78,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")	
     implementation 'com.google.firebase:firebase-admin:9.2.0'           // Google Firebase Admin	
 	
-	implementation("com.tosspayments:toss-payments-server-sdk:1.14.0")
+	//implementation("com.tosspayments:toss-payments-server-sdk:1.14.0")
 }
 
 tasks.named('bootBuildImage') {
