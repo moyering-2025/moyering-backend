@@ -3,13 +3,13 @@ package com.dev.moyering.host.service;
 import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.dev.moyering.admin.dto.AdminClassDto;
-import com.dev.moyering.admin.dto.AdminClassSearchCond;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dev.moyering.admin.dto.AdminClassDto;
+import com.dev.moyering.admin.dto.AdminClassSearchCond;
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.common.repository.SubCategoryRepository;
@@ -29,12 +31,15 @@ import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostClassSearchRequestDto;
 import com.dev.moyering.host.dto.HostPageResponseDto;
 import com.dev.moyering.host.entity.ClassCalendar;
+import com.dev.moyering.host.entity.ClassRegist;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.QClassCalendar;
 import com.dev.moyering.host.entity.QHostClass;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
+import com.dev.moyering.host.repository.ClassRegistRepository;
 import com.dev.moyering.host.repository.HostClassRepository;
 import com.dev.moyering.host.repository.HostRepository;
+import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
 import com.dev.moyering.util.PageInfo;
@@ -42,6 +47,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +58,7 @@ public class HostClassServiceImpl implements HostClassService {
 	private final UserRepository userRepository;
 	private final HostRepository hostRepository;
 	private final SubCategoryRepository subCategoryRepository;
+	private final ClassRegistRepository classRegistRepository;
 
 	@Value("${iupload.path}")
 	private String iuploadPath;
@@ -436,91 +443,30 @@ public class HostClassServiceImpl implements HostClassService {
 		hostClassRepository.save(hostClassDto.toEntity());
 		
 		return hostClassDto.getClassId();
-		
-		
-//		HostClassDto classDto = hostClassRepository.findByClassId(hostClassDto.getClassId()).toDto();
-//		MultipartFile[] files = { hostClassDto.getImg1(), hostClassDto.getImg2(), hostClassDto.getImg3(),
-//				hostClassDto.getImg4(), hostClassDto.getImg5(), hostClassDto.getMaterial(),
-//				hostClassDto.getPortfolio() };
-//		for (MultipartFile file : files) {
-//			if (file != null && !file.isEmpty()) {
-//				File upFile = new File(iuploadPath, file.getOriginalFilename());
-//				file.transferTo(upFile);
-//			}
-//		}
-//
-//		if (files[0] != null && !files[0].isEmpty() && files[0] instanceof MultipartFile)
-//			classDto.setImgName1(files[0].getOriginalFilename());
-//		if (files[1] != null && !files[1].isEmpty() && files[1] instanceof MultipartFile)
-//			classDto.setImgName2(files[1].getOriginalFilename());
-//		if (files[2] != null && !files[2].isEmpty() && files[2] instanceof MultipartFile)
-//			classDto.setImgName3(files[2].getOriginalFilename());
-//		if (files[3] != null && !files[3].isEmpty() && files[3] instanceof MultipartFile)
-//			classDto.setImgName4(files[3].getOriginalFilename());
-//		if (files[4] != null && !files[4].isEmpty() && files[4] instanceof MultipartFile)
-//			classDto.setImgName5(files[4].getOriginalFilename());
-//		if (files[5] != null && !files[5].isEmpty() && files[5] instanceof MultipartFile)
-//			classDto.setMaterialName(files[5].getOriginalFilename());
-//		if (files[6] != null && !files[6].isEmpty() && files[6] instanceof MultipartFile)
-//			classDto.setPortfolioName(files[6].getOriginalFilename());
-//
-//		if (hostClassDto.getCategory1() != null && !hostClassDto.getCategory1().isEmpty()
-//				&& !hostClassDto.getCategory1().equals(classDto.getCategory1())) {
-//			classDto.setCategory1(hostClassDto.getCategory1());
-//		}
-//
-//		if (hostClassDto.getCategory2() != null && !hostClassDto.getCategory2().isEmpty()
-//				&& !hostClassDto.getCategory2().equals(classDto.getCategory2())) {
-//			classDto.setCategory2(hostClassDto.getCategory2());
-//		}
-//		
-//		if (hostClassDto.getSubCategoryId() != null && !hostClassDto.getSubCategoryId().equals(classDto.getSubCategoryId())) {
-//			classDto.setSubCategoryId(hostClassDto.getSubCategoryId());
-//		}
-//
-//		if (hostClassDto.getName() != null && !hostClassDto.getName().isEmpty()
-//				&& !hostClassDto.getName().equals(classDto.getName())) {
-//			classDto.setName(hostClassDto.getName());
-//		}
-//
-//		if (hostClassDto.getRecruitMin() != null && !hostClassDto.getRecruitMin().equals(classDto.getRecruitMin())) {
-//			classDto.setRecruitMin(hostClassDto.getRecruitMin());
-//		}
-//
-//		if (hostClassDto.getDetailDescription() != null && !hostClassDto.getDetailDescription().isEmpty()
-//				&& !hostClassDto.getDetailDescription().equals(classDto.getDetailDescription())) {
-//			classDto.setDetailDescription(hostClassDto.getDetailDescription());
-//		}
-//
-//		if (hostClassDto.getIncluision() != null && !hostClassDto.getIncluision().isEmpty()
-//				&& !hostClassDto.getIncluision().equals(classDto.getIncluision())) {
-//			classDto.setIncluision(hostClassDto.getIncluision());
-//		}
-//
-//		if (hostClassDto.getPreparation() != null && !hostClassDto.getPreparation().isEmpty()
-//				&& !hostClassDto.getPreparation().equals(classDto.getPreparation())) {
-//			classDto.setPreparation(hostClassDto.getPreparation());
-//		}
-//
-//		if (hostClassDto.getKeywords() != null && !hostClassDto.getKeywords().isEmpty()
-//				&& !hostClassDto.getKeywords().equals(classDto.getKeywords())) {
-//			classDto.setKeywords(hostClassDto.getKeywords());
-//		}
-//
-//		if (hostClassDto.getPrice() != null && !hostClassDto.getPrice().equals(classDto.getPrice())) {
-//			classDto.setPrice(hostClassDto.getPrice());
-//		}
-//
-//		if (hostClassDto.getCaution() != null && !hostClassDto.getCaution().isEmpty()
-//				&& !hostClassDto.getCaution().equals(classDto.getCaution())) {
-//			classDto.setCaution(hostClassDto.getCaution());
-//		}
-//
-//		HostClass hostClass = classDto.toEntity();
-//		hostClassRepository.save(hostClass);
-//		
-//		return hostClass.getClassId();
 
+	}
+
+	@Override
+	public List<UserDto> selectClassStudentList(Integer calendarId) throws Exception {
+		List<ClassRegist> classRegistList = classRegistRepository.findByClassCalendarCalendarId(calendarId);
+		List<User> studnetList = new ArrayList<>();
+		for(ClassRegist regist : classRegistList) {
+			studnetList.add(userRepository.findById(regist.getUser().getUserId()).get());
+		}
+		List<UserDto> dtoList = studnetList.stream().map(User::toDto).collect(Collectors.toList());
+		return dtoList;
+	}
+
+	@Override
+	public List<UserDto> selectStudentList(Integer hostId) throws Exception {
+		List<ClassRegist> regList = classRegistRepository.findByCalendar_HostClass_Host_HostId(hostId);
+		List<UserDto> userDtoList = new ArrayList<>();
+		for(ClassRegist reg : regList) {
+			User user = userRepository.findById(reg.getUser().getUserId()).get();
+			userDtoList.add(user.toDto());
+		}
+		
+		return userDtoList;
 	}
 
 }

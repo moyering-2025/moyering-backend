@@ -13,13 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.admin.dto.AdminCouponDto;
 import com.dev.moyering.admin.service.AdminCouponService;
-import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostPageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.dto.InquirySearchRequestDto;
+import com.dev.moyering.host.repository.ClassCalendarRepository;
+import com.dev.moyering.host.repository.ClassRegistRepository;
 import com.dev.moyering.host.service.HostClassService;
 import com.dev.moyering.host.service.InquiryService;
+import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.service.UserService;
 import com.dev.moyering.util.PageInfo;
 
 import lombok.RequiredArgsConstructor;
@@ -30,7 +34,11 @@ public class HostClassController {
 	private final HostClassService hostClassService;
 	private final InquiryService inquiryService;
 	private final AdminCouponService adminCouponService;
-
+	private final ClassRegistRepository classRegistService;
+	private final ClassCalendarRepository calendarRepository;
+	private final UserService userService;
+	
+	
 	@GetMapping("/host/calendar")
 	public ResponseEntity<List<HostClassDto>> selectClassCalendar(@RequestParam Integer hostId) {
 		try {
@@ -73,6 +81,10 @@ public class HostClassController {
 			HostPageResponseDto<InquiryDto> response = HostPageResponseDto.<InquiryDto>builder()
 					.content(page.getContent()).pageInfo(pageInfo).build();
 			
+			for(InquiryDto inquiryDto : response.getContent()) {
+				UserDto user = userService.findUserByUserId(inquiryDto.getUserId());
+				inquiryDto.setStudentName(user.getNickName());
+			}
 			return new ResponseEntity<>(response, HttpStatus.OK);
 
 		} catch (Exception e) {
@@ -99,6 +111,28 @@ public class HostClassController {
 			List<AdminCouponDto> couponList = adminCouponService.selectHostAllCoupon("HT");
 			return new ResponseEntity<>(couponList, HttpStatus.OK);
 		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/host/classStudentList")
+	public ResponseEntity<List<UserDto>> classStudentList(@RequestParam Integer calendarId){
+		try {
+			List<UserDto> studnetList = hostClassService.selectClassStudentList(calendarId);
+			return new ResponseEntity<>(studnetList,HttpStatus.OK); 
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+		}
+	}
+	
+	@GetMapping("/host/studentList")
+	public ResponseEntity<List<UserDto>> studentList(@RequestParam Integer hostId) {
+		try {
+			List<UserDto> studentList = hostClassService.selectStudentList(hostId);
+			return new ResponseEntity<>(studentList,HttpStatus.OK);
+		}catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
