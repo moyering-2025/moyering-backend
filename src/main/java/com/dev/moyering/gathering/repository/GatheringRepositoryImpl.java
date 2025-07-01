@@ -51,32 +51,38 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	            .fetchOne();
 	    return count != null ? count : 0L;
 	}
-	@Override
 	public List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word, String status){	
 	    QGathering gathering = QGathering.gathering;
 	    List<Gathering> gatheringList = null;
 	    BooleanExpression condition = gathering.user.userId.eq(loginId);
+	    
 	    if (word != null && word.trim().length() > 0) {
 	        condition = condition.and(gathering.title.contains(word));
 	    }
-	    BooleanExpression statusCondition = getStatusCondition(gathering, status);
+	    
+	    // "진행예정"을 "모집중"으로 변환하여 처리
+	    String processStatus = "진행예정".equals(status) ? "모집중" : status;
+	    BooleanExpression statusCondition = getStatusCondition(gathering, processStatus);
+	    
 	    if (statusCondition != null) {
 	        condition = condition.and(statusCondition); 
 	    }
 	    
-	    // 정렬 조건 설정
 	    JPAQuery<Gathering> query = jpaQueryFactory.selectFrom(gathering)
 	            .where(condition);
 	    
-	    // status가 "진행예정"인 경우 특별한 정렬 적용
-	    if ("진행예정".equals(status)) {
+	    // status가 "진행예정"이나 "모집중"인 경우 특별한 정렬 적용
+	    if ("진행예정".equals(status) || "모집중".equals(status) || "전체".equals(status)) {
 	        query = query.orderBy(
-	            gathering.meetingDate.asc(),      // 날짜 오름차순 (가까운 날짜부터)
-	            gathering.startTime.asc(),        // 시간 오름차순 (이른 시간부터)
-	            gathering.gatheringId.desc()      // ID 내림차순 (같은 시간이면 최신 등록순)
+	            gathering.meetingDate.asc(),      // 현재 날짜 기준 가까운 날짜부터
+	            gathering.startTime.asc(),        
+	            gathering.gatheringId.desc()      
 	        );
 	    } else {
-	        query = query.orderBy(gathering.gatheringId.desc());
+	        query = query.orderBy(
+	            gathering.meetingDate.asc(),
+	            gathering.gatheringId.desc()
+	        );
 	    }
 	    
 	    gatheringList = query
@@ -88,7 +94,6 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	            .map(Gathering::toDto)
 	            .collect(Collectors.toList());
 	}
-
 	private BooleanExpression getStatusCondition(QGathering gathering, String status) {
 	    
 	    if (status == null || "전체".equals(status)) {
