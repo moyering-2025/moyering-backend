@@ -73,23 +73,19 @@ public class GatheringApplyController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	@GetMapping("/getApplyListByGatheringId")
-	public ResponseEntity<Map<String,Object>> getApplyListOfGathering( @RequestParam("gatheringId") Integer gatheringId) {
-		 
+	@GetMapping("/user/myApplyList")
+	public ResponseEntity<List<GatheringApplyDto>> getMyApplyList(@AuthenticationPrincipal PrincipalDetails principal,
+			@ModelAttribute GatheringApplyDto gatheringApplyDto) {
 		try {
-			Map<String, Object> res = new HashMap();
-			List<GatheringApplyDto> findApplyUserList = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
-			if(findApplyUserList!=null) {
-				return new ResponseEntity<>(null, HttpStatus.OK);
-			} else {
-				res.put("findApplyUserList", findApplyUserList);
-			}
-			return new ResponseEntity<>(res, HttpStatus.OK);
+			List<GatheringApplyDto> applyList = null;
+			applyList = gatheringApplyService.findApplyListByApplyUserId(principal.getUser().getUserId());
+			return new ResponseEntity<>(applyList, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+
 	@GetMapping("/getApplyListByGatheringId/{gatheringId}")
 	public ResponseEntity<List<GatheringApplyDto>> getApplyListOfGatheringForOrganizer(@PathVariable("gatheringId") Integer gatheringId) {
 		
