@@ -1,11 +1,14 @@
 package com.dev.moyering.classring.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.classring.repository.UserCouponRepository;
 import com.dev.moyering.host.entity.ClassCoupon;
@@ -53,5 +56,11 @@ public class UserCouponServiceImpl implements UserCouponService {
         //클래스 쿠폰의 사용량 증가
         classCoupon.setUsedCnt(classCoupon.getUsedCnt()+1);
         classCouponRepository.save(classCoupon);
+	}
+
+	@Override
+	public List<UserCouponDto> getByUserIdAndClassId(Integer userId, Integer classId) throws Exception {
+		return userCouponRepository.findAllByUser_UserIdAndClassCoupon_HostClass_ClassId(userId,classId).stream()
+				.map(u->u.toDto()).collect(Collectors.toList());
 	}
 }

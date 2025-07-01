@@ -36,6 +36,10 @@ public class UserPayment {
 
     @Column
     private String status; // 상태 (주문, 취소, 환불)
+    
+    @Column
+    private LocalDateTime canceledAt; //취소시간
+    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id") // 수강생 id

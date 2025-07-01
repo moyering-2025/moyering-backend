@@ -42,6 +42,7 @@ public class MainController {
         List<GatheringDto> gathers;
         List<BannerDto> banners;
         Integer userId=null;
+        System.out.println(principal+"sdflsjflskjflaeh;glrikn");
 		try {
 			if (principal != null) {
 				 userId = principal.getUser().getUserId();
