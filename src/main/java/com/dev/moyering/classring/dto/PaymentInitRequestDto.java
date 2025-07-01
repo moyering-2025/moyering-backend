@@ -5,18 +5,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
-public class PaymentApproveRequestDto {
+public class PaymentInitRequestDto {
     private String orderNo;
-    private Integer amount;
-    private String paymentType;
     private Integer calendarId;
     private Integer userCouponId;
+    private Integer amount;
+    private String paymentType;
 }

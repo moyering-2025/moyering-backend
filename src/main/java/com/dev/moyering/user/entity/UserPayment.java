@@ -22,7 +22,7 @@ public class UserPayment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer paymentId; // 결제 id
 
-    @Column
+    @Column(unique = true)
     private String orderNo; // 주문 id
 
     @Column
@@ -65,6 +65,12 @@ public class UserPayment {
         this.classRegist = classRegist;
         this.classCalendar = classCalendar;
         this.userCoupon = userCoupon;
+    } 
+    
+    public void approve(ClassRegist regist, LocalDateTime paidAt) {
+        this.status = "결제완료";
+        this.paidAt = paidAt;
+        this.classRegist = regist;
     }
 }
 
