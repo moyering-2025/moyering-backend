@@ -1,6 +1,9 @@
 package com.dev.moyering.host.service;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -10,8 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.ReviewDto;
+import com.dev.moyering.host.dto.ReviewSearchRequestDto;
+import com.dev.moyering.host.entity.ClassCalendar;
+import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.Review;
+import com.dev.moyering.host.repository.ClassCalendarRepository;
+import com.dev.moyering.host.repository.HostClassRepository;
 import com.dev.moyering.host.repository.ReviewRepository;
+import com.dev.moyering.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +28,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
 	private final ReviewRepository reviewRepository;
+	private final HostClassRepository classRepository;
+	private final ClassCalendarRepository calendarRepository;
+	private final UserRepository userRepository;
+	
+	
 	@Override
 	public List<ReviewDto> getReviewByHostId(Integer hostId) {
 		return reviewRepository.findTop3ByHost_HostIdOrderByReviewDateDesc(hostId)
@@ -58,6 +72,51 @@ public class ReviewServiceImpl implements ReviewService {
 				.totalPages(reviewPage.getTotalPages())
 				.totalElements(reviewPage.getTotalElements())
 				.build();
+	}
+
+	@Override
+	public Page<ReviewDto> searchReviews(ReviewSearchRequestDto dto) throws Exception {
+		PageRequest pageable = PageRequest.of(dto.getPage(),dto.getSize());
+		Page<Review> resultPage = reviewRepository.getReviewsForHost(dto, pageable);
+		return resultPage.map(Review::toDto);
+	}
+
+	@Override
+	public List<ReviewDto> getReviews(Integer hostId) throws Exception {
+			List<HostClass> hostClassList = classRepository.findByHostHostId(hostId);
+			Set<Integer> classIdList = hostClassList.stream()
+					.map(HostClass::getClassId)
+					.collect(Collectors.toSet());
+			List<ClassCalendar> calendarList = calendarRepository.findByHostClassClassIdIn(classIdList);
+			List<Integer> calendarIdList = new ArrayList<>();
+			for(ClassCalendar cCalendar : calendarList) {
+				calendarIdList.add(cCalendar.getCalendarId());
+			}
+			List<Review> reviewList = reviewRepository.findByClassCalendarCalendarIdIn(calendarIdList);
+			List<ReviewDto> reviewDtoList = new ArrayList<>();
+			for(Review entity : reviewList) {
+				reviewDtoList.add(entity.toDto());
+			}
+			for(ReviewDto dto : reviewDtoList) {
+				String studentName = userRepository.findById(dto.getUserId()).get().getNickName();
+				dto.setStudentName(studentName);
+			}
+			return reviewDtoList;
+		
+	}
+
+	@Override
+	public void replyReview(Integer reviewId, Integer hostId, String revRegContent) throws Exception {
+		Review review = reviewRepository.findById(reviewId).get();
+		ReviewDto reviewDto = review.toDto();
+		if(hostId != null && revRegContent!=null) {
+			reviewDto.setHostId(hostId);
+			reviewDto.setRevRegCotnent(revRegContent);
+			reviewDto.setResponseDate(new Date(System.currentTimeMillis()));
+			reviewDto.setState(1);
+		}
+		reviewRepository.save(reviewDto.toEntity());
+		
 	}
 
 }

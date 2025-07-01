@@ -20,6 +20,7 @@ import com.dev.moyering.host.dto.HostPageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.dto.InquirySearchRequestDto;
 import com.dev.moyering.host.dto.ReviewDto;
+import com.dev.moyering.host.dto.ReviewSearchRequestDto;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.ClassRegistRepository;
 import com.dev.moyering.host.service.HostClassService;
@@ -63,6 +64,7 @@ public class HostClassController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	
 
 	@PostMapping("/host/inquiry/search")
 	public ResponseEntity<HostPageResponseDto<InquiryDto>> searchInquries(@RequestBody InquirySearchRequestDto dto) {
@@ -92,6 +94,60 @@ public class HostClassController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 
 		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/host/review")
+	public ResponseEntity<List<ReviewDto>> selectReview(@RequestParam Integer hostId){
+		try {
+			List<ReviewDto> reviewList = reviewService.getReviews(hostId);
+			return new ResponseEntity<>(reviewList,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping("/host/review/search")
+	public ResponseEntity<HostPageResponseDto<ReviewDto>> studentReview(@RequestBody ReviewSearchRequestDto dto){
+		try {
+			Page<ReviewDto> page = reviewService.searchReviews(dto);
+			
+			PageInfo pageInfo = new PageInfo();
+			int curPage = page.getNumber() + 1;
+			int allPage = page.getTotalPages();
+			int blockSize = 5;
+			int startPage = ((curPage - 1) / blockSize) * blockSize + 1;
+			int endPage = Math.min(startPage + blockSize - 1, allPage);
+
+			pageInfo.setCurPage(curPage);
+			pageInfo.setAllPage(allPage);
+			pageInfo.setStartPage(startPage);
+			pageInfo.setEndPage(endPage);
+			
+			HostPageResponseDto<ReviewDto> response = HostPageResponseDto.<ReviewDto>builder()
+					.content(page.getContent()).pageInfo(pageInfo).build();
+			
+			for(ReviewDto reviewDto : response.getContent()) {
+				UserDto user = userService.findUserByUserId(reviewDto.getUserId());
+				reviewDto.setStudentName(user.getNickName());
+			}
+			return new ResponseEntity<>(response,HttpStatus.OK);			
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping("/host/reviewReply")
+	public ResponseEntity<Object> reviewReply(@RequestParam Integer reviewId, @RequestParam Integer hostId,
+			@RequestParam String revRegContent){
+		try {
+			reviewService.replyReview(reviewId, hostId, revRegContent);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
@@ -142,17 +198,6 @@ public class HostClassController {
 		}
 	}
 	
-	@GetMapping("/host/studentReview")
-	public ResponseEntity<PageResponseDto<ReviewDto>> studentReview(@RequestParam("hostId") Integer hostId
-			,@RequestParam int page,
-			@RequestParam int size){
-		try {
-			PageResponseDto<ReviewDto> reviewList = reviewService.getReviewsForHost(hostId, page, size);
-			return new ResponseEntity<>(reviewList,HttpStatus.OK);			
-		}catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}
+	
 
 }

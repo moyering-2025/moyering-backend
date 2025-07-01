@@ -7,12 +7,11 @@ import lombok.Data;
 @Data
 public class ReviewSearchRequestDto {
 	private Integer hostId;
-	private String className;
-	private String hostName;
-	private String studentName;
-	private Date startDate;
-	private Date endDate;
-	private Integer page = 0;
-	private Integer size = 10;
-
+	private String searchFilter;
+	private String searchQuery;
+	private String startDate;
+	private String endDate;
+	private String replyStatus;
+	private Integer page;
+	private Integer size;
 }
