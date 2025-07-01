@@ -20,6 +20,7 @@ public interface GatheringService {
 	List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception;
 
 	Integer selectMyGatheringListCount(Integer userId, String word, String status) throws Exception;
+	void updateGatheringStatus(Integer gatheringId, Boolean canceled) throws Exception;
 	List<GatheringDto> myGatheringApplyList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception;
 	
 	//메인페이지 게더링

@@ -18,7 +18,6 @@ import static com.dev.moyering.admin.entity.QAdminNotice.adminNotice;
 public class AdminNoticeRepositoryImpl implements AdminNoticeRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
-
     @Override
     public Page<AdminNoticeDto> findNoticesByKeyword(String searchKeyword, Pageable pageable) {
 
