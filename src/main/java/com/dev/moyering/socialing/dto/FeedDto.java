@@ -68,5 +68,28 @@ public class FeedDto {
                 .build();
         return entity;
     }
+
+    public FeedDto(Integer feedId, String content, String img1, String img2, String img3, String img4, String img5,
+                   String tag1, String tag2, String tag3, String tag4, String tag5, boolean isDeleted,
+                   String writerId, String writerProfile, Integer writerBadge, LocalDateTime createdAt, Boolean likedByUser) {
+        this.feedId = feedId;
+        this.content = content;
+        this.img1 = img1;
+        this.img2 = img2;
+        this.img3 = img3;
+        this.img4 = img4;
+        this.img5 = img5;
+        this.tag1 = tag1;
+        this.tag2 = tag2;
+        this.tag3 = tag3;
+        this.tag4 = tag4;
+        this.tag5 = tag5;
+        this.isDeleted = isDeleted;
+        this.writerId = writerId;
+        this.writerProfile = writerProfile;
+        this.writerBadge = writerBadge;
+        this.createdAt = createdAt;
+        this.likedByUser = likedByUser;
+    }
 }
 

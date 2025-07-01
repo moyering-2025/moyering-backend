@@ -43,6 +43,7 @@ public class FeedController {
 //            @RequestParam(required = false) String userId
             @RequestHeader(value = "Authorization",required = false) String header
     ) {
+        System.out.println("==== CONTROLLER /socialing/feeds ====");
         System.out.println("▶▶▶ Authorization header = " + header);
 
 //        try {
@@ -54,14 +55,26 @@ public class FeedController {
 //            e.printStackTrace();
 //            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 //        }
+//        try {
+//            Integer userId = jwtUtil.extractUserIdFromHeader(header); // ✅ 로그인한 경우만 값 나옴
+//            System.out.println("▶▶▶ extracted userId = " + userId);
+//            List<FeedDto> feeds = feedService.getFeeds(sort, userId);
+//            return new ResponseEntity<>(feeds, HttpStatus.OK);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+        Integer userId = jwtUtil.extractUserIdFromHeader(header);
+        System.out.println("userId = " + userId);
+
+        List<FeedDto> feeds = null;
         try {
-            Integer userId = jwtUtil.extractUserIdFromHeader(header); // ✅ 로그인한 경우만 값 나옴
-            System.out.println("▶▶▶ extracted userId = " + userId);
-            List<FeedDto> feeds = feedService.getFeeds(sort, userId);
+            feeds = feedService.getFeeds(sort, userId);
+            System.out.println("feeds.size = " + feeds.size());
             return new ResponseEntity<>(feeds, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -193,6 +206,20 @@ public class FeedController {
             Map<String, Object> feedsByUserId = feedService.getFeedsByUserId(userId);
             return new ResponseEntity<>(feedsByUserId, HttpStatus.OK);
         }catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/socialing/popular")
+    public ResponseEntity<List<FeedDto>> getPopularFeeds(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size) {
+        List<FeedDto> popularFeeds = null;
+        try {
+            popularFeeds = feedService.getPopularFeeds(page, size);
+            return new ResponseEntity<>(popularFeeds, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

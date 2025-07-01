@@ -33,4 +33,6 @@ public interface FeedService {
     void updateFeed(Integer feedId, FeedDto feedDto,List<MultipartFile> umages, List<String> removeUrls) throws Exception;
 
     boolean isLikedByUser(Integer feedId, Integer userId);
+
+    List<FeedDto> getPopularFeeds(Integer page, Integer size) throws Exception;
 }

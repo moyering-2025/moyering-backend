@@ -17,4 +17,11 @@ public interface FeedRepositoryCustom {
     List<String> findTop3Img1ByUserId(Integer userId);
 
     List<FeedDto> findFeedsWithoutLiked();
+
+    //인기피드
+    List<FeedDto> findTopLikedFeeds(int offset, int size);
+
+    // 좋아요여부 없이 조회
+    List<FeedDto> findFeedsWithoutLiked(String sortType);
+
 }

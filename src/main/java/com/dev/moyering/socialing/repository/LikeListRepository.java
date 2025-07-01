@@ -14,11 +14,9 @@ public interface LikeListRepository extends JpaRepository<LikeList, Integer> ,Li
     // 피드의 전체 좋아요 수
     Long countByFeedFeedId(Integer feedId);
 
-    // 좋아요 상세 엔티티 조회 (삭제용)
-    Optional<LikeList> findByFeed_FeedIdAndUser_UserId(Integer feedId, Integer userId);
-
     // 좋아요 삭제
     void deleteByFeedFeedIdAndUserUserId(Integer feedId, Integer userId);
+
 
     List<LikeList> findByFeedFeedId(Integer feedId);
 
