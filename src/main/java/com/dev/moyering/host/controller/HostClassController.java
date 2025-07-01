@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,16 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.admin.dto.AdminCouponDto;
 import com.dev.moyering.admin.service.AdminCouponService;
+import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostPageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.dto.InquirySearchRequestDto;
+import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.ClassRegistRepository;
 import com.dev.moyering.host.service.HostClassService;
 import com.dev.moyering.host.service.InquiryService;
+import com.dev.moyering.host.service.ReviewService;
 import com.dev.moyering.user.dto.UserDto;
-import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.service.UserService;
 import com.dev.moyering.util.PageInfo;
 
@@ -37,6 +40,7 @@ public class HostClassController {
 	private final ClassRegistRepository classRegistService;
 	private final ClassCalendarRepository calendarRepository;
 	private final UserService userService;
+	private final ReviewService reviewService;
 	
 	
 	@GetMapping("/host/calendar")
@@ -132,6 +136,19 @@ public class HostClassController {
 		try {
 			List<UserDto> studentList = hostClassService.selectStudentList(hostId);
 			return new ResponseEntity<>(studentList,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/host/studentReview")
+	public ResponseEntity<PageResponseDto<ReviewDto>> studentReview(@RequestParam("hostId") Integer hostId
+			,@RequestParam int page,
+			@RequestParam int size){
+		try {
+			PageResponseDto<ReviewDto> reviewList = reviewService.getReviewsForHost(hostId, page, size);
+			return new ResponseEntity<>(reviewList,HttpStatus.OK);			
 		}catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

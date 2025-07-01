@@ -24,6 +24,7 @@ public class ReviewServiceImpl implements ReviewService {
 		return reviewRepository.findTop3ByHost_HostIdOrderByReviewDateDesc(hostId)
 				.stream().map(r->r.toDto()).collect(Collectors.toList());
 	}
+	
 	@Override
 	public PageResponseDto<ReviewDto> getAllReviewByHostId(Integer hostId, Integer page, Integer size) {
 		Pageable pageable = PageRequest.of(page, size);
@@ -34,6 +35,23 @@ public class ReviewServiceImpl implements ReviewService {
 				.map(Review::toDto)
 				.collect(Collectors.toList());
 		//PageResponseDto로 변환
+		return PageResponseDto.<ReviewDto>builder()
+				.content(dtoList)
+				.currentPage(reviewPage.getNumber()+1)
+				.totalPages(reviewPage.getTotalPages())
+				.totalElements(reviewPage.getTotalElements())
+				.build();
+	}
+
+	@Override
+	public PageResponseDto<ReviewDto> getReviewsForHost(Integer hostId, int page, int size) throws Exception {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Review> reviewPage = reviewRepository.findReviewsByHostId(hostId, pageable);
+		
+		List<ReviewDto> dtoList = reviewPage.getContent().stream()
+				.map(Review::toDto)
+				.collect(Collectors.toList());
+		
 		return PageResponseDto.<ReviewDto>builder()
 				.content(dtoList)
 				.currentPage(reviewPage.getNumber()+1)
