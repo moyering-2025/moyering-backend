@@ -73,6 +73,18 @@ public class GatheringApplyController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	@GetMapping("/user/myApplyList")
+	public ResponseEntity<List<GatheringApplyDto>> getMyApplyList(@AuthenticationPrincipal PrincipalDetails principal,
+			@ModelAttribute GatheringApplyDto gatheringApplyDto) {
+		try {
+			List<GatheringApplyDto> applyList = null;
+			applyList = gatheringApplyService.findApplyListByApplyUserId(principal.getUser().getUserId());
+			return new ResponseEntity<>(applyList, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 
 	@GetMapping("/getApplyListByGatheringId/{gatheringId}")
 	public ResponseEntity<List<GatheringApplyDto>> getApplyListOfGatheringForOrganizer(@PathVariable("gatheringId") Integer gatheringId) {

@@ -45,8 +45,6 @@ public class Alarm {
     // 수신자 (receiver)
     @Column
     private Integer receiverId;
-    @Column
-    private String receiverNickname;
 
 	@Column
 	private String title;
@@ -68,7 +66,6 @@ public class Alarm {
 				.senderId(senderId)
 				.senderNickname(senderNickname)
 				.receiverId(receiverId)
-				.receiverNickname(receiverNickname)
 				.title(title)
 				.content(content)
 				.confirm(confirm)

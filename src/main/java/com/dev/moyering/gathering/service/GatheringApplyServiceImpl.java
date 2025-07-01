@@ -56,13 +56,13 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 		User user =userRepository.findById(gatheringApplyDto.getUserId()).get(); 
 		
 		AlarmDto alarmDto = AlarmDto.builder()
-				.alarmType(3)
-				.title("모임가입")
+				.alarmType(3)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
+				.title("모임 신청자 접수") // 필수 사항
 				.receiverId(gathering.getUser().getUserId())
-				.receiverNickname(gathering.getUser().getNickName())
+				//수신자 유저 아이디
 				.senderId(gatheringApplyDto.getUserId())
 				.senderNickname(user.getNickName())
-				.content(gathering.getTitle() +"에 "+user.getNickName()+"이 가입하였습니다")
+				.content(gatheringApplyDto.getTitle() +"에 "+user.getNickName()+"이 가입하였습니다")
 				.build();
 		
 		alarmService.sendAlarm(alarmDto);
@@ -74,6 +74,11 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 	public void updateGatheringApplyApproval(Integer gatheringApplyId, boolean isApproved) throws Exception {
 		//주최자 시점 수락여부 결정
 		gatheringApplyRepository.updateGatheringApplyApproval(gatheringApplyId, isApproved);
+	}
+	@Override
+	public List<GatheringApplyDto> findApplyListByApplyUserId(Integer userId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

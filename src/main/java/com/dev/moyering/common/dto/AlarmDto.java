@@ -33,7 +33,6 @@ public class AlarmDto {
 
 	// 수신자 (receiver)
 	private Integer receiverId;
-	private String receiverNickname;
 	private String title;
 	private String content;
 	private Boolean confirm;
@@ -46,7 +45,6 @@ public class AlarmDto {
 				.senderId(senderId)
 				.senderNickname(senderNickname)
 				.receiverId(receiverId)
-				.receiverNickname(receiverNickname)
 				.title(title)
 				.content(content)
 				.confirm(confirm)
