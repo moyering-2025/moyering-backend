@@ -61,12 +61,9 @@ public class ClassPaymentController {
     //결제 처리
     @PostMapping("/approve")
     public ResponseEntity<Void> approve(@RequestBody PaymentApproveRequestDto dto, @AuthenticationPrincipal PrincipalDetails principal) {
-        System.out.println("afgstyserdododspfopsufwesdfsnljslfjslk"+principal);
-
     	if (principal == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        System.out.println("dododspfopsufwesnljslfjslk");
         try {
 			classPaymentService.approvePayment(dto,principal.getUser());
 	    	return ResponseEntity.ok().build();
