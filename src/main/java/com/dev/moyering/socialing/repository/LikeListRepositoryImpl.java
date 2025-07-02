@@ -1,6 +1,9 @@
 package com.dev.moyering.socialing.repository;
 
+import com.dev.moyering.socialing.dto.FeedDto;
+import com.dev.moyering.socialing.entity.QFeed;
 import com.dev.moyering.socialing.entity.QLikeList;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,6 +22,39 @@ public class LikeListRepositoryImpl implements LikeListRepositoryCustom {
                 .select(like.feed.feedId)
                 .from(like)
                 .where(like.user.userId.eq(userId))
+                .fetch();
+    }
+
+    @Override
+    public List<FeedDto> findAllWithLikedByUser(Integer userId) {
+        QFeed feed = QFeed.feed;
+        QLikeList likeList = QLikeList.likeList;
+
+        return queryFactory
+                .select(Projections.constructor(FeedDto.class,
+                        feed.feedId,
+                        feed.content,
+                        feed.img1,
+                        feed.img2,
+                        feed.img3,
+                        feed.img4,
+                        feed.img5,
+                        feed.tag1,
+                        feed.tag2,
+                        feed.tag3,
+                        feed.tag4,
+                        feed.tag5,
+                        feed.isDeleted,
+                        feed.user.nickName,
+                        feed.user.profile,
+                        feed.user.userBadgeId,
+                        feed.createDate,
+                        likeList.likeid.isNotNull() // 좋아요 눌렀으면 true
+                ))
+                .from(feed)
+                .leftJoin(likeList)
+                .on(likeList.feed.feedId.eq(feed.feedId)
+                        .and(likeList.user.userId.eq(userId)))
                 .fetch();
     }
 }

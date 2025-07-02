@@ -6,6 +6,7 @@ import com.dev.moyering.socialing.entity.Feed;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FeedService {
 
@@ -24,6 +25,7 @@ public interface FeedService {
      */
     List<FeedDto> getFeedsByNickname(String nickname, Integer userId) throws Exception;
 
+    Map<String ,Object> getFeedsByUserId(Integer userId)throws Exception;
 
     // 피드 작성
     Integer createFeed(FeedDto feedDto, List<MultipartFile> images) throws Exception;
@@ -31,4 +33,6 @@ public interface FeedService {
     void updateFeed(Integer feedId, FeedDto feedDto,List<MultipartFile> umages, List<String> removeUrls) throws Exception;
 
     boolean isLikedByUser(Integer feedId, Integer userId);
+
+    List<FeedDto> getPopularFeeds(Integer page, Integer size) throws Exception;
 }

@@ -9,6 +9,9 @@ import com.dev.moyering.user.entity.QUser;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanTemplate;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -22,6 +25,7 @@ import java.util.List;
 public class FeedRepositoryImpl implements FeedRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
+
     @Override
     public List<FeedDto> findAllWithCounts() {
         QFeed feed = QFeed.feed;
@@ -82,13 +86,27 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 
                         // 로그인 유저가 해당 피드에 좋아요 눌렀는지 여부
                         ExpressionUtils.as(
-                                JPAExpressions.selectOne()
-                                        .from(likeList)
-                                        .where(
-                                                likeList.feed.feedId.eq(feed.feedId)
-                                                        .and(likeList.user.userId.eq(userId))
+//                                JPAExpressions.selectOne()
+//                                        .from(likeList)
+//                                        .where(
+//                                                likeList.feed.feedId.eq(feed.feedId)
+//                                                        .and(likeList.user.userId.eq(userId))
+//                                        )
+//                                        .exists(),
+//                                "likedByUser"
+                                new CaseBuilder()
+                                        .when(
+                                                JPAExpressions
+                                                        .selectOne()
+                                                        .from(likeList)
+                                                        .where(
+                                                                likeList.feed.feedId.eq(feed.feedId)
+                                                                        .and(likeList.user.userId.eq(userId))
+                                                        )
+                                                        .exists()
                                         )
-                                        .exists(),
+                                        .then(true)
+                                        .otherwise(false),
                                 "likedByUser"
                         )
                 ))
@@ -153,6 +171,66 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 .where(feed.isDeleted.eq(false))
                 .groupBy(feed.feedId)
                 .orderBy(feed.createDate.desc()) // 기본 정렬
+                .fetch();
+    }
+
+    @Override
+    public List<FeedDto> findTopLikedFeeds(int offset, int size) {
+        QFeed feed = QFeed.feed;
+        QLikeList likeList = QLikeList.likeList;
+        QUser user = QUser.user;
+
+        return jpaQueryFactory
+                .select(Projections.fields(FeedDto.class,
+                        feed.feedId,
+                        feed.content,
+                        feed.img1, feed.img2, feed.img3, feed.img4, feed.img5,
+                        feed.tag1, feed.tag2, feed.tag3, feed.tag4, feed.tag5,
+                        feed.isDeleted,
+                        user.nickName.as("writerId"),
+                        user.profile.as("writerProfile"),
+                        user.userBadgeId.as("writerBadge"),
+                        likeList.countDistinct().as("likesCount")
+                ))
+                .from(feed)
+                .leftJoin(feed.user, user)
+                .leftJoin(likeList).on(likeList.feed.feedId.eq(feed.feedId))
+                .where(feed.isDeleted.eq(false))
+                .groupBy(feed.feedId)
+                .orderBy(likeList.countDistinct().desc())
+                .offset(offset)
+                .limit(size)
+                .fetch();
+    }
+
+    @Override
+    public List<FeedDto> findFeedsWithoutLiked(String sortType) {
+        QFeed feed = QFeed.feed;
+        QComment comment = QComment.comment;
+        QLikeList likeList = QLikeList.likeList;
+        QUser user = QUser.user;
+
+        return jpaQueryFactory
+                .select(Projections.fields(FeedDto.class,
+                        feed.feedId,
+                        feed.content,
+                        feed.img1, feed.img2, feed.img3, feed.img4, feed.img5,
+                        feed.tag1, feed.tag2, feed.tag3, feed.tag4, feed.tag5,
+                        feed.isDeleted,
+                        user.userId,
+                        user.username.as("writerId"),
+                        user.profile.as("writerProfile"),
+                        user.userBadgeId.as("writerBadge"),
+                        comment.countDistinct().as("commentsCount"),
+                        likeList.countDistinct().as("likesCount")
+                ))
+                .from(feed)
+                .leftJoin(feed.user, user)
+                .leftJoin(comment).on(comment.feed.feedId.eq(feed.feedId))
+                .leftJoin(likeList).on(likeList.feed.feedId.eq(feed.feedId))
+                .where(feed.isDeleted.eq(false))
+                .groupBy(feed.feedId)
+                .orderBy(getSortOrder(sortType, comment, likeList, feed))
                 .fetch();
     }
 

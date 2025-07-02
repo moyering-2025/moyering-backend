@@ -2,6 +2,7 @@ package com.dev.moyering.socialing.service;
 
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
+import com.dev.moyering.socialing.dto.LikeListDto;
 import com.dev.moyering.socialing.entity.Comment;
 import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.socialing.entity.LikeList;
@@ -48,27 +49,57 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public List<FeedDto> getFeeds(String sortType, Integer userId) throws Exception {
-        List<FeedDto> feeds;
-        Set<Integer> likedSet = Collections.emptySet();
+//        List<FeedDto> feeds;
+//        Set<Integer> likedSet = Collections.emptySet();
+//
+//        if (userId != null) {
+//            feeds = feedRepository.findFeeds(sortType, userId);
+//            // 유저가 좋아요 누른 피드 ID 목록 조회
+//            List<Integer> likedIds = likeListRepository.findFeedIdsByUserId(userId);
+//            likedSet = new HashSet<>(likedIds);
+//        } else {
+//            // 로그인 안 되어 있으면 likedByUser 없는 단순 조회 쿼리 실행
+//            feeds = feedRepository.findFeedsWithoutLiked(); // ← 이 메서드를 새로 만듦
+//        }
+//        for (FeedDto feed : feeds) {
+//            long latestLikeCount = likeListRepository.countByFeedFeedId(feed.getFeedId());
+//            feed.setLikesCount(latestLikeCount);
+//
+//            // 로그인 한 경우에만 likedByUser 설정
+//            if (userId != null) {
+//                feed.setLikedByUser(likedSet.contains(feed.getFeedId()));
+//            } else {
+//                feed.setLikedByUser(false);
+//            }
+//        }
+//        return feeds;
+        List<FeedDto> feeds = feedRepository.findFeedsWithoutLiked(sortType);
 
         if (userId != null) {
-            feeds = feedRepository.findFeeds(sortType, userId);
-            // 유저가 좋아요 누른 피드 ID 목록 조회
-            List<Integer> likedIds = likeListRepository.findFeedIdsByUserId(userId);
-            likedSet = new HashSet<>(likedIds);
-        } else {
-            // 로그인 안 되어 있으면 likedByUser 없는 단순 조회 쿼리 실행
-            feeds = feedRepository.findFeedsWithoutLiked(); // ← 이 메서드를 새로 만듦
-        }
-        for (FeedDto feed : feeds) {
-            long latestLikeCount = likeListRepository.countByFeedFeedId(feed.getFeedId());
-            feed.setLikesCount(latestLikeCount);
+            // 로그인한 경우 좋아요한 피드 id 리스트를 가져와서
+            List<Integer> likedFeedIds = likeListRepository.findFeedIdsByUserId(userId);
+            Set<Integer> likedFeedIdSet = new HashSet<>(likedFeedIds);
 
-            // 로그인 한 경우에만 likedByUser 설정
-            if (userId != null) {
-                feed.setLikedByUser(likedSet.contains(feed.getFeedId()));
+            System.out.println("========== Feed List ==========");
+            for (FeedDto feed : feeds) {
+                System.out.println("feedId: " + feed.getFeedId());
+            }
+
+            System.out.println("========== Liked Feed Ids ==========");
+            System.out.println("▶▶ likedFeedIdSet = " + likedFeedIdSet);
+
+            // DTO에 likedByUser 설정
+            for (FeedDto feed : feeds) {
+                feed.setLikedByUser(likedFeedIdSet.contains(feed.getFeedId()));
+                System.out.println("▶ feedId=" + feed.getFeedId() + ", likedByUser=" + likedFeedIdSet.contains(feed.getFeedId()));
+            }
+        } else {
+            // 비로그인 사용자라면 likedByUser = false
+            for (FeedDto feed : feeds) {
+                feed.setLikedByUser(false);
             }
         }
+
         return feeds;
     }
 
@@ -152,6 +183,27 @@ public class FeedServiceImpl implements FeedService {
                 })
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public Map<String ,Object> getFeedsByUserId(Integer userId) throws Exception {
+        List<Feed> feedList = feedRepository.findByUserUserId(userId);
+        List<FeedDto> dtoList = new ArrayList<>();
+        List<LikeList> likeList = new ArrayList<>();
+        List<LikeListDto> likeListDtos = new ArrayList<>();
+
+        for (Feed feed : feedList) {
+            dtoList.add(feed.toDto());
+            likeList = likeListRepository.findByFeedFeedId(feed.getFeedId());
+        }
+        for(LikeList like : likeList){
+            likeListDtos.add(like.toDto());
+        }
+        Map<String ,Object> map = new HashMap<>();
+        map.put("likeList",likeListDtos);
+        map.put("feedList",dtoList);
+
+        return map;
     }
 
     @Override
@@ -248,7 +300,7 @@ public class FeedServiceImpl implements FeedService {
             for (MultipartFile img : images) {
                 if (img.isEmpty()) continue;
                 String orig = img.getOriginalFilename();
-                String fname = /*System.currentTimeMillis() + "_" +*/iuploadPath+ orig;
+                String fname = /*System.currentTimeMillis() + "_" +*/iuploadPath + orig;
                 Path target = dir.resolve(fname);
                 try {
                     Files.copy(img.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
@@ -280,6 +332,15 @@ public class FeedServiceImpl implements FeedService {
     @Override
     public boolean isLikedByUser(Integer feedId, Integer userId) {
         return likeListRepository.existsByFeedFeedIdAndUserUserId(feedId, userId);
+    }
+
+    @Override
+    public List<FeedDto> getPopularFeeds(Integer page, Integer size) throws Exception {
+        if (page == null || page < 0) page = 0;
+        if (size == null || size <= 0) size = 10;
+
+        int offset = page * size;
+        return feedRepository.findTopLikedFeeds(offset, size);
     }
 
 

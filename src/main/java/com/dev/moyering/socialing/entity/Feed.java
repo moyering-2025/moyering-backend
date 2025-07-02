@@ -80,6 +80,7 @@ public class Feed {
                .writerId(user.getNickName())
                .writerProfile(user.getProfile())
                .writerBadge(user.getUserBadgeId())
+               .writerUserId(user.getUserId())
                .build();
     }
 }

@@ -38,6 +38,8 @@ public class FeedDto {
     private Long commentsCount;
     private Long likesCount;
 
+    private Integer writerUserId;
+
     // 피드 상세 페이지용
     private LocalDateTime createdAt;
     private Boolean likedByUser;       // 로그인 유저가 좋아요 눌렀는지
@@ -62,9 +64,32 @@ public class FeedDto {
                 .tag4(tag4)
                 .tag5(tag5)
                 .isDeleted(false)
-                .user(User.builder().nickName(writerId).profile(writerProfile).userBadgeId(writerBadge).build())
+                .user(User.builder().nickName(writerId).profile(writerProfile).userBadgeId(writerBadge).userId(writerUserId).build())
                 .build();
         return entity;
+    }
+
+    public FeedDto(Integer feedId, String content, String img1, String img2, String img3, String img4, String img5,
+                   String tag1, String tag2, String tag3, String tag4, String tag5, boolean isDeleted,
+                   String writerId, String writerProfile, Integer writerBadge, LocalDateTime createdAt, Boolean likedByUser) {
+        this.feedId = feedId;
+        this.content = content;
+        this.img1 = img1;
+        this.img2 = img2;
+        this.img3 = img3;
+        this.img4 = img4;
+        this.img5 = img5;
+        this.tag1 = tag1;
+        this.tag2 = tag2;
+        this.tag3 = tag3;
+        this.tag4 = tag4;
+        this.tag5 = tag5;
+        this.isDeleted = isDeleted;
+        this.writerId = writerId;
+        this.writerProfile = writerProfile;
+        this.writerBadge = writerBadge;
+        this.createdAt = createdAt;
+        this.likedByUser = likedByUser;
     }
 }
 
