@@ -42,6 +42,8 @@ public class HostServiceImpl implements HostService {
 		entityManager.clear();
 		return hostId;
 	}
+	
+	
 
 	@Override
 	public Host findByUserId(Integer userId) throws Exception {

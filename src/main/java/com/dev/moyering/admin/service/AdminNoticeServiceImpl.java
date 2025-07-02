@@ -6,6 +6,9 @@ import com.dev.moyering.admin.repository.AdminNoticeRepository;
 import com.dev.moyering.admin.repository.AdminNoticeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -167,5 +170,11 @@ import org.springframework.transaction.annotation.Transactional;
         adminNoticeRepository.save(adminNotice);
         log.info (">>> 공지사항 표시 처리 완료 : noticeId = {}", noticeId);
     }
+
+	@Override
+	public List<AdminNotice> selectAllNotice() throws Exception {
+		List<AdminNotice> list = adminNoticeRepository.findAll();
+		return list;
+	}
 
 }
