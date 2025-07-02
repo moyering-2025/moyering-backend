@@ -26,7 +26,7 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public Page<Inquiry> findInquiriesByClassId(Integer classId, Pageable pageable) {
+	public Page<Inquiry> findInquiriesByClassId(Integer classId, Pageable pageable) throws Exception{
 		QInquiry inquiry = QInquiry.inquiry;
 		List<Inquiry> content = jpaQueryFactory.selectFrom(inquiry)
 				.where(inquiry.classCalendar.hostClass.classId.eq(classId)).orderBy(inquiry.inquiryDate.desc())

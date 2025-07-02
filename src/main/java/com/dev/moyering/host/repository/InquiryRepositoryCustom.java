@@ -7,7 +7,7 @@ import com.dev.moyering.host.dto.InquirySearchRequestDto;
 import com.dev.moyering.host.entity.Inquiry;
 
 public interface InquiryRepositoryCustom {
-	Page<Inquiry> findInquiriesByClassId(Integer classId, Pageable pageable);
+	Page<Inquiry> findInquiriesByClassId(Integer classId, Pageable pageable) throws Exception;
 	Page<Inquiry> searchInquiries(InquirySearchRequestDto dto, Pageable pageable) throws Exception;
 	
 }
