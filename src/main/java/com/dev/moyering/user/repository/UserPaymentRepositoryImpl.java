@@ -5,9 +5,12 @@ import com.dev.moyering.admin.dto.AdminPaymentSearchCond;
 import com.dev.moyering.user.entity.QUserPayment;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -16,6 +19,8 @@ import java.util.List;
 
 import static com.dev.moyering.admin.entity.QAdminCoupon.adminCoupon;
 import static com.dev.moyering.classring.entity.QUserCoupon.userCoupon;
+import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
+import static com.dev.moyering.host.entity.QClassRegist.classRegist;
 import static com.dev.moyering.host.entity.QHostClass.hostClass;
 import static com.dev.moyering.user.entity.QUser.user;
 
@@ -29,34 +34,40 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
     QUserPayment userPayment = QUserPayment.userPayment;
 
     /*** 관리자 페이지 > 결제 내역 조회 */
+    // JPA는 연관관계를 기준으로 경로를 따라가야 SQL을 제대로 만들 수 있음 => **중간 경로**가 빠져버리면 Hibernate는 무슨 객체인지 몰라서 아예 데이터를 못 가져옴 !
     @Override
-    public List<AdminPaymentDto> searchPaymentList(AdminPaymentSearchCond cond, Pageable pageable) {
-        return jpaQueryFactory
+    public Page<AdminPaymentDto> searchPaymentList(AdminPaymentSearchCond cond, Pageable pageable) {
+        List<AdminPaymentDto> content =  jpaQueryFactory
                 .select(Projections.constructor(AdminPaymentDto.class,
                         userPayment.paymentId, // 결제 id
                         userPayment.orderNo,  // 주문번호
-                        userPayment.classRegist.user.username, // 결제자 로그인 ID (studentId)
-                        userPayment.classCalendar.hostClass.name, //클래스명 (className)
-                        userPayment.classCalendar.hostClass.price, //클래스 금액 (classAmount)
-                        userPayment.userCoupon.adminCoupon.couponType, // 쿠폰 유형 (관리자, 호스트)
-                        userPayment.userCoupon.adminCoupon.discountType, // 쿠폰할인 타입 (금액, 비율)
-                        userPayment.userCoupon.adminCoupon.discount, //할인 금액 / 비율
-                        com.querydsl.core.types.dsl.Expressions.constant(0), // calculatedDiscountAmount 초기값
+                        user.username, // 결제자 로그인 ID (studentId)
+                        hostClass.name, //클래스명 (className)
+                        hostClass.price, //클래스 금액 (classAmount)
+                        adminCoupon.couponType, // 쿠폰 유형 (관리자, 호스트)
+                        adminCoupon.discountType, // 쿠폰할인 타입 (금액, 비율)
+                        adminCoupon.discount, //할인 금액 / 비율
+                        Expressions.constant(0), // calculatedDiscountAmount 초기값
                         userPayment.amount, // 총 결제금액 (totalAmount)
                         userPayment.paidAt, //결제일시 (LocalDateTime)
                         userPayment.paymentType, //결제타입 (카드, 간편결제)
                         userPayment.status // 상태 (결제완료, 취소됨)
                 ))
                 .from(userPayment)
-                .innerJoin(userPayment.classRegist.user, user)
-                .innerJoin(userPayment.classCalendar.hostClass, hostClass)
-                .leftJoin(userPayment.userCoupon, userCoupon) // 쿠폰은 선택사항이므로 leftJoin
+                .leftJoin(userPayment.classRegist, classRegist)
+                .leftJoin(classRegist.user, user)
+                .leftJoin(userPayment.classCalendar, classCalendar)
+                .leftJoin(classCalendar.hostClass, hostClass)
+                .leftJoin(userPayment.userCoupon, userCoupon)
                 .leftJoin(userCoupon.adminCoupon, adminCoupon)
                 .where(buildSearchConditions(cond))
                 .orderBy(userPayment.paidAt.desc())  // 결제 최신순 정렬
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        Long total = countPaymentList(cond);
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
@@ -64,8 +75,10 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
         return jpaQueryFactory
                 .select(userPayment.count())
                 .from(userPayment)
-                .innerJoin(userPayment.classRegist.user, user)
-                .innerJoin(userPayment.classCalendar.hostClass, hostClass)
+                .innerJoin(userPayment.classRegist, classRegist)
+                .innerJoin(classRegist.user, user)
+                .innerJoin(userPayment.classCalendar, classCalendar)
+                .innerJoin(classCalendar.hostClass, hostClass)
                 .leftJoin(userPayment.userCoupon, userCoupon)
                 .leftJoin(userCoupon.adminCoupon, adminCoupon)
                 .where(buildSearchConditions(cond))
