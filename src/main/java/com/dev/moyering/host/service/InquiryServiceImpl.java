@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
+import com.dev.moyering.host.dto.InquirySearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.Inquiry;
@@ -100,6 +101,12 @@ public class InquiryServiceImpl implements InquiryService {
 			inquiryDto.setState(1);
 		}
 		inquiryRepository.save(inquiryDto.toEntity());
+	}
+	@Override
+	public Page<InquiryDto> searchInquiries(InquirySearchRequestDto dto) throws Exception {
+		PageRequest pageable = PageRequest.of(dto.getPage(),dto.getSize());
+		Page<Inquiry> resultPage = inquiryRepository.searchInquiries(dto, pageable);
+		return resultPage.map(Inquiry::toDto);
 	}
 
 }

@@ -23,7 +23,7 @@ public class ClassLikesController {
 	
 	@PostMapping("/toggle-like")
     public ResponseEntity<Void> toggleLike(@RequestBody ClassLikesDto dto, @AuthenticationPrincipal PrincipalDetails principal) {
-        dto.setUserId(principal.getUser().getUserId());
+		dto.setUserId(principal.getUser().getUserId());
 		try {
 			classLikesService.toggleLike(dto);
 	        return ResponseEntity.ok().build();

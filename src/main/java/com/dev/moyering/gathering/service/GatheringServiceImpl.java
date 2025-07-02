@@ -23,7 +23,6 @@ import com.dev.moyering.common.repository.SubCategoryRepository;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
-import com.dev.moyering.gathering.repository.GatheringApplyRepository;
 import com.dev.moyering.gathering.repository.GatheringRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
@@ -43,8 +42,6 @@ public class GatheringServiceImpl implements GatheringService {
 	private String duploadPath;
 	@Autowired
 	public GatheringRepository gatheringRepository;
-	@Autowired
-	public GatheringApplyRepository gatheringApplyRepository;
 	@Autowired
 	private final UserRepository userRepository;
 	private final JPAQueryFactory jpaQueryFactory;
@@ -76,7 +73,7 @@ public class GatheringServiceImpl implements GatheringService {
 	public List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception {
 		// 내가 등록한 게더링 목록 + 페이지네이션, 제목으로 검색 
 		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
-		Long cnt = gatheringRepository.selectMyGatheringListCount(pageRequest, userId, word, status);
+		Long cnt = gatheringRepository.selectMyGatheringListCount(userId, word, status);
 		
 		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
 		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
@@ -87,7 +84,10 @@ public class GatheringServiceImpl implements GatheringService {
 		pageInfo.setEndPage(endPage);
 		return gatheringRepository.selectMyGatheringList(pageRequest, userId, word, status);
 	}
-	
+	@Override
+	public Integer selectMyGatheringListCount(Integer userId, String word, String status) throws Exception {
+		return gatheringRepository.selectMyGatheringListCount(userId, word, status).intValue();
+	}
 
 	@Override
 	public List<GatheringDto> myGatheringApplyList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception {
@@ -102,6 +102,11 @@ public class GatheringServiceImpl implements GatheringService {
 		return gathering.toDto();
 	}
 	
+	@Override
+	public void updateGatheringStatus(Integer gatheringId, Boolean canceled) throws Exception {
+		//주최자 시점 상태 변경 모임 취소 등.. 
+		gatheringRepository.updateGatheringStatus(gatheringId, canceled);
+	}
 	@Override
 	public List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception {
 		//메인페이지에 취향에 맞는 게더링 4개 가져오기
@@ -183,5 +188,10 @@ public class GatheringServiceImpl implements GatheringService {
 	            .totalPages((int) Math.ceil((double) total / dto.getSize()))
 	            .totalElements(total)
 	            .build();
-	}	
+	}
+	@Override
+	public List<GatheringDto> findGatheringWithCategory(Integer subCategoryId, Integer categoryId) throws Exception {
+		return gatheringRepository.findRecommendGatheringForUser(subCategoryId, categoryId);
+	}
+
 }

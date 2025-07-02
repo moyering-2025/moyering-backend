@@ -39,7 +39,10 @@ public class AdminCoupon {
 
     @Column(nullable = false)
     private LocalDateTime createdAt; // 생성일
-
+    
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    private Integer usedCount; //사용량
+    
 
 
      // PAYMENT구현 끝나고 usedCount 추가
@@ -57,6 +60,7 @@ public class AdminCoupon {
         this.validFrom = validFrom;
         this.validUntil = validUntil;
         this.createdAt = createdAt;
+        this.usedCount = usedCount;
     }
 
     // Entity -> DTO 변환
@@ -71,6 +75,7 @@ public class AdminCoupon {
                 .validFrom(this.validFrom)
                 .validUntil(this.validUntil)
                 .createdAt(this.createdAt)
+                .usedCount(this.usedCount)
                 .build();
     }
 
@@ -81,4 +86,13 @@ public class AdminCoupon {
             this.createdAt = LocalDateTime.now();
         }
     }
+    
+    //쿠폰 사용 시 매수 차감
+    public void incrementUsedCount() {
+    	if (this.usedCount == null) {
+            this.usedCount = 1;
+        } else {
+            this.usedCount++;
+        }
+	}
 }

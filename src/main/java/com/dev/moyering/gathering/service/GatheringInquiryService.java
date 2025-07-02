@@ -12,7 +12,11 @@ public interface GatheringInquiryService {
 	Integer writeGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception;
 	List<GatheringInquiryDto> gatheringInquiryListBygatheringId(Integer gatheringId) throws Exception;
 	void responseToGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception;
+	Integer findInquirieCntReceivedByOrganizer(Integer loginId, Date startDate, Date endDate,
+			Boolean isAnswered) throws Exception;
 	List<GatheringInquiryDto> findInquiriesReceivedByOrganizer(PageInfo pageInfo, Integer loginId, Date startDate, Date endDate,
+			Boolean isAnswered) throws Exception;
+	Integer findInquirieCntSentByUser(Integer loginId, Date startDate, Date endDate,
 			Boolean isAnswered) throws Exception;
 	List<GatheringInquiryDto> findInquiriesSentByUser(PageInfo pageInfo, Integer loginId, Date startDate, Date endDate,
 			Boolean isAnswered) throws Exception;

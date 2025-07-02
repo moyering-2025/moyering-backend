@@ -51,6 +51,7 @@ public class HostClassDto {
    private Integer calendarId;
    private String category1;
    private String category2;
+   private Integer categoryId;
    
    private MultipartFile img1;
    private MultipartFile img2;

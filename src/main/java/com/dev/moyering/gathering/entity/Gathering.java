@@ -106,8 +106,8 @@ public class Gathering {
     @Column()
     private String intrOnln;//한줄 소개
 
-    @Column(columnDefinition = "TINYINT")
-	@ColumnDefault("0")
+    @Column(columnDefinition = "TINYINT DEFAULT 0")
+	@ColumnDefault("false")
     private Boolean canceled; //true : 취소됨 / false : 취소 안 됨. 
     
     public GatheringDto toDto() {
