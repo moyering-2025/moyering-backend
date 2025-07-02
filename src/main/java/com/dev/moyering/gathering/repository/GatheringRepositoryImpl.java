@@ -51,6 +51,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	            .fetchOne();
 	    return count != null ? count : 0L;
 	}
+	@Override
 	public List<GatheringDto> selectMyGatheringList(PageRequest pageRequest, Integer loginId, String word, String status){	
 	    QGathering gathering = QGathering.gathering;
 	    List<Gathering> gatheringList = null;
@@ -149,7 +150,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		clause.execute();
 	}
 	@Override
-
+	@Transactional
 	public void updateGatheringStatus(Integer gatheringId, Boolean canceled) throws Exception{
 		QGathering gathering = QGathering.gathering;
 		JPAUpdateClause clause = jpaQueryFactory.update(gathering)
