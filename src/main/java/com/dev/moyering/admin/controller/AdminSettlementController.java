@@ -51,9 +51,7 @@ public class AdminSettlementController {
         }
     }
 
-    /**
-     * 정산 내역 단건 조회
-     */
+    /*** 정산 내역 단건 조회*/
     @GetMapping("/{settlementId}")
     public ResponseEntity<Map<String, Object>> getSettlementDetail(
             @PathVariable Integer settlementId) {
@@ -88,10 +86,8 @@ public class AdminSettlementController {
 
     // ========== 정산 대기 목록 관리 ==========
 
-    /**
-     * 정산 대기 목록 조회
-     * 조건: 결제완료 + 클래스종료 + 미정산
-     */
+    /*** 정산 대기 목록 조회
+     * 조건: 결제완료 + 클래스종료 + 미정산*/
     @GetMapping("/pending")
     public ResponseEntity<Map<String, Object>> getPendingSettlements(
             @RequestParam(required = false) String searchKeyword,
