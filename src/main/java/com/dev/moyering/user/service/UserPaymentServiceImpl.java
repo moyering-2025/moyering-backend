@@ -28,7 +28,7 @@ public class UserPaymentServiceImpl implements UserPaymentService {
         log.debug("결제 내역 조회 시작 - 조건: {}, 페이지: {}", cond, pageable);
 
         // 1. Repository에서 원본 데이터 조회
-        List<AdminPaymentDto> paymentList = userPaymentRepository.searchPaymentList(cond, pageable);
+        Page <AdminPaymentDto> paymentList = userPaymentRepository.searchPaymentList(cond, pageable);
         Long totalCount = userPaymentRepository.countPaymentList(cond); // 목록 개수 조회
 
         // 2. 서비스에서 할인 금액 계산 로직 처리
