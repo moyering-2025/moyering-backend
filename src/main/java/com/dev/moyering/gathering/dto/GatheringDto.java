@@ -60,6 +60,9 @@ public class GatheringDto {
     private String status;
     private Boolean canceled; 
     
+    private Integer acceptedCount;
+    private Integer appliedCount;
+    
     public Gathering toEntity() {
    	 Gathering.GatheringBuilder builder = Gathering.builder()
     			.gatheringId(gatheringId)

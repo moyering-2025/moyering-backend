@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -85,7 +86,9 @@ public class GatheringController {
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
 			List<GatheringApplyDto> member = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
 			List<GatheringDto> recommendations = gatheringService.findGatheringWithCategory(nGatheringDto.getSubCategoryId(), nGatheringDto.getCategoryId());
-			
+
+	        Integer acceptedCount = gatheringApplyService.findApprovedUserCountByGatheringId(gatheringId);
+	        nGatheringDto.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);
 			userDto.setPassword(null);
 			res.put("organizer", userDto);
 			res.put("member", member);
@@ -161,11 +164,12 @@ public class GatheringController {
 	
 	@PostMapping("/user/cancelGathering/{gatheringId}")
 	public ResponseEntity<Boolean> cancelGathering(@AuthenticationPrincipal PrincipalDetails principal, 
-			@RequestParam Integer gatheringId){
+			@PathVariable Integer gatheringId){
 		try {
 			Integer userId = principal.getUser().getUserId();
 			System.out.println("로그인 유저 : "+ userId);
-			
+			System.out.println("gatheringId : "+gatheringId);
+			gatheringService.updateGatheringStatus(gatheringId, true);
             return new ResponseEntity<>(HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -174,11 +178,11 @@ public class GatheringController {
 	}
 	@PostMapping("/user/myGatheringList")
 	public ResponseEntity<Map<String, Object>> myGatheringList(@AuthenticationPrincipal PrincipalDetails principal, 
-			@RequestBody(required=false) Map<String,String> param){
+			@RequestBody(required=false) Map<String, String> param){
 		try {
 			Integer userId = principal.getUser().getUserId();
-			System.out.println("로그인 유저 : "+ userId);
-			System.out.println("param : "+param);
+//			System.out.println("로그인 유저 : "+ userId);
+//			System.out.println("param : "+param);
 			String word = null;	
 			PageInfo pageInfo = new PageInfo(1);
 			String status = null;

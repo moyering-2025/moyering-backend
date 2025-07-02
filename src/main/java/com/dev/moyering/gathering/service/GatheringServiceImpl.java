@@ -23,6 +23,7 @@ import com.dev.moyering.common.repository.SubCategoryRepository;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
+import com.dev.moyering.gathering.repository.GatheringApplyRepository;
 import com.dev.moyering.gathering.repository.GatheringRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
@@ -43,10 +44,11 @@ public class GatheringServiceImpl implements GatheringService {
 	@Autowired
 	public GatheringRepository gatheringRepository;
 	@Autowired
+	public GatheringApplyRepository gatheringApplyRepository;
+	@Autowired
 	private final UserRepository userRepository;
 	private final JPAQueryFactory jpaQueryFactory;
 	
-	@Override
 	public Integer writeGathering(GatheringDto gatheringDto, MultipartFile thumbnail) throws Exception {
 		// 게더링 등록
 		if(thumbnail!=null && !thumbnail.isEmpty()) {
@@ -71,18 +73,36 @@ public class GatheringServiceImpl implements GatheringService {
 	
 	@Override
 	public List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception {
-		// 내가 등록한 게더링 목록 + 페이지네이션, 제목으로 검색 
-		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
-		Long cnt = gatheringRepository.selectMyGatheringListCount(userId, word, status);
-		
-		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
-		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
-		Integer endPage = Math.min(startPage+10-1, allPage);
-		
-		pageInfo.setAllPage(allPage);
-		pageInfo.setStartPage(startPage);
-		pageInfo.setEndPage(endPage);
-		return gatheringRepository.selectMyGatheringList(pageRequest, userId, word, status);
+	    // 내가 등록한 게더링 목록 + 페이지네이션, 제목으로 검색 
+	    PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+	    Long cnt = gatheringRepository.selectMyGatheringListCount(userId, word, status);
+	    
+	    Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
+	    Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
+	    Integer endPage = Math.min(startPage+10-1, allPage);
+	    
+	    pageInfo.setAllPage(allPage);
+	    pageInfo.setStartPage(startPage);
+	    pageInfo.setEndPage(endPage);
+	    
+	    // 1. 기본 게더링 목록 조회
+	    List<GatheringDto> gatheringList = gatheringRepository.selectMyGatheringList(pageRequest, userId, word, status);
+	    
+	    // 2. 각 게더링별 참여 인원수 정보 추가
+	    for (GatheringDto gathering : gatheringList) {
+	        Integer gatheringId = gathering.getGatheringId();
+	        
+	        // 참여 수락된 인원수 조회
+	        Integer acceptedCount = gatheringApplyRepository.findApprovedUserCountByGatheringId(gatheringId);
+	        // 전체 참여신청 인원수 조회  
+	        Integer appliedCount = gatheringApplyRepository.findApplyUserCountByGatheringId(gatheringId);
+	        
+	        // DTO에 값 설정
+	        gathering.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);
+	        gathering.setAppliedCount(appliedCount != null ? appliedCount : 0);
+	    }
+	    
+	    return gatheringList;
 	}
 	@Override
 	public Integer selectMyGatheringListCount(Integer userId, String word, String status) throws Exception {
