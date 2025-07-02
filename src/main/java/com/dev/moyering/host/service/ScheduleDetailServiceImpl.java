@@ -1,14 +1,16 @@
 package com.dev.moyering.host.service;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dev.moyering.host.dto.ScheduleDetailDto;
+import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.ScheduleDetail;
+import com.dev.moyering.host.repository.HostClassRepository;
 import com.dev.moyering.host.repository.ScheduleDetailRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +20,8 @@ public class ScheduleDetailServiceImpl implements ScheduleDetailService {
 
 	@Autowired
 	private ScheduleDetailRepository scheduleDetailRespository;
+	@Autowired
+	private HostClassRepository hostClassRepository;
 
 	@Override
 	public void registScheduleDetail(String scheduleDetail, Integer classId) throws Exception {
@@ -34,7 +38,13 @@ public class ScheduleDetailServiceImpl implements ScheduleDetailService {
 		for (ScheduleDetail schedule : scheduleList) {
 			scheduleDetailRespository.save(schedule);
 		}
-
+		
+		
+		
+		HostClass hostClass = hostClassRepository.findByClassId(classId);
+		hostClass.setScheduleStart(LocalTime.parse(scheduleDetails.get(0).getStartTime()));
+		hostClass.setScheduleEnd(LocalTime.parse(scheduleDetails.get(scheduleDetails.size()-1).getEndTime()));
+		hostClassRepository.save(hostClass);
 	}
 
 	@Override
