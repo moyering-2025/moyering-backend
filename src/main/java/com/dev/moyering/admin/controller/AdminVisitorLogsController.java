@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-
-@RestController
-@RequestMapping("/api")
-@RequiredArgsConstructor
-public class AdminVisitorLogsController {
-
+//
+//@RestController
+//@RequestMapping("/api")
+//@RequiredArgsConstructor
+//public class AdminVisitorLogsController {
+//
 //    private final AdminVisitorLogsService visitorLogsService; // 인터페이스로 주입!
-
-    /**
-     * 메인 페이지 (방문 기록)
-     */
+//
+//    /**
+//     * 메인 페이지 (방문 기록)
+//     */
 //    @GetMapping("/")
 //    public ResponseEntity<String> home(HttpServletRequest request) {
 //        // 방문 기록
@@ -44,4 +44,4 @@ public class AdminVisitorLogsController {
 //        long count = visitorLogsService.getMonthlyVisitorCount();
 //        return ResponseEntity.ok(count);
 //    }
-}
+//}

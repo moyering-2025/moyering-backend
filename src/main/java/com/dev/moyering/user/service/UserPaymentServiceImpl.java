@@ -80,7 +80,7 @@ public class UserPaymentServiceImpl implements UserPaymentService {
         }
         adminPaymentDto.setCalculatedDiscountAmount(calculatedDiscountAmount);
         log.debug("최종 할인금액 계산 완료 - 주문번호: {}, 원래값: {}, 계산된값: {}, 최종값: {}",
-                adminPaymentDto.getOrderNo(), couponDiscountValue, calculatedDiscountAmount);
+                adminPaymentDto.getOrderNo(), couponDiscountValue, calculatedDiscountAmount, adminPaymentDto.getDiscountAmount());
         return adminPaymentDto;
 
     }

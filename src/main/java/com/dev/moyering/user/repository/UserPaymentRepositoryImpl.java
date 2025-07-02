@@ -11,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
-
-import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.dev.moyering.admin.entity.QAdminCoupon.adminCoupon;
@@ -87,7 +84,7 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
     /*** 키워드 검색 - 주문번호, 수강생ID, 클래스명 포함 검색*/
     private BooleanExpression containsKeyword(String keyword) {
         if (!StringUtils.hasText(keyword)) {
-            return null;
+            return null; // 키워드 없으면 전체 조회
         }
 
         String trimmedKeyword = keyword.trim();

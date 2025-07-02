@@ -59,7 +59,7 @@ public class AlarmServiceImpl implements AlarmService {
 	}
 	@Override
 	public List<AlarmDto> getAlarmList(Integer loginId) throws Exception {
-		List<Alarm> alarmList = alarmRepository.findByReceiverIdAndConfirmFalse(loginId);
+		List<Alarm> alarmList = alarmRepository.findByReceiverIdAndConfirmFalseOrderByAlarmIdDesc(loginId);
 		return alarmList.stream().map(alarm->AlarmDto.builder()
 									.alarmId(alarm.getAlarmId())
 									.receiverId(loginId)

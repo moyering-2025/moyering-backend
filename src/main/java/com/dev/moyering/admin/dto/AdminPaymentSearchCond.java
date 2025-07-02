@@ -21,7 +21,7 @@ public class AdminPaymentSearchCond {
         this.status = status;
     }
 
-    // 안전한 LocalDate 변환 메서드들
+    // LocalDate 변환 메서드들 (날짜 필터링 계산)
     public LocalDate getFromLocalDate() {
         return fromDate != null ? fromDate.toLocalDate() : null;
     }

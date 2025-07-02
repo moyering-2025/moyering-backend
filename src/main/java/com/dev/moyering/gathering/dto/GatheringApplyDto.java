@@ -34,6 +34,7 @@ public class GatheringApplyDto {
     private String locName;
     private Integer minAttendees;
     private Integer maxAttendees;
+    private Integer currentAttendees;
     
     private Timestamp applyDeadline;
 //    private String preparationItems;
@@ -48,6 +49,7 @@ public class GatheringApplyDto {
     private Date applyDate;   
     private Boolean isApprove;
     private String aspiration;
+    private Integer acceptedCount;
     
     public GatheringApply toEntity() {
     	return GatheringApply.builder()
@@ -59,4 +61,18 @@ public class GatheringApplyDto {
     			.aspiration(aspiration)
     			.build();
     }
+
+	public GatheringApplyDto(Integer gatheringApplyId, Integer gatheringId, Integer userId, String nickName,
+			String profile, String intro, Date applyDate, Boolean isApprove, String aspiration) {
+		super();
+		this.gatheringApplyId = gatheringApplyId;
+		this.gatheringId = gatheringId;
+		this.userId = userId;
+		this.nickName = nickName;
+		this.profile = profile;
+		this.intro = intro;
+		this.applyDate = applyDate;
+		this.isApprove = isApprove;
+		this.aspiration = aspiration;
+	}
 }

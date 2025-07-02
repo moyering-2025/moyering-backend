@@ -62,24 +62,72 @@ public class GatheringApplyController {
 		}
 	}
 	
-	@PostMapping("/user/updateMemberApproval")
-	public ResponseEntity<Boolean> updateMemberApproval(@AuthenticationPrincipal PrincipalDetails principal,
-			@ModelAttribute GatheringApplyDto gatheringApplyDto) {
+	@PostMapping("/updateApproval")
+	public ResponseEntity<Boolean> updateApproval(
+				    @RequestParam(value = "applyId") int applyId,
+				    @RequestParam(value = "isApprove") boolean isApprove){
 		try {
-			gatheringApplyService.updateGatheringApplyApproval(gatheringApplyDto.getGatheringApplyId(), gatheringApplyDto.getIsApprove());
+			gatheringApplyService.updateGatheringApplyApproval(applyId, isApprove);
 			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	@GetMapping("/user/myApplyList")
-	public ResponseEntity<List<GatheringApplyDto>> getMyApplyList(@AuthenticationPrincipal PrincipalDetails principal,
-			@ModelAttribute GatheringApplyDto gatheringApplyDto) {
+	@PostMapping("/user/cancelGatheringApply")
+	public ResponseEntity<Boolean> cancelGatheringApply(
+				    @RequestParam(value = "applyId") int applyId){
 		try {
+			gatheringApplyService.cancelGatheringApply(applyId);
+			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	@PostMapping("/user/myApplyList")
+	public ResponseEntity<Map<String, Object>> getMyApplyList(@AuthenticationPrincipal PrincipalDetails principal,
+			@RequestBody(required = false) Map<String, String> param) {
+		try {
+			Integer userId = principal.getUser().getUserId();	
+			System.out.println("로그인 유저 : "+ userId);
+			System.out.println("param : "+param);
+			String word = null;	
+			PageInfo pageInfo = new PageInfo(1);
+			String status = null;
+			if(param != null) {
+				if(param.get("page")!=null) {
+					pageInfo.setCurPage(Integer.parseInt(param.get("page")));
+				}
+				word = param.get("word");
+                status = param.get("status");
+                if ("전체".equals(status)) {
+                    status = null; // 전체인 경우 null로 처리
+                }
+			}
+			Integer allCnt = 0, undefinedCnt = 0, approvedCnt = 0, canceledCnt = 0;
+			allCnt = gatheringApplyService.selectMyApplyListCount(userId, word, "전체");
+			undefinedCnt = gatheringApplyService.selectMyApplyListCount(userId, word, "대기중");
+			approvedCnt = gatheringApplyService.selectMyApplyListCount(userId, word, "수락됨");
+			canceledCnt = gatheringApplyService.selectMyApplyListCount(userId, word, "거절됨");
+			
 			List<GatheringApplyDto> applyList = null;
-			applyList = gatheringApplyService.findApplyListByApplyUserId(principal.getUser().getUserId());
-			return new ResponseEntity<>(applyList, HttpStatus.OK);
+			
+					Map<String, Object> response = new HashMap<>();
+			if(allCnt > 0) {
+				applyList = gatheringApplyService.findApplyListByApplyUserId(userId, pageInfo, word, status);
+				response.put("list", applyList);				
+				response.put("pageInfo", pageInfo);
+			} else {
+				response.put("list", "조회된 리스트 없음");
+			}
+			response.put("allCnt", allCnt);
+			response.put("undefinedCnt", undefinedCnt);
+			response.put("inProgressCnt", approvedCnt);
+			response.put("canceledCnt", canceledCnt);
+            
+			return new ResponseEntity<>(response, HttpStatus.OK);
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -88,7 +136,6 @@ public class GatheringApplyController {
 
 	@GetMapping("/getApplyListByGatheringId/{gatheringId}")
 	public ResponseEntity<List<GatheringApplyDto>> getApplyListOfGatheringForOrganizer(@PathVariable("gatheringId") Integer gatheringId) {
-		
 		try {
 			List<GatheringApplyDto> findApplyUserList = null;
 			findApplyUserList = gatheringApplyService.findApplyUserListByGatheringIdForOrganizer(gatheringId);

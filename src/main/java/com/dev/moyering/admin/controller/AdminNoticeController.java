@@ -22,9 +22,7 @@ public class AdminNoticeController {
 
     private final AdminNoticeServiceImpl noticeService;
 
-    /**
-     * 공지사항 등록
-     */
+    /*** 공지사항 등록*/
     @PostMapping
     public ResponseEntity<AdminNoticeDto> createNotice(@RequestBody AdminNoticeDto noticeDto) {
         log.info("공지사항 등록 요청: {}", noticeDto.getTitle());
@@ -38,9 +36,7 @@ public class AdminNoticeController {
         }
     }
 
-    /**
-     * 공지사항 수정
-     */
+    /*** 공지사항 수정*/
     @PutMapping("/{noticeId}")
     public ResponseEntity<AdminNoticeDto> updateNotice(
             @PathVariable Integer noticeId,
@@ -67,9 +63,7 @@ public class AdminNoticeController {
         }
     }
 
-    /**
-     * 공지사항 삭제
-     */
+    /*** 공지사항 삭제*/
     @DeleteMapping("/{noticeId}")
     public ResponseEntity<Void> deleteNotice(@PathVariable Integer noticeId) {
         log.info("공지사항 삭제 요청: {}", noticeId);
@@ -87,9 +81,7 @@ public class AdminNoticeController {
 
 
 
-    /**
-     * 공지사항 숨가가
-     */
+    /*** 공지사항 숨가가*/
     @PatchMapping("/{noticeId}/hide")
     public ResponseEntity<AdminNoticeDto> hideNotice(@PathVariable Integer noticeId) {
         try {
@@ -104,9 +96,7 @@ public class AdminNoticeController {
         }
     }
 
-    /**
-     * 공지사항 보이기
-     */
+    /*** 공지사항 보이기*/
     @PatchMapping("/{noticeId}/show")
     public ResponseEntity<AdminNoticeDto> showNotice(@PathVariable Integer noticeId) {
         try {
@@ -122,9 +112,7 @@ public class AdminNoticeController {
     }
 
 
-    /**
-     * 공지사항 목록 조회 (검색 + 페이징)
-     */
+    /*** 공지사항 목록 조회 (검색 + 페이징)*/
     @GetMapping
     public ResponseEntity<Page<AdminNoticeDto>> getNoticeList(
             @RequestParam(required = false) String keyword,
@@ -141,9 +129,7 @@ public class AdminNoticeController {
         }
     }
 
-    /**
-     * 공지사항 핀 상태 변경
-     */
+    /*** 공지사항 핀 상태 변경*/
     @PatchMapping("/{noticeId}/pin")
     public ResponseEntity<AdminNoticeDto> changePinStatus(
             @PathVariable Integer noticeId,
@@ -163,9 +149,7 @@ public class AdminNoticeController {
         }
     }
 
-    /**
-     * 공지사항 단건 조회
-     */
+    /*** 공지사항 단건 조회*/
     @GetMapping("/{noticeId}")
     public ResponseEntity<AdminNoticeDto> getNotice(@PathVariable Integer noticeId) {
         log.info("공지사항 단건 조회 요청: noticeId={}", noticeId);
