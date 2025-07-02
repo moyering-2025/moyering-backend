@@ -64,4 +64,9 @@ public class ClassCalendar {
 	public void incrementRegisteredCount() {
 		this.registeredCount++;
 	}
+	//강의의 상태 변경
+	public void changeStatus(String status) {
+		this.status=status;
+	}
+	
 }

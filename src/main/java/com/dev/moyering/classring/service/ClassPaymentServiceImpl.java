@@ -10,6 +10,7 @@ import com.dev.moyering.admin.entity.AdminCoupon;
 import com.dev.moyering.admin.repository.AdminCouponRepository;
 import com.dev.moyering.classring.dto.ClassPaymentResponseDto;
 import com.dev.moyering.classring.dto.PaymentApproveRequestDto;
+import com.dev.moyering.classring.dto.PaymentInitRequestDto;
 import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.classring.repository.UserCouponRepository;
@@ -86,19 +87,13 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
         regist = classRegistRepository.save(regist);
         
         // 2. 결제 정보 저장 (payment)
-        UserPayment payment = UserPayment.builder()
-            .amount(dto.getAmount())
-            .orderNo(dto.getOrderNo())
-            .paidAt(LocalDateTime.now())
-            .paymentType(dto.getPaymentType())
-            .status("결제완료")
-            .classCalendar(ClassCalendar.builder().calendarId(dto.getCalendarId()).build())
-            .classRegist(regist)
-            .userCoupon(
-                dto.getUserCouponId() != null ?
-                UserCoupon.builder().ucId(dto.getUserCouponId()).build() : null
-            )
-            .build();
+        UserPayment payment = userPaymentRepository.findByOrderNo(dto.getOrderNo())
+                .orElseThrow(() -> new Exception("해당 주문번호의 결제 정보가 존재하지 않습니다."));
+        
+        if (!payment.getAmount().equals(dto.getAmount())) {
+            throw new IllegalStateException("결제 금액이 일치하지 않습니다.");
+        }
+        payment.approve(regist, LocalDateTime.now()); 
         userPaymentRepository.save(payment);
 
         //3. 쿠폰 사용처리
@@ -124,9 +119,35 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
         //4. 수강생 수 업데이트
         cc.incrementRegisteredCount();
         classCalendarRepository.save(cc);
-        
-        
-        		
+        //5. 강의 상태 업데이트
+        if (cc.getHostClass().getRecruitMax().equals(cc.getRegisteredCount())) {
+        	cc.changeStatus("모집마감");
+            classCalendarRepository.save(cc);
+        }        		
 	}
-	
+
+
+	@Override
+	public void initPayment(PaymentInitRequestDto dto, User user) throws Exception {
+	    ClassCalendar calendar = classCalendarRepository.findById(dto.getCalendarId())
+	            .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다."));
+	    if (userPaymentRepository.existsByOrderNo(dto.getOrderNo())) {
+	        throw new IllegalStateException("이미 존재하는 주문번호입니다.");
+	    }
+
+	    // 사전 결제 정보 저장 (status = "결제대기")
+	    UserPayment payment = UserPayment.builder()
+	            .orderNo(dto.getOrderNo())
+	            .amount(dto.getAmount())
+	            .paidAt(null) // 아직 결제 안 했으니 null
+	            .paymentType(dto.getPaymentType())
+	            .status("결제대기")
+	            .classCalendar(calendar)
+	            .userCoupon(dto.getUserCouponId() != null
+	                ? UserCoupon.builder().ucId(dto.getUserCouponId()).build()
+	                : null)
+	            .build();
+
+	    userPaymentRepository.save(payment);		
+	}	
 }
