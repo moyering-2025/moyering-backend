@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ClassRegistDto {
-    private Integer sudentId;
+    private Integer studentId;
     private Integer attCount;
     private Integer userId;
     private Integer calendarId;

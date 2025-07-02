@@ -43,7 +43,7 @@ public class ClassCoupon {
     private LocalDateTime validFrom; //쿠폰 시작일
     @Column
     private LocalDateTime validUntil; //쿠폰 종료일
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer usedCnt; // 사용량
     @Column(nullable = false)
     private String discountType; //할인 유형 =>비율할인 : RT, 정액할인 ; AMT
@@ -70,4 +70,12 @@ public class ClassCoupon {
     	}
     	return dto;
     }
+
+	public void incrementUsedCount() {
+    	if (this.usedCnt == null) {
+            this.usedCnt = 1;
+        } else {
+            this.usedCnt++;
+        }		
+	}
 }

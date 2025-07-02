@@ -103,6 +103,11 @@ public class GatheringServiceImpl implements GatheringService {
 	}
 	
 	@Override
+	public void updateGatheringStatus(Integer gatheringId, Boolean canceled) throws Exception {
+		//주최자 시점 상태 변경 모임 취소 등.. 
+		gatheringRepository.updateGatheringStatus(gatheringId, canceled);
+	}
+	@Override
 	public List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception {
 		//메인페이지에 취향에 맞는 게더링 4개 가져오기
 		List<Gathering> gathers;

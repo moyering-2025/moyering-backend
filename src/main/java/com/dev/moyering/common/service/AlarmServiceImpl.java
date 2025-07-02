@@ -1,8 +1,9 @@
 package com.dev.moyering.common.service;
 
+import java.sql.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -40,10 +41,11 @@ public class AlarmServiceImpl implements AlarmService {
 	}
 
 	@Override
-	public List<AlarmDto> findAlarmListByReceiverUserId(PageInfo pageInfo, Map<String, Object> param) throws Exception {
+	public List<AlarmDto> findAlarmListByReceiverUserId(PageInfo pageInfo, Integer loginId, Integer alarmType,
+			Date startDate, Date endDate, Boolean isConfirmed) throws Exception {
 
 		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
-		Long cnt = alarmRepository.countAlarmsByReceiverUserId(param);
+		Long cnt = countAlarmsByReceiverUserId(loginId, alarmType, startDate, endDate, isConfirmed);
 
 		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
 		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
@@ -53,16 +55,32 @@ public class AlarmServiceImpl implements AlarmService {
 		pageInfo.setStartPage(startPage);
 		pageInfo.setEndPage(endPage);
 
-		return alarmRepository.findAlarmListByReceiverUserId(pageRequest, param);
+		return alarmRepository.findAlarmListByReceiverUserId(pageRequest, loginId, alarmType, startDate, endDate, isConfirmed);
 	}
-
+	@Override
+	public List<AlarmDto> getAlarmList(Integer loginId) throws Exception {
+		List<Alarm> alarmList = alarmRepository.findByReceiverIdAndConfirmFalse(loginId);
+		return alarmList.stream().map(alarm->AlarmDto.builder()
+									.alarmId(alarm.getAlarmId())
+									.receiverId(loginId)
+									.senderId(alarm.getSenderId())
+									.senderNickname(alarm.getSenderNickname())
+									.title(alarm.getTitle())
+									.content(alarm.getContent()).build())
+								    .collect(Collectors.toList());
+		
+	}
+	@Override
+	public Long countAlarmsByReceiverUserId(Integer loginId, Integer alarmType, Date startDate, Date endDate, Boolean isConfirmed) throws Exception {
+		return alarmRepository.countAlarmsByReceiverUserId(loginId, alarmType, startDate, endDate, isConfirmed);
+	}
 	@Override
 	public Boolean sendAlarm(AlarmDto alarmDto) throws Exception {
 		System.out.println(alarmDto);
 		  //'1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
 
-		//1. username로 fcmToken 가져오기
-		Optional<User> ouser = userRepository.findById(alarmDto.getReceiverUserId());
+		//1. userId로 fcmToken 가져오기
+		Optional<User> ouser = userRepository.findById(alarmDto.getReceiverId());
 		if(ouser.isEmpty()) {
 			System.out.println("사용자 오류");
 			return false;
@@ -72,29 +90,24 @@ public class AlarmServiceImpl implements AlarmService {
 			System.out.println("FCM Token 오류");
 			return false;
 		}
-		//2. AlarmTable에 저장
-		Alarm alarm =  Alarm.builder().receiver(User.builder().userId(alarmDto.getReceiverUserId()).build())
-			.sender(User.builder().userId(alarmDto.getSenderUserId()).build())
-			.senderNickName(alarmDto.getSenderUserNickName())
+		//2. Alarm 저장
+		Alarm alarm =  Alarm.builder().receiverId(alarmDto.getReceiverId())
+			.alarmType(alarmDto.getAlarmType())
+			.senderId(alarmDto.getSenderId())
+			.senderNickname(alarmDto.getSenderNickname())
 			.title(alarmDto.getTitle())
 			.content(alarmDto.getContent())
 			.confirm(false).build();
 			alarmRepository.save(alarm);
 
-		//3. FCM 메시지 전송
-//		Notification notification = Notification.builder()
-//				.setTitle(alarm.getAlarmId()+"_"+alarmDto.getTitle())
-//				.setBody(alarmDto.getContent())
-//				.build();
 
 		Message message = Message.builder()
 				.setToken(fcmToken)
-//						.setNotification(notification)
-				.putData("num", alarmDto.getAlarmId()+"")
+//				.setNotification(notification)
+				.putData("alarmId", alarm.getAlarmId()+"")
 				.putData("title", alarmDto.getTitle())
-				.putData("body", alarmDto.getContent())
-				.putData("sender", alarmDto.getSenderUserNickName())
-				.putData("receiver", ouser.get().getNickName())
+				.putData("content", alarmDto.getContent())
+				.putData("sender", alarmDto.getSenderNickname())
 				.build();
 
 			try {

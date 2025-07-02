@@ -1,22 +1,33 @@
 package com.dev.moyering.classring.service;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.dev.moyering.admin.entity.AdminCoupon;
+import com.dev.moyering.admin.repository.AdminCouponRepository;
 import com.dev.moyering.classring.dto.ClassPaymentResponseDto;
+import com.dev.moyering.classring.dto.PaymentApproveRequestDto;
+import com.dev.moyering.classring.dto.PaymentInitRequestDto;
 import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.classring.repository.UserCouponRepository;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostDto;
+import com.dev.moyering.host.entity.ClassCalendar;
+import com.dev.moyering.host.entity.ClassCoupon;
+import com.dev.moyering.host.entity.ClassRegist;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
+import com.dev.moyering.host.repository.ClassCouponRepository;
+import com.dev.moyering.host.repository.ClassRegistRepository;
 import com.dev.moyering.host.repository.HostClassRepository;
 import com.dev.moyering.host.repository.HostRepository;
 import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.entity.UserPayment;
+import com.dev.moyering.user.repository.UserPaymentRepository;
 import com.dev.moyering.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +40,10 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
     private final UserCouponRepository userCouponRepository;
     private final ClassCalendarRepository classCalendarRepository;
     private final HostRepository hostRepository;
+    private final ClassRegistRepository classRegistRepository;
+    private final UserPaymentRepository userPaymentRepository; 
+    private final AdminCouponRepository adminCouponRepository;
+    private final ClassCouponRepository classCouponRepository;
 	@Override
 	public ClassPaymentResponseDto getClassPaymentInfo(Integer userId, Integer classId, Integer selectedCalendarId) throws Exception {
 		HostClass hostClass = hostClassRepository.findById(classId)
@@ -59,4 +74,80 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
             		.build();
 	}
 	
+	@Override
+	public void approvePayment(PaymentApproveRequestDto dto, User user) throws Exception {
+		// 1. 수강 정보 등록 (class_regist)
+	    ClassCalendar cc = classCalendarRepository.findById(dto.getCalendarId())
+	            .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다."));
+		ClassRegist regist = ClassRegist.builder()
+            .user(user)
+            .classCalendar(cc)
+            .attCount(0)
+            .build();
+        regist = classRegistRepository.save(regist);
+        
+        // 2. 결제 정보 저장 (payment)
+        UserPayment payment = userPaymentRepository.findByOrderNo(dto.getOrderNo())
+                .orElseThrow(() -> new Exception("해당 주문번호의 결제 정보가 존재하지 않습니다."));
+        
+        if (!payment.getAmount().equals(dto.getAmount())) {
+            throw new IllegalStateException("결제 금액이 일치하지 않습니다.");
+        }
+        payment.approve(regist, LocalDateTime.now()); 
+        userPaymentRepository.save(payment);
+
+        //3. 쿠폰 사용처리
+        if (dto.getUserCouponId() != null) {
+            UserCoupon userCoupon = userCouponRepository.findById(dto.getUserCouponId())
+                .orElseThrow(() -> new RuntimeException("쿠폰이 존재하지 않습니다."));
+            userCoupon.useCoupon();
+            userCouponRepository.save(userCoupon);
+            
+            if (userCoupon.getAdminCoupon() != null ) {
+            	AdminCoupon adminCoupon = adminCouponRepository.findById(userCoupon.getAdminCoupon().getCouponId())
+            			.orElseThrow(() -> new Exception("해당 어드민 쿠폰이 존재하지 않습니다."));
+            	adminCoupon.incrementUsedCount();
+            	adminCouponRepository.save(adminCoupon);
+            }
+            if (userCoupon.getClassCoupon() != null ) {
+            	ClassCoupon classCoupon = classCouponRepository.findById(userCoupon.getClassCoupon().getClassCouponId())
+            			.orElseThrow(() -> new Exception("해당 클래스 쿠폰이 존재하지 않습니다."));
+            	classCoupon.incrementUsedCount();
+            	classCouponRepository.save(classCoupon);
+            }
+        }
+        //4. 수강생 수 업데이트
+        cc.incrementRegisteredCount();
+        classCalendarRepository.save(cc);
+        //5. 강의 상태 업데이트
+        if (cc.getHostClass().getRecruitMax().equals(cc.getRegisteredCount())) {
+        	cc.changeStatus("모집마감");
+            classCalendarRepository.save(cc);
+        }        		
+	}
+
+
+	@Override
+	public void initPayment(PaymentInitRequestDto dto, User user) throws Exception {
+	    ClassCalendar calendar = classCalendarRepository.findById(dto.getCalendarId())
+	            .orElseThrow(() -> new RuntimeException("일정을 찾을 수 없습니다."));
+	    if (userPaymentRepository.existsByOrderNo(dto.getOrderNo())) {
+	        throw new IllegalStateException("이미 존재하는 주문번호입니다.");
+	    }
+
+	    // 사전 결제 정보 저장 (status = "결제대기")
+	    UserPayment payment = UserPayment.builder()
+	            .orderNo(dto.getOrderNo())
+	            .amount(dto.getAmount())
+	            .paidAt(null) // 아직 결제 안 했으니 null
+	            .paymentType(dto.getPaymentType())
+	            .status("결제대기")
+	            .classCalendar(calendar)
+	            .userCoupon(dto.getUserCouponId() != null
+	                ? UserCoupon.builder().ucId(dto.getUserCouponId()).build()
+	                : null)
+	            .build();
+
+	    userPaymentRepository.save(payment);		
+	}	
 }

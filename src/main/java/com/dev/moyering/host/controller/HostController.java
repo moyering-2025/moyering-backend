@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.common.dto.CategoryDto;
 import com.dev.moyering.common.dto.SubCategoryDto;
 import com.dev.moyering.common.service.CategoryService;
@@ -244,8 +246,37 @@ public class HostController {
 			result.put("scheduleDetail",scheduleDetails);
 			result.put("couponList", couponList);
 			result.put("calendarList", calendarList);
+			System.out.println(calendarList);
 			return new ResponseEntity<>(result,HttpStatus.OK);
 		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping("/host/classUpdate/submit")
+	public ResponseEntity<Integer> classUpdate(HostClassDto hostClassDto, @RequestPart("coupons") String couponsJson,
+			@RequestPart("scheduleDetail") String scheduleDetail) {
+		try {
+			System.out.println("호스트:" + hostClassDto);
+			Integer classId = hostClassService.updateClass(hostClassDto);
+			
+			
+//			scheduleDetailService.registScheduleDetail(scheduleDetail, classId);
+//			 ObjectMapper mapper = new ObjectMapper();
+//		        mapper.registerModule(new JavaTimeModule()); // LocalDateTime용
+//		        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+//
+//		        List<ClassCouponDto> coupons = mapper.readValue(
+//		                couponsJson,
+//		                new TypeReference<List<ClassCouponDto>>() {}
+//		        );
+//		        for(ClassCouponDto coupon : coupons) {
+//		        	coupon.setClassId(classId);
+//		        }
+//			couponService.insertHostSelectedCoupon(coupons, classId);
+			return new ResponseEntity<>(classId, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}

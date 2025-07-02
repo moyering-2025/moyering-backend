@@ -59,4 +59,14 @@ public class ClassCalendar {
 		
 		return dto;
 	}
+	
+	//등록인원 1추가
+	public void incrementRegisteredCount() {
+		this.registeredCount++;
+	}
+	//강의의 상태 변경
+	public void changeStatus(String status) {
+		this.status=status;
+	}
+	
 }

@@ -115,6 +115,7 @@ public class HostClass {
     	  dto.setSubCategoryId(subCategory.getSubCategoryId());
     	  dto.setCategory2(subCategory.getSubCategoryName());
     	  dto.setCategory1(subCategory.getFirstCategory().getCategoryName());
+    	  dto.setCategoryId(subCategory.getFirstCategory().getCategoryId());
       }
       return dto;
    }
