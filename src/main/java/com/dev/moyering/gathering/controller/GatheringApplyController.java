@@ -74,9 +74,9 @@ public class GatheringApplyController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	@PostMapping("/user/cancelGatheringApply")
+	@PostMapping("/user/cancelGatheringApply/{applyId}")
 	public ResponseEntity<Boolean> cancelGatheringApply(
-				    @RequestParam(value = "applyId") int applyId){
+			@PathVariable(value = "applyId") int applyId){
 		try {
 			gatheringApplyService.cancelGatheringApply(applyId);
 			return new ResponseEntity<Boolean>(true, HttpStatus.OK);

@@ -39,9 +39,9 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 		return gatheringApplyRepository.findApprovedUserCountByGatheringId(gatheringId);
 	}
 	@Override
-	public List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId) throws Exception {
+	public List<GatheringApplyDto> findApprovedUserListByGatheringId(Integer gatheringId) throws Exception {
 		//상세보기용
-		return gatheringApplyRepository.findApplyUserListByGatheringId(gatheringId);
+		return gatheringApplyRepository.findApprovedUserListByGatheringId(gatheringId);
 	}
 	@Override
 	public List<GatheringApplyDto> findApplyUserListByGatheringIdForOrganizer(Integer gatheringId) throws Exception {

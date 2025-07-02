@@ -31,7 +31,6 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	
 	@Override
 	public void responseToGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception {
-
 		gatheringInquiryRepository.responseToGatheringInquiry(gatheringInquiryDto);
 	}
 	@Override

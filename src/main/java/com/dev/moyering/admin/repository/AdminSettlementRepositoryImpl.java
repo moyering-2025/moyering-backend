@@ -107,83 +107,84 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                                                                    LocalDate startDate,
                                                                    LocalDate endDate,
                                                                    Pageable pageable) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT ")
-                .append("psv.payment_id, psv.student_id, psv.payer_username, ")
-                .append("psv.host_id, psv.class_id, psv.class_name, psv.class_price, ")
-                .append("psv.class_date, psv.payment_amount, psv.payment_type, ")
-                .append("psv.coupon_type, psv.platform_fee, psv.settlement_amount, ")
-                .append("psv.payment_status, psv.class_status ")
-                .append("FROM payment_settlement_view psv ")
-                .append("WHERE psv.payment_status = '결제완료' ")
-                .append("AND psv.class_status = '종료됨' ")
-                .append("AND psv.class_id NOT IN (")
-                .append("    SELECT DISTINCT cc.class_id ")
-                .append("    FROM settlement s ")
-                .append("    JOIN class_calendar cc ON s.calendar_id = cc.calendar_id")
-                .append(") ");
-
-        // 동적 조건 추가
-        if (StringUtils.hasText(searchKeyword)) {
-            sql.append("AND (CAST(psv.host_id AS CHAR) LIKE :searchKeyword ")
-                    .append("OR UPPER(psv.class_name) LIKE UPPER(:searchKeyword)) ");
-        }
-
-        if (startDate != null) {
-            sql.append("AND psv.class_date >= :startDate ");
-        }
-
-        if (endDate != null) {
-            sql.append("AND psv.class_date <= :endDate ");
-        }
-
-        sql.append("ORDER BY psv.class_date DESC ")
-                .append("LIMIT :limit OFFSET :offset");
-
-        Query query = entityManager.createNativeQuery(sql.toString());
-
-        // 파라미터 설정
-        if (StringUtils.hasText(searchKeyword)) {
-            query.setParameter("searchKeyword", "%" + searchKeyword + "%");
-        }
-        if (startDate != null) {
-            query.setParameter("startDate", startDate);
-        }
-        if (endDate != null) {
-            query.setParameter("endDate", endDate);
-        }
-
-        query.setParameter("limit", pageable.getPageSize());
-        query.setParameter("offset", pageable.getOffset());
-
-        List<Object[]> results = query.getResultList();
-
-        // 1. 데이터 변환
-        List<PaymentSettlementViewDto> content = results.stream()
-                .map(row -> new PaymentSettlementViewDto(
-                        ((Number) row[0]).longValue(),     // payment_id
-                        ((Number) row[1]).longValue(),     // student_id
-                        (String) row[2],                   // payer_username
-                        ((Number) row[3]).longValue(),     // host_id
-                        ((Number) row[4]).longValue(),     // class_id
-                        (String) row[5],                   // class_name
-                        (BigDecimal) row[6],               // class_price
-                        ((java.sql.Date) row[7]).toLocalDate(), // class_date
-                        (BigDecimal) row[8],               // payment_amount
-                        (String) row[9],                   // payment_type
-                        (String) row[10],                  // coupon_type
-                        (BigDecimal) row[11],              // platform_fee
-                        (BigDecimal) row[12],              // settlement_amount
-                        (String) row[13],                  // payment_status
-                        (String) row[14]                   // class_status
-                ))
-                .toList();
-
-        // 2. 총 개수 조회
-        Long totalCount = getPendingSettlementListCount(searchKeyword, startDate, endDate);
-
-        // 3. Page 객체로 변환하여 반환
-        return new PageImpl<>(content, pageable, totalCount);
+																	return null;
+//        StringBuilder sql = new StringBuilder();
+//        sql.append("SELECT ")
+//                .append("psv.payment_id, psv.student_id, psv.payer_username, ")
+//                .append("psv.host_id, psv.class_id, psv.class_name, psv.class_price, ")
+//                .append("psv.class_date, psv.payment_amount, psv.payment_type, ")
+//                .append("psv.coupon_type, psv.platform_fee, psv.settlement_amount, ")
+//                .append("psv.payment_status, psv.class_status ")
+//                .append("FROM payment_settlement_view psv ")
+//                .append("WHERE psv.payment_status = '결제완료' ")
+//                .append("AND psv.class_status = '종료됨' ")
+//                .append("AND psv.class_id NOT IN (")
+//                .append("    SELECT DISTINCT cc.class_id ")
+//                .append("    FROM settlement s ")
+//                .append("    JOIN class_calendar cc ON s.calendar_id = cc.calendar_id")
+//                .append(") ");
+//
+//        // 동적 조건 추가
+//        if (StringUtils.hasText(searchKeyword)) {
+//            sql.append("AND (CAST(psv.host_id AS CHAR) LIKE :searchKeyword ")
+//                    .append("OR UPPER(psv.class_name) LIKE UPPER(:searchKeyword)) ");
+//        }
+//
+//        if (startDate != null) {
+//            sql.append("AND psv.class_date >= :startDate ");
+//        }
+//
+//        if (endDate != null) {
+//            sql.append("AND psv.class_date <= :endDate ");
+//        }
+//
+//        sql.append("ORDER BY psv.class_date DESC ")
+//                .append("LIMIT :limit OFFSET :offset");
+//
+//        Query query = entityManager.createNativeQuery(sql.toString());
+//
+//        // 파라미터 설정
+//        if (StringUtils.hasText(searchKeyword)) {
+//            query.setParameter("searchKeyword", "%" + searchKeyword + "%");
+//        }
+//        if (startDate != null) {
+//            query.setParameter("startDate", startDate);
+//        }
+//        if (endDate != null) {
+//            query.setParameter("endDate", endDate);
+//        }
+//
+//        query.setParameter("limit", pageable.getPageSize());
+//        query.setParameter("offset", pageable.getOffset());
+//
+//        List<Object[]> results = query.getResultList();
+//
+//        // 1. 데이터 변환
+//        List<PaymentSettlementViewDto> content = results.stream()
+//                .map(row -> new PaymentSettlementViewDto(
+//                        ((Number) row[0]).longValue(),     // payment_id
+//                        ((Number) row[1]).longValue(),     // student_id
+//                        (String) row[2],                   // payer_username
+//                        ((Number) row[3]).longValue(),     // host_id
+//                        ((Number) row[4]).longValue(),     // class_id
+//                        (String) row[5],                   // class_name
+//                        (BigDecimal) row[6],               // class_price
+//                        ((java.sql.Date) row[7]).toLocalDate(), // class_date
+//                        (BigDecimal) row[8],               // payment_amount
+//                        (String) row[9],                   // payment_type
+//                        (String) row[10],                  // coupon_type
+//                        (BigDecimal) row[11],              // platform_fee
+//                        (BigDecimal) row[12],              // settlement_amount
+//                        (String) row[13],                  // payment_status
+//                        (String) row[14]                   // class_status
+//                ))
+//                .toList();
+//
+//        // 2. 총 개수 조회
+//        Long totalCount = getPendingSettlementListCount(searchKeyword, startDate, endDate);
+//
+//        // 3. Page 객체로 변환하여 반환
+//        return new PageImpl<>(content, pageable, totalCount);
     }
 
     @Override

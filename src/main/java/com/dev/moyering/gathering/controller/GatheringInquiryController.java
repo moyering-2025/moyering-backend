@@ -126,7 +126,8 @@ public class GatheringInquiryController {
 		try {
 			PageInfo pageInfo = new PageInfo(1);
 			Integer loginId = principal.getUser().getUserId();
-			System.out.println("내가 게더링에 등록된 문의+로그인한 유저 " + loginId);
+			System.out.println("129 " + loginId);
+			System.out.println("param : "+param );
 		    Date startDate = null;
 		    Date endDate = null;
 		    Boolean isAnswered=null;
@@ -147,14 +148,18 @@ public class GatheringInquiryController {
 			Integer findInquirieCntReceivedByOrganizer = gatheringInquiryService.findInquirieCntReceivedByOrganizer(loginId, startDate, endDate, isAnswered);
 			Integer findInquirieCntSentByUser = gatheringInquiryService.findInquirieCntSentByUser(loginId, startDate, endDate, isAnswered);
 			
-			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findInquiriesReceivedByOrganizer(pageInfo, loginId, startDate, endDate, isAnswered);
-			
-			System.out.println("gatheringInquiryList : "+gatheringInquiryList);
 			Map<String,Object> res = new HashMap<>();
 			res.put("findInquirieCntReceivedByOrganizer", findInquirieCntReceivedByOrganizer);
 			res.put("findInquirieCntSentByUser", findInquirieCntSentByUser);
-			
-			res.put("gatheringInquiryList", gatheringInquiryList);
+			List<GatheringInquiryDto> gatheringInquiryList = null;
+			if(findInquirieCntReceivedByOrganizer > 0) {
+				gatheringInquiryList = gatheringInquiryService.findInquiriesReceivedByOrganizer(pageInfo, loginId, startDate, endDate, isAnswered);
+				System.out.println("gatheringInquiryList : "+gatheringInquiryList);
+			    res.put("gatheringInquiryList", gatheringInquiryList);
+				res.put("pageInfo", pageInfo);
+			} else {
+				res.put("gatheringInquiryList", null);
+			}
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -169,9 +174,11 @@ public class GatheringInquiryController {
 		try {
 			PageInfo pageInfo = new PageInfo(1);
 			Integer loginId = principal.getUser().getUserId();
+			System.out.println("173 " + loginId);
 		    Date startDate = null;
 		    Date endDate = null;
 		    Boolean isAnswered=null;
+			System.out.println("param : "+param );
 			if(param != null) {
 				if(param.get("page")!=null) {
 					pageInfo.setCurPage((Integer) param.get("page"));
@@ -186,17 +193,21 @@ public class GatheringInquiryController {
 					endDate = (Date)param.get("endDate");
 				} 
 			}
-			List<GatheringInquiryDto> gatheringInquiryList = gatheringInquiryService.findInquiriesSentByUser(pageInfo, loginId, startDate, endDate, isAnswered);
-
 			Integer findInquirieCntReceivedByOrganizer = gatheringInquiryService.findInquirieCntReceivedByOrganizer(loginId, startDate, endDate, isAnswered);
 			Integer findInquirieCntSentByUser = gatheringInquiryService.findInquirieCntSentByUser(loginId, startDate, endDate, isAnswered);
-			
-			System.out.println("gatheringInquiryList : "+gatheringInquiryList);
 			Map<String,Object> res = new HashMap<>();
+
 			res.put("findInquirieCntReceivedByOrganizer", findInquirieCntReceivedByOrganizer);
 			res.put("findInquirieCntSentByUser", findInquirieCntSentByUser);
-			
-			res.put("gatheringInquiryList", gatheringInquiryList);
+			List<GatheringInquiryDto> gatheringInquiryList = null;
+			if(findInquirieCntSentByUser > 0) {
+				gatheringInquiryList = gatheringInquiryService.findInquiriesSentByUser(pageInfo, loginId, startDate, endDate, isAnswered);
+				System.out.println("gatheringInquiryList : "+gatheringInquiryList);
+				res.put("gatheringInquiryList", gatheringInquiryList);
+				res.put("pageInfo", pageInfo);
+			} else {
+				res.put("gatheringInquiryList", null);
+			}
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();

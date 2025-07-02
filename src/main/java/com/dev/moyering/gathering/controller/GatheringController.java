@@ -84,7 +84,7 @@ public class GatheringController {
 			Map<String,Object> res = new HashMap<>();
 			res.put("gathering", nGatheringDto);
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
-			List<GatheringApplyDto> member = gatheringApplyService.findApplyUserListByGatheringId(gatheringId);
+			List<GatheringApplyDto> member = gatheringApplyService.findApprovedUserListByGatheringId(gatheringId);
 			List<GatheringDto> recommendations = gatheringService.findGatheringWithCategory(nGatheringDto.getSubCategoryId(), nGatheringDto.getCategoryId());
 
 	        Integer acceptedCount = gatheringApplyService.findApprovedUserCountByGatheringId(gatheringId);
@@ -209,7 +209,7 @@ public class GatheringController {
 				response.put("list", myGatheringList);				
 				response.put("pageInfo", pageInfo);
 			} else {
-				response.put("list", "조회된 리스트 없음");
+				response.put("list", null);
 			}
 			response.put("allCnt", allCnt);
 			response.put("scheduledCnt", scheduled);
