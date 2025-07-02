@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@ToString(exclude = {"userPayment", "classCalendar"})
+@ToString(exclude = { "classCalendar"})
 @Table(name = "settlement")
 public class AdminSettlement {
 
@@ -54,7 +54,7 @@ public class AdminSettlement {
     @JoinColumn(name = "payment_id", nullable = false)
     private UserPayment userPayment; // 결제 정보
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_id", nullable = false)
     private ClassCalendar classCalendar; // 클래스 일정 정보
 
@@ -62,12 +62,10 @@ public class AdminSettlement {
     public AdminSettlement(Integer settlementId, Integer hostId, LocalDate settlementDate,
                            LocalDateTime settledAt, String settlementStatus, String bankType,  String bankAccount,
                            BigDecimal totalIncome, BigDecimal platformFee, BigDecimal settlementAmount,
-                           UserPayment userPayment, ClassCalendar classCalendar) {
+                           ClassCalendar classCalendar) {
         this.settlementId = settlementId;
         this.classCalendar = classCalendar;
         this.hostId = hostId;
-        this.userPayment = userPayment;
-
         this.settlementDate = settlementDate;
         this.settledAt = settledAt;
         this.settlementStatus = settlementStatus;
@@ -86,7 +84,6 @@ public class AdminSettlement {
                 .settlementId(settlementId)
                 .calendarId(classCalendar != null ? classCalendar.getCalendarId() : null)
                 .hostId(hostId)
-                .paymentId(userPayment != null ? userPayment.getPaymentId() : null)
                 .settlementDate(settlementDate)
                 .settledAt(settledAt)
                 .settlementStatus(settlementStatus)
