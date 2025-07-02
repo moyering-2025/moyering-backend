@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.dev.moyering.admin.entity.QAdminSettlement.adminSettlement;
 
@@ -177,7 +178,7 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                         (String) row[13],                  // payment_status
                         (String) row[14]                   // class_status
                 ))
-                .toList();
+                .collect(Collectors.toList());
 
         // 2. 총 개수 조회
         Long totalCount = getPendingSettlementListCount(searchKeyword, startDate, endDate);

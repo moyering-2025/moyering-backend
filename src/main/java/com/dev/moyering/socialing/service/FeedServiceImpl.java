@@ -49,30 +49,7 @@ public class FeedServiceImpl implements FeedService {
     @Override
     @Transactional
     public List<FeedDto> getFeeds(String sortType, Integer userId) throws Exception {
-//        List<FeedDto> feeds;
-//        Set<Integer> likedSet = Collections.emptySet();
-//
-//        if (userId != null) {
-//            feeds = feedRepository.findFeeds(sortType, userId);
-//            // 유저가 좋아요 누른 피드 ID 목록 조회
-//            List<Integer> likedIds = likeListRepository.findFeedIdsByUserId(userId);
-//            likedSet = new HashSet<>(likedIds);
-//        } else {
-//            // 로그인 안 되어 있으면 likedByUser 없는 단순 조회 쿼리 실행
-//            feeds = feedRepository.findFeedsWithoutLiked(); // ← 이 메서드를 새로 만듦
-//        }
-//        for (FeedDto feed : feeds) {
-//            long latestLikeCount = likeListRepository.countByFeedFeedId(feed.getFeedId());
-//            feed.setLikesCount(latestLikeCount);
-//
-//            // 로그인 한 경우에만 likedByUser 설정
-//            if (userId != null) {
-//                feed.setLikedByUser(likedSet.contains(feed.getFeedId()));
-//            } else {
-//                feed.setLikedByUser(false);
-//            }
-//        }
-//        return feeds;
+
         List<FeedDto> feeds = feedRepository.findFeedsWithoutLiked(sortType);
 
         if (userId != null) {
@@ -91,12 +68,21 @@ public class FeedServiceImpl implements FeedService {
             // DTO에 likedByUser 설정
             for (FeedDto feed : feeds) {
                 feed.setLikedByUser(likedFeedIdSet.contains(feed.getFeedId()));
-                System.out.println("▶ feedId=" + feed.getFeedId() + ", likedByUser=" + likedFeedIdSet.contains(feed.getFeedId()));
+                feed.setMine(Objects.equals(feed.getWriterUserId(), userId));
             }
+            for (FeedDto feed : feeds) {
+                log.info("▶ feedId={}, writerUserId={}, userId={}, mine={}",
+                        feed.getFeedId(),
+                        feed.getWriterUserId(),
+                        userId,
+                        feed.getMine());
+            }
+
         } else {
             // 비로그인 사용자라면 likedByUser = false
             for (FeedDto feed : feeds) {
                 feed.setLikedByUser(false);
+                feed.setMine(false);
             }
         }
 

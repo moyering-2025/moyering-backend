@@ -88,4 +88,17 @@ public class FollowController {
         boolean status = followService.isFollowing(followerId, followingId);
         return ResponseEntity.ok(status);
     }
+
+    @GetMapping("/followingIds")
+    public ResponseEntity<List<Integer>> getFollowingIds(
+            @AuthenticationPrincipal PrincipalDetails principal) {
+        try {
+            Integer followerId = principal.getUser().getUserId();
+            List<Integer> ids = followService.getFollowingUserIds(followerId);
+            return ResponseEntity.ok(ids);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

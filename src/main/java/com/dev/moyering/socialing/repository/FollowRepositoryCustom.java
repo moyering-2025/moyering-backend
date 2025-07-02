@@ -11,4 +11,6 @@ public interface FollowRepositoryCustom {
     List<UserDto> findFollowersWithPaging(Integer followingId, int offset, int size, String search);
 
     List<UserDto> findFollowingsWithPaging(Integer followingId, int offset, int size, String search);
+
+    List<Integer> findFollowingIdsByFollowerId(Integer followerId);
 }
