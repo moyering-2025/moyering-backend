@@ -9,6 +9,7 @@ import lombok.*;
 import org.springframework.data.relational.core.sql.In;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
@@ -53,19 +54,38 @@ public class UserPayment {
     @JoinColumn(name = "uc_id") // 사용한 쿠폰 id
     private UserCoupon userCoupon;
 
+    @Column
+    private Integer classPrice; // 가격
 
-    @Builder
-    public UserPayment(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon) {
+    @Column
+    private String couponType; //사용한 쿠폰 유형
+
+    @Column
+    private String discountType; //쿠폰 할인 유형
+
+    @Column
+    private BigDecimal platformFee;
+
+    // 관리자 쿠폰 사용하면 => 클래스 원가의 10%, // 강사쿠폰이면 => 결제금액의 10%%
+
+@Builder
+    public UserPayment(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, LocalDateTime canceledAt, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer classPrice, String couponType, String discountType, BigDecimal platformFee) {
         this.paymentId = paymentId;
         this.orderNo = orderNo;
         this.amount = amount;
         this.paymentType = paymentType;
         this.paidAt = paidAt;
         this.status = status;
+        this.canceledAt = canceledAt;
         this.classRegist = classRegist;
         this.classCalendar = classCalendar;
         this.userCoupon = userCoupon;
-    } 
+        this.classPrice = classPrice;
+        this.couponType = couponType;
+        this.discountType = discountType;
+        this.platformFee = platformFee;
+    }
+
     
     public void approve(ClassRegist regist, LocalDateTime paidAt) {
         this.status = "결제완료";

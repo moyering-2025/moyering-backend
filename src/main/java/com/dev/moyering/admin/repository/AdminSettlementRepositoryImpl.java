@@ -118,10 +118,12 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                 .append("FROM payment_settlement_view psv ")
                 .append("WHERE psv.payment_status = '결제완료' ")
                 .append("AND psv.class_status = '종료됨' ")
+                .append("AND psv.class_date <= current_date - INTERVAL 7 DAY ")
                 .append("AND psv.class_id NOT IN (")
                 .append("    SELECT DISTINCT cc.class_id ")
                 .append("    FROM settlement s ")
                 .append("    JOIN class_calendar cc ON s.calendar_id = cc.calendar_id")
+                .append("    WHERE s.settlement_status IN ('COMPLETED', 'CANCELLED')" )
                 .append(") ");
 
         // 동적 조건 추가
@@ -194,10 +196,12 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                 .append("FROM payment_settlement_view psv ")
                 .append("WHERE psv.payment_status = '결제완료' ")
                 .append("AND psv.class_status = '종료됨' ")
-                .append("AND psv.class_id NOT IN (")
+                .append("AND psv.class_date <= current_date - INTERVAL 7 DAY ") // 종료된지 7일 이후부터 정산 list에 띄우기
+                .append("AND psv.class_id NOT IN (") // 정산 내역에 있으면 안됨
                 .append("    SELECT DISTINCT cc.class_id ")
                 .append("    FROM settlement s ")
                 .append("    JOIN class_calendar cc ON s.calendar_id = cc.calendar_id")
+                .append("    WHERE s.settlement_status IN ('COMPLETED', 'CANCELLED')" )
                 .append(") ");
 
         if (StringUtils.hasText(searchKeyword)) {

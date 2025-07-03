@@ -21,4 +21,8 @@ public interface UserService {
 	void updateUserRole(Integer userId)throws Exception;
 	//feed
 	UserDto getByNickname(String nickname) throws Exception;
+	
+	Boolean verifyEmail(String token)throws Exception;
+	
+	void completeJoin(UserDto userDto) throws Exception;
 }

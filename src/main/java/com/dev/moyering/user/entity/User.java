@@ -82,6 +82,10 @@ public class User {
 	private Integer activeScore;
 	@Column
 	private Integer userBadgeId;
+	@Column
+	private Boolean emailVerified;
+	@Column
+	private String emailVerificationToken;
 	
 	public UserDto toDto() {
 		UserDto dto = UserDto.builder()
@@ -112,6 +116,7 @@ public class User {
 				.providerId(providerId)
 				.activeScore(activeScore)
 				.userBadgeId(userBadgeId)
+				.emailVerified(emailVerified)
 				.build();
 		
 		return dto;

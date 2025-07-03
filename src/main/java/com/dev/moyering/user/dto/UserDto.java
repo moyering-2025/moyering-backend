@@ -41,6 +41,8 @@ public class UserDto {
 	private String providerId;
 	private Integer activeScore;
 	private Integer userBadgeId;
+	private Boolean emailVerified;
+	private String emialVerificationToken;
 
 	public User toEntity() {
 		User entity = User.builder()
@@ -71,6 +73,7 @@ public class UserDto {
 				.providerId(providerId)
 				.activeScore(activeScore)
 				.userBadgeId(userBadgeId)
+				.emailVerified(emailVerified)
 				.build();
 		
 		return entity;

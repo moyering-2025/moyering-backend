@@ -136,8 +136,6 @@ public class HostController {
 		try {
 			System.out.println("호스트:" + hostClassDto);
 			Integer classId = hostClassService.registClass(hostClassDto, Arrays.asList(dates));
-			System.out.println(hostClassDto.getCategory1());
-			System.out.println(hostClassDto.getCategory2());
 			scheduleDetailService.registScheduleDetail(scheduleDetail, classId);
 			
 			 ObjectMapper mapper = new ObjectMapper();

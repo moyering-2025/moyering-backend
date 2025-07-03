@@ -44,7 +44,8 @@ public class AdminCouponRepositoryImpl implements AdminCouponRepositoryCustom {
                         coupon.issueCount,
                         coupon.validFrom,
                         coupon.validUntil,
-                        coupon.createdAt
+                        coupon.createdAt,
+                        coupon.usedCount
                 ))
                 .from(coupon)
                 .where(builder)

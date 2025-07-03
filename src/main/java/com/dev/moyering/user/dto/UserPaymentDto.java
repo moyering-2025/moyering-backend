@@ -11,13 +11,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
+
 
 public class UserPaymentDto {
     private Integer paymentId; // 결제 id
@@ -29,10 +31,14 @@ public class UserPaymentDto {
     private ClassRegist classRegist; // 수강생 id
     private ClassCalendar classCalendar;  // 클래스 일정 id
     private UserCoupon userCoupon; // 사용한 쿠폰 id
+    private Integer classPrice; // 클래스 금액
+    private String couponType; //사용한 쿠폰 유형
+    private String discountType; //쿠폰 할인 유형
+    private BigDecimal platformFee; // 수수료
 
-    public UserPaymentDto(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer platformFee) {
+    public UserPaymentDto(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer classPrice, String couponType, String discountType, BigDecimal platformFee) {
         this.paymentId = paymentId;
-        this.orderNo = UUID.randomUUID().toString();
+        this.orderNo = orderNo;
         this.amount = amount;
         this.paymentType = paymentType;
         this.paidAt = paidAt;
@@ -40,6 +46,10 @@ public class UserPaymentDto {
         this.classRegist = classRegist;
         this.classCalendar = classCalendar;
         this.userCoupon = userCoupon;
+        this.classPrice = classPrice;
+        this.couponType = couponType;
+        this.discountType = discountType;
+        this.platformFee = platformFee;
     }
 
     // DTO -> Entity 변환
@@ -54,6 +64,10 @@ public class UserPaymentDto {
                 .classRegist(this.classRegist)
                 .classCalendar(this.classCalendar)
                 .userCoupon(this.userCoupon)
+                .classPrice(this.classPrice) // 클래스 금액
+                .couponType(this.couponType) //사용한 쿠폰 유형
+                .discountType(this.discountType) //쿠폰 할인 유형
+                .platformFee(this.platformFee) // 수수료
                 .build();
     }
 }
