@@ -11,6 +11,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.dev.moyering.classring.dto.UserReviewResponseDto;
+import com.dev.moyering.classring.dto.UtilSearchDto;
+import com.dev.moyering.classring.dto.WritableReviewResponseDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.dto.ReviewSearchRequestDto;
@@ -118,5 +121,30 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewRepository.save(reviewDto.toEntity());
 		
 	}
+	
+	public PageResponseDto<WritableReviewResponseDto> getWritableReviews(UtilSearchDto dto) throws Exception {
+	    Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
+	    Page<WritableReviewResponseDto> pageResult = reviewRepository.findWritableReviews(dto, pageable);
+
+	    return PageResponseDto.<WritableReviewResponseDto>builder()
+	            .content(pageResult.getContent())
+	            .currentPage(pageResult.getNumber() + 1)
+	            .totalPages(pageResult.getTotalPages())
+	            .totalElements(pageResult.getTotalElements())
+	            .build();
+	}
+
+	public PageResponseDto<UserReviewResponseDto> getDoneReviews(UtilSearchDto dto) throws Exception {
+	    Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
+	    Page<UserReviewResponseDto> pageResult = reviewRepository.findDoneReviews(dto, pageable);
+
+	    return PageResponseDto.<UserReviewResponseDto>builder()
+	            .content(pageResult.getContent())
+	            .currentPage(pageResult.getNumber() + 1)
+	            .totalPages(pageResult.getTotalPages())
+	            .totalElements(pageResult.getTotalElements())
+	            .build();
+	}
+
 
 }
