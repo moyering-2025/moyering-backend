@@ -24,23 +24,21 @@ public class AdminSettlementDto {
     private LocalDate settlementDate;    // 정산 예정일
     private LocalDateTime settledAt;     // 실제 지급일
     private String settlementStatus;     // 정산 상태 (PENDING/COMPLETED/CANCELLED)
-    private String bankType;
-    private String bankAccount;          // 지급계좌 정보
-    private BigDecimal totalIncome;      // 클래스 당 총 결제 금액 (뷰에서 가져와서 집계)
-    private BigDecimal platformFee;      // 클래스 당 정산 수수료 (뷰에서 가져와서 집계)
-    private BigDecimal settlementAmount; // 실제 지급액
+    private String bankName;        // 은행 정보
+    private String accNum;          // 지급계좌 정보
+    private Integer settleAmountToDo;      // 정산예정 금액
+    private Integer settlementAmount; // 실제 지급액
 
-    public AdminSettlementDto(Integer settlementId, Integer calendarId, Integer hostId, LocalDate settlementDate, LocalDateTime settledAt, String settlementStatus, String bankType, String bankAccount, BigDecimal totalIncome, BigDecimal platformFee, BigDecimal settlementAmount) {
+    public AdminSettlementDto(Integer settlementId, Integer calendarId, Integer hostId, LocalDate settlementDate, LocalDateTime settledAt, String settlementStatus, String bankName, String accNum, Integer settleAmountToDo, Integer settlementAmount) {
         this.settlementId = settlementId;
         this.calendarId = calendarId;
         this.hostId = hostId;
         this.settlementDate = settlementDate;
         this.settledAt = settledAt;
         this.settlementStatus = settlementStatus;
-        this.bankType = bankType;
-        this.bankAccount = bankAccount;
-        this.totalIncome = totalIncome;
-        this.platformFee = platformFee;
+        this.bankName = bankName;
+        this.accNum = accNum;
+        this.settleAmountToDo = settleAmountToDo;
         this.settlementAmount = settlementAmount;
     }
 }
