@@ -10,6 +10,7 @@ import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
+import com.dev.moyering.host.repository.ScheduleDetailRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
 
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class ClassCalendarServiceImpl implements ClassCalendarService {
 	private final ClassCalendarRepository classCalendarRepository;
 	private final UserRepository userRepository;
+	private final ScheduleDetailRepository scheduleDetailRepository;
 
 	@Override
 	public List<HostClassDto> getHotHostClasses() throws Exception {
@@ -63,10 +65,23 @@ public class ClassCalendarServiceImpl implements ClassCalendarService {
 		}
 		return calDtoList;
 	}
-	public List<ClassCalendarDto> getClassCalendarByHostClassId(Integer classId) {
+	public List<ClassCalendarDto> getClassCalendarByHostClassId(Integer classId) throws Exception {
 		List<ClassCalendar> classes = classCalendarRepository.findAllByHostClass_ClassIdAndStatus(classId, "모집중");
 		return classes.stream()
 				.map(cc -> cc.toDto()).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<ClassCalendarDto> getMyClassSchedule(Integer userId) throws Exception {
+		List<ClassCalendarDto> classList = classCalendarRepository.findAllScheduleWithDetailsByUserId(userId);
+		
+		for (ClassCalendarDto dto : classList ) {
+			scheduleDetailRepository.findFirstByHostClass_ClassIdOrderByStartTimeAsc(dto.getClassId())
+				.ifPresent(d-> {
+					dto.setStartTime(d.getStartTime());
+				});
+		}
+		return classList;
 	}
 
 }

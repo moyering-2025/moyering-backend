@@ -18,4 +18,6 @@ public interface FollowService {
     List<UserDto> getFollowers(Integer followingId,Integer pagem,Integer size,String search);
 
     List<UserDto> getFollowings(Integer followerId,Integer pagem,Integer size,String search);
+
+    List<Integer> getFollowingUserIds(Integer followerId) throws Exception;
 }

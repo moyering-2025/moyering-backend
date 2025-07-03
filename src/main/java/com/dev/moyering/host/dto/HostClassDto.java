@@ -1,6 +1,9 @@
 package com.dev.moyering.host.dto;
 
 import java.sql.Date;
+import java.time.LocalTime;
+
+import javax.persistence.Column;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,6 +47,8 @@ public class HostClassDto {
    private String portfolioName;
    private Integer price;
    private Date regDate;
+   private LocalTime scheduleStart;
+   private LocalTime scheduleEnd;
    //공통 필드 추가
 
    private Date startDate;
@@ -87,6 +92,8 @@ public class HostClassDto {
             .portfolio(portfolioName)
             .price(price)
               .regDate(regDate)
+              .scheduleStart(scheduleStart)
+              .scheduleEnd(scheduleEnd)
             .build();
       if(hostId!=null) {
          entity.setHost(Host.builder()

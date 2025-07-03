@@ -28,4 +28,6 @@ public interface GatheringRepositoryCustom {
 	// 상세 페이지에 추천 게더링 3개
 	List<GatheringDto> findRecommendGatheringForUser(Integer subCategoryId, Integer categoryId) throws Exception;
 
+	//마이페이지 스케줄
+	List<GatheringDto> findMyGatheringSchedule(Integer userId) throws Exception;
 }

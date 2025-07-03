@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.host.entity.ClassCoupon;
 import com.dev.moyering.user.entity.User;

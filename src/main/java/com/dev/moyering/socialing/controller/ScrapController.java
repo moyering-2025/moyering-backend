@@ -37,14 +37,14 @@ public class ScrapController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<Integer>> getScrapFeedIds(
-            @AuthenticationPrincipal PrincipalDetails principal
-    ) {
-        Integer userId = principal.getUser().getUserId();
-        List<Integer> feedIds = scrapService.getScrapFeedIds(userId);
-        return ResponseEntity.ok(feedIds);
-    }
+//    @GetMapping
+//    public ResponseEntity<List<Integer>> getScrapFeedIds(
+//            @AuthenticationPrincipal PrincipalDetails principal
+//    ) {
+//        Integer userId = principal.getUser().getUserId();
+//        List<Integer> feedIds = scrapService.getScrapFeedIds(userId);
+//        return ResponseEntity.ok(feedIds);
+//    }
 
     @GetMapping("/{feedId}")
     public ResponseEntity<Boolean> isScrapped(
@@ -54,5 +54,14 @@ public class ScrapController {
         Integer userId = principal.getUser().getUserId();
         boolean scrapped = scrapService.isScrapped(userId, feedId);
         return ResponseEntity.ok(scrapped);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Integer>> getScrapFeedIds(
+            @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        Integer userId = principal.getUser().getUserId();
+        List<Integer> feedIds = scrapService.getScrapFeedIds(userId);
+        return ResponseEntity.ok(feedIds); // [1,2,5,7] 이런 feedId 리스트
     }
 }

@@ -1,5 +1,8 @@
 package com.dev.moyering.host.entity;
 
+import java.sql.Date;
+import java.time.LocalTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -7,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import com.dev.moyering.common.entity.SubCategory;
@@ -16,8 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.sql.Date;
 
 @Data
 @NoArgsConstructor
@@ -61,7 +63,8 @@ public class HostClass {
    private String img4;
    @Column
    private String img5;
-   @Column
+   @Lob // Large Object
+   @Column(name = "detail_description", columnDefinition = "LONGTEXT")
    private String detailDescription;
    @Column
    private String material;
@@ -77,6 +80,11 @@ public class HostClass {
    private String portfolio;
    @Column
    private Integer price;
+   @Column
+   private LocalTime scheduleStart;
+   @Column
+   private LocalTime scheduleEnd;
+   
 
    @Column(name = "reg_date")
    private Date regDate; // 강의 개설일
@@ -107,6 +115,8 @@ public class HostClass {
             .portfolioName(portfolio)
             .price(price)
             .regDate(regDate)
+            .scheduleStart(scheduleStart)
+            .scheduleEnd(scheduleEnd)
             .build();
       if(host!=null) {
          dto.setHostId(host.getHostId());

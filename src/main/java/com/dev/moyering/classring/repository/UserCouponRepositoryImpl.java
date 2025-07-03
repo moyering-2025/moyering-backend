@@ -2,8 +2,13 @@ package com.dev.moyering.classring.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
 import com.dev.moyering.classring.entity.QUserCoupon;
 import com.dev.moyering.classring.entity.UserCoupon;
+import com.dev.moyering.host.entity.Inquiry;
 import com.dev.moyering.host.entity.QClassCoupon;
 import com.dev.moyering.host.entity.QHostClass;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -33,5 +38,16 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
                 )
             )
             .fetch();
+	}
+	@Override
+	public Page<UserCoupon> findAllCouponsByUserId(Integer userId, Pageable pageable) throws Exception {
+		QUserCoupon userCoupon = QUserCoupon.userCoupon;
+		List<UserCoupon> content = jpaQueryFactory.selectFrom(userCoupon)
+				.where(userCoupon.user.userId.eq(userId)).orderBy(userCoupon.ucId.desc())
+				.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
+
+		Long total = jpaQueryFactory.select(userCoupon.count()).from(userCoupon)
+				.where(userCoupon.user.userId.eq(userId)).fetchOne();
+		return new PageImpl<UserCoupon>(content, pageable, total);	
 	}
 }

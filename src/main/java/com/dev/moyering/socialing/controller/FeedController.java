@@ -167,21 +167,39 @@ public class FeedController {
         }
     }
 
-    @PatchMapping(value = "/user/socialing/feed/{feedId}")
+//    @PatchMapping(value = "/user/socialing/feed/{feedId}")
+//    public ResponseEntity<Void> updateFeed(
+//            @PathVariable Integer feedId,
+//            @RequestPart("feed") FeedDto feedDto,
+//            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+//            @RequestPart(value = "removeUrls", required = false) List<String> removeUrls,
+//            @AuthenticationPrincipal PrincipalDetails principal
+//    ) throws Exception {
+//        FeedDto existing = feedService.getFeedDetail(feedId, principal.getUser().getUserId());
+//        if (!existing.getWriterId().equals(principal.getUser().getUsername())) {
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+//        feedService.updateFeed(feedId, feedDto, images, removeUrls);
+//        return ResponseEntity.noContent().build();
+//    }
+
+    @PostMapping(value = "/socialing/feed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateFeed(
-            @PathVariable Integer feedId,
+            @RequestPart Integer feedId,
+            @RequestPart Integer userId,
             @RequestPart("feed") FeedDto feedDto,
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @RequestPart(value = "removeUrls", required = false) List<String> removeUrls,
-            @AuthenticationPrincipal PrincipalDetails principal
+            @RequestPart(value = "removeUrls", required = false) List<String> removeUrls
+
     ) throws Exception {
-        FeedDto existing = feedService.getFeedDetail(feedId, principal.getUser().getUserId());
-        if (!existing.getWriterId().equals(principal.getUser().getUsername())) {
+        FeedDto existing = feedService.getFeedDetail(feedId, userId);
+        if (!existing.getWriterId().equals(userId)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         feedService.updateFeed(feedId, feedDto, images, removeUrls);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/socialing/feeds/{feedId}/liked")
     public ResponseEntity<Map<String, Boolean>> isFeedLiked(
             @PathVariable Integer feedId,
@@ -213,7 +231,7 @@ public class FeedController {
     @GetMapping("/socialing/popular")
     public ResponseEntity<List<FeedDto>> getPopularFeeds(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size) {
+            @RequestParam(defaultValue = "10") int size) {
         List<FeedDto> popularFeeds = null;
         try {
             popularFeeds = feedService.getPopularFeeds(page, size);
