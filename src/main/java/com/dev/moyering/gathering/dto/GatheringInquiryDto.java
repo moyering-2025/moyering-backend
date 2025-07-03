@@ -37,6 +37,15 @@ public class GatheringInquiryDto {
 	private String organizerNicknNme;
 	private String organizerProfile;
 	
+
+	//답변 등록용 생성자
+	public GatheringInquiryDto(Integer inquiryId, Date responseDate, String responseContent) {
+		super();
+		this.inquiryId = inquiryId;
+		this.responseDate = responseDate;
+		this.responseContent = responseContent;
+	}
+	
 	// QueryDSL용 생성자 추가
     public GatheringInquiryDto(Integer inquiryId, Integer gatheringId, String title, 
                               Integer userId, String nickName, String profile,
@@ -61,6 +70,7 @@ public class GatheringInquiryDto {
             this.responseState = "답변대기";
         }
     }
+    
     public GatheringInquiry toEntity() {
 	    GatheringInquiry.GatheringInquiryBuilder builder = GatheringInquiry.builder()
 	    		.inquiryId(inquiryId)

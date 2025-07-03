@@ -1,6 +1,5 @@
 package com.dev.moyering.host.repository;
 
-import java.sql.Timestamp;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
@@ -9,14 +8,16 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.dev.moyering.gathering.entity.Gathering;
+import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.entity.ClassCalendar;
+import com.dev.moyering.host.entity.ClassRegist;
 import com.dev.moyering.host.entity.QClassCalendar;
+import com.dev.moyering.host.entity.QClassRegist;
+import com.dev.moyering.host.entity.QHostClass;
 import com.dev.moyering.user.entity.User;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 
 import lombok.RequiredArgsConstructor;
 
@@ -111,4 +112,24 @@ public class ClassCalendarRepositoryImpl implements ClassCalendarRepositoryCusto
 
 		return preferred;	
 		}
+
+	@Override
+	public List<ClassCalendarDto> findAllScheduleWithDetailsByUserId(Integer userId) throws Exception {
+	    QClassRegist regist = QClassRegist.classRegist;
+	    QClassCalendar calendar = QClassCalendar.classCalendar;
+	    QHostClass hostClass = QHostClass.hostClass;
+	    
+		List<ClassRegist> registList = jpaQueryFactory
+			    .select(regist)
+			    .from(regist)
+			    .join(regist.classCalendar, calendar).fetchJoin()
+			    .join(calendar.hostClass, hostClass).fetchJoin()
+			    .where(regist.user.userId.eq(userId))
+			    .fetch();
+
+		// 그 후 calendar만 뽑아서 DTO 변환
+		return registList.stream()
+		    .map(r -> r.getClassCalendar().toDto())
+		    .collect(Collectors.toList());    
+	}
 }

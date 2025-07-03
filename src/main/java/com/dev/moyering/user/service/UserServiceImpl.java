@@ -2,6 +2,8 @@ package com.dev.moyering.user.service;
 
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
+import com.dev.moyering.common.service.EmailService;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,7 @@ import com.dev.moyering.user.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -22,12 +25,15 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired 
+	private EmailService emailService;
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Override
 	public void join(UserDto userDto) throws Exception {
+		
 		// 중복 아이디 확인
 		if (userRepository.findByUsername(userDto.getUsername()).isPresent()) {
 			throw new Exception("이미 존재하는 아이디입니다.");
@@ -37,9 +43,49 @@ public class UserServiceImpl implements UserService {
 		User user = userDto.toEntity();
 		user.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
 
+		//이메일 인증을 위한 토큰 생성 및 초기 인증false
+		String token = UUID.randomUUID().toString();
+		user.setEmailVerificationToken(token);
+		user.setEmailVerified(false);
+		
 		// 저장
 		userRepository.save(user);
+		
+		emailService.sendVerificationEmail(user.getEmail(), token);
 	}
+	
+	@Override
+	public Boolean verifyEmail(String token) throws Exception {
+		User user = userRepository.findByEmailVerificationToken(token).get();
+		if(user !=null) {
+			user.setEmailVerified(true);
+			user.setEmailVerificationToken(null);
+			userRepository.save(user);
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	public void completeJoin(UserDto userDto) throws Exception {
+		User user = userRepository.findByUsername(userDto.getUsername()).get();
+		
+		if(user!=null && user.getEmailVerified()) {
+			user.setCategory1(userDto.getCategory1());
+			user.setCategory2(userDto.getCategory2());
+			user.setCategory3(userDto.getCategory3());
+			user.setCategory4(userDto.getCategory4());
+			user.setCategory5(userDto.getCategory5());
+			user.setIntro(userDto.getIntro());
+		}else {
+			throw new Exception("이메일 인증이 완료되지 않았습니다.");
+		}
+		
+		userRepository.save(user);
+	}
+
+	
+	
 
 	public UserDto findUserByUserId(Integer userId) throws Exception {
 		User user = userRepository.findById(userId).orElseThrow(() -> new Exception("멤버 조회 오류"));
@@ -119,4 +165,9 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new IllegalArgumentException("없는 닉네임입니다: " + nickname));
 		return user.toDto();
 	}
+
+	
+
+
+	
 }

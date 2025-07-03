@@ -72,4 +72,14 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom {
 //        System.out.println("DB 호출: offset=" + offset + ", size=" + size + ", 반환 row 수=" + result.size());
         return result;
     }
+
+    @Override
+    public List<Integer> findFollowingIdsByFollowerId(Integer followerId) {
+        QFollow follow = QFollow.follow;
+        return jpaQueryFactory
+                .select(follow.following.userId)
+                .from(follow)
+                .where(follow.follower.userId.eq(followerId))
+                .fetch();
+    }
 }

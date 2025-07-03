@@ -36,7 +36,7 @@ public class InquiryServiceImpl implements InquiryService {
 	private final HostClassRepository hostClassRepository;
 	
 	@Override
-	public PageResponseDto<InquiryDto> getInquiryListByClassId(Integer classId, int page, int size) {
+	public PageResponseDto<InquiryDto> getInquiryListByClassId(Integer classId, int page, int size) throws Exception {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<Inquiry> inquiryPage = inquiryRepository.findInquiriesByClassId(classId,pageable);
 		

@@ -18,6 +18,7 @@ import com.dev.moyering.common.entity.QSubCategory;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.QGathering;
+import com.dev.moyering.gathering.entity.QGatheringApply;
 import com.dev.moyering.user.entity.User;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
@@ -241,5 +242,20 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	        .orderBy(gathering.meetingDate.asc())
 	        .limit(3)
 	        .fetch();
+	}
+	@Override
+	public List<GatheringDto> findMyGatheringSchedule(Integer userId) throws Exception {
+        QGatheringApply apply = QGatheringApply.gatheringApply;
+        QGathering gathering = QGathering.gathering;
+        List<Gathering> result = jpaQueryFactory
+                .select(gathering)
+                .from(apply)
+                .join(apply.gathering, gathering)
+                .where(apply.user.userId.eq(userId)
+                    .and(apply.isApproved.isTrue()))
+                .fetch();
+
+		return result.stream()
+				.map(g -> g.toDto()).collect(Collectors.toList());
 	}
 }

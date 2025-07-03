@@ -40,7 +40,7 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<GatheringApplyDto> findApplyUserListByGatheringId(Integer gatheringId) throws Exception {
+	public List<GatheringApplyDto> findApprovedUserListByGatheringId(Integer gatheringId) throws Exception {
 	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
 	    QUser user = QUser.user;
 		
@@ -49,7 +49,7 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	            gatheringApply.gatheringApplyId,
 	            gatheringApply.gathering.gatheringId,
 	            user.userId,
-	            user.nickName,  // DTO에서는 name 필드를 사용
+	            user.nickName,  
 	            user.profile,
 	            user.intro,
 	            gatheringApply.applyDate,
@@ -182,6 +182,7 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	            gathering.startTime.asc(),
 	            gatheringApply.applyDate.desc(),
 	            gatheringApply.gatheringApplyId.desc()
+	            
 	        );
 	    }
 	    
@@ -237,7 +238,8 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	        case "수락됨":
 	            return gatheringApply.isApproved.isTrue(); 
 	        case "거절됨":
-	            return gatheringApply.isApproved.isFalse(); 
+	            return gatheringApply.isApproved.isFalse()
+	                    .or(gatheringApply.gathering.canceled.isTrue());
 	        default:
 	            return null;
 	    }

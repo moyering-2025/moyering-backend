@@ -31,7 +31,6 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	
 	@Override
 	public void responseToGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception {
-
 		gatheringInquiryRepository.responseToGatheringInquiry(gatheringInquiryDto);
 	}
 	@Override
@@ -49,7 +48,10 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
 		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
 		Integer endPage = Math.min(startPage+10-1, allPage);
-		
+
+	    System.out.println("startDate: " + startDate);
+	    System.out.println("endDate: " + endDate);
+	    System.out.println("isAnswered: " + isAnswered);
 		pageInfo.setAllPage(allPage);
 		pageInfo.setStartPage(startPage);
 		pageInfo.setEndPage(endPage);

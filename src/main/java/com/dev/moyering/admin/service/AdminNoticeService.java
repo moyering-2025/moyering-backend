@@ -1,9 +1,12 @@
 package com.dev.moyering.admin.service;
 
-import com.dev.moyering.admin.dto.AdminNoticeDto;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import com.dev.moyering.admin.dto.AdminNoticeDto;
+import com.dev.moyering.admin.entity.AdminNotice;
 
 public interface AdminNoticeService {
     Page<AdminNoticeDto> getNoticeList(String searchKeyword, Pageable pageable) throws Exception; // 리스트 조회
@@ -21,5 +24,7 @@ public interface AdminNoticeService {
     void hideNotice(Integer noticeId) throws Exception;
 
     void showNotice(Integer noticeId) throws Exception;
+    
+    List<AdminNotice> selectAllNotice() throws Exception;
 
 }

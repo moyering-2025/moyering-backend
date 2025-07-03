@@ -1,9 +1,10 @@
 package com.dev.moyering.host.dto;
 
 import java.sql.Date;
+import java.time.LocalTime;
 
-import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.ClassCalendar;
+import com.dev.moyering.host.entity.HostClass;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,9 @@ public class ClassCalendarDto {
 	private String status;
 	private Integer registeredCount;
 	
+	private String className;
+    private LocalTime startTime;
+
 	public ClassCalendar toEntity() {
 		ClassCalendar entity = ClassCalendar.builder()
 				.calendarId(calendarId)

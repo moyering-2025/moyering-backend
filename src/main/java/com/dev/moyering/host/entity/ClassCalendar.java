@@ -55,6 +55,7 @@ public class ClassCalendar {
 				.build();
 		if(hostClass!=null) {
 			dto.setClassId(hostClass.getClassId());
+			dto.setClassName(hostClass.getName());
 		}
 		
 		return dto;
