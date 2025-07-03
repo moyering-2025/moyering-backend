@@ -1,8 +1,6 @@
 package com.dev.moyering.admin.service;
 import com.dev.moyering.admin.dto.AdminSettlementDto;
-import com.dev.moyering.admin.entity.AdminSettlement;
 import com.dev.moyering.admin.repository.AdminSettlementRepository;
-import com.dev.moyering.user.entity.UserPayment;
 import com.dev.moyering.user.repository.UserPaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 
