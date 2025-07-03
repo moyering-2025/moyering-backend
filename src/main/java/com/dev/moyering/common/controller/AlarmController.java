@@ -59,22 +59,37 @@ public class AlarmController {
 		Boolean confirm = alarmService.confirmAlarmAll(param.get("alarmList"));
 		return new ResponseEntity<Boolean>(confirm, HttpStatus.OK);
 	}
-	@GetMapping("/user/alarmList")
+	@PostMapping("/user/alarmList")
 	public ResponseEntity<Map<String, Object>> alarmList(@AuthenticationPrincipal PrincipalDetails principal, @RequestBody(required=false) Map<String, Object> param){
 		System.out.println("로그인 아이디 : "+principal.getUser().getUserId());
 		Integer loginId = principal.getUser().getUserId();
 		Map<String, Object> res = new HashMap<>();
 		PageInfo pageInfo = new PageInfo(1);
-		Integer alarmCnt = null;
-	    Integer alarmType =null;
-	    Date startDate =null;
-	    Date endDate =null;
-	    Boolean isConfirmed =null;
+		Integer alarmCnt = 0;
+	    Integer alarmType = null;
+	    Date startDate = null;
+	    Date endDate = null;
+	    Boolean isConfirmed = null;
 	    if(param !=null ) {
+	    	if(param.get("page")!=null) {
+				pageInfo.setCurPage((Integer)param.get("page"));
+			}
+            if (param.get("isConfirmed")!=null) {
+            	isConfirmed = (Boolean) param.get("isConfirmed");
+            }
 		    alarmType = (Integer) param.get("alarmType");
-		    startDate = (Date) param.get("startDate");
-		    endDate = (Date) param.get("endDate");
-		    isConfirmed = (Boolean) param.get("isConfirmed");
+			if(param.get("startDate") != null) {
+                String startDateStr = (String) param.get("startDate");
+                if (!startDateStr.trim().isEmpty()) {
+                    startDate = Date.valueOf(startDateStr); 
+                }
+            }
+            if(param.get("endDate") != null) {
+                String endDateStr = (String) param.get("endDate");
+                if (!endDateStr.trim().isEmpty()) {
+                    endDate = Date.valueOf(endDateStr);
+                }
+            }
 	    }
 		List<AlarmDto> alarmList = null;
 		try {
@@ -83,6 +98,7 @@ public class AlarmController {
 			if(alarmCnt > 0) {
 				alarmList = alarmService.findAlarmListByReceiverUserId(pageInfo, loginId, alarmType, startDate, endDate, isConfirmed);		
 				res.put("alarmList", alarmList);
+				res.put("pageInfo", pageInfo);
 			}
 			return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch (Exception e) {
