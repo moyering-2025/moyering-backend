@@ -1,15 +1,19 @@
 package com.dev.moyering.host.service;
 
+import java.io.File;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.classring.dto.UserReviewResponseDto;
 import com.dev.moyering.classring.dto.UtilSearchDto;
@@ -34,7 +38,9 @@ public class ReviewServiceImpl implements ReviewService {
 	private final HostClassRepository classRepository;
 	private final ClassCalendarRepository calendarRepository;
 	private final UserRepository userRepository;
-	
+    @Value("${iupload.path}")
+    private String uploadPath;
+
 	
 	@Override
 	public List<ReviewDto> getReviewByHostId(Integer hostId) {
@@ -145,6 +151,29 @@ public class ReviewServiceImpl implements ReviewService {
 	            .totalElements(pageResult.getTotalElements())
 	            .build();
 	}
+
+	@Override
+	public Integer writeReview(ReviewDto reviewDto) throws Exception {
+		//이미지가 있을 때
+		String savedFileName = null;
+		MultipartFile file = reviewDto.getReviewImg();
+		
+		if (file != null && !file.isEmpty()) {
+			String originalFilename = file.getOriginalFilename();
+			String uuid = UUID.randomUUID().toString();
+			savedFileName = uuid + "_" + originalFilename;
+			
+			File saveFile = new File(uploadPath,savedFileName);
+			file.transferTo(saveFile);
+			reviewDto.setReviewImgName(savedFileName);		
+		}
+		reviewDto.setReviewDate(new Date(System.currentTimeMillis()));
+		reviewDto.setState(0);
+		
+		Review entity = reviewDto.toEntity();
+        Review saved = reviewRepository.save(entity);
+        return saved.getReviewId();
+    }
 
 
 }

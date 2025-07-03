@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,6 +66,23 @@ public class UserReviewController {
         try {
             var result = reviewService.getDoneReviews(dto); // ↓서비스 분리
             return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    @PostMapping("/user/mypage/write-review")
+    public ResponseEntity<Integer> uploadReview(
+		@ModelAttribute ReviewDto reviewDto,
+        @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+    	
+        System.out.println("sdflijasljflwsaef");
+        reviewDto.setUserId(principal.getUser().getUserId());
+        try {
+        	Integer reviewId = reviewService.writeReview(reviewDto); // ↓서비스 분리
+            return ResponseEntity.ok(reviewId);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

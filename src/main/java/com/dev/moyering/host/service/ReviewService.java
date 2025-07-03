@@ -20,4 +20,5 @@ public interface ReviewService {
 	void replyReview (Integer reviewId,Integer hostId,String revRegContent) throws Exception;
 	PageResponseDto<WritableReviewResponseDto> getWritableReviews(UtilSearchDto dto) throws Exception;
 	PageResponseDto<UserReviewResponseDto> getDoneReviews(UtilSearchDto dto) throws Exception;
+	Integer writeReview(ReviewDto reviewDto) throws Exception;
 }

@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class UserInquiryController {
-	private final ReviewService reviewService;
 	private final InquiryService inquiryService;
 	
 	//클래스 상세 문의하기
