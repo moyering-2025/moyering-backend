@@ -6,12 +6,18 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.classring.repository.UserCouponRepository;
+import com.dev.moyering.common.dto.PageResponseDto;
+import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.entity.ClassCoupon;
+import com.dev.moyering.host.entity.Inquiry;
 import com.dev.moyering.host.repository.ClassCouponRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
@@ -62,5 +68,22 @@ public class UserCouponServiceImpl implements UserCouponService {
 	public List<UserCouponDto> getByUserIdAndClassId(Integer userId, Integer classId) throws Exception {
 		return userCouponRepository.findAllByUser_UserIdAndClassCoupon_HostClass_ClassId(userId,classId).stream()
 				.map(u->u.toDto()).collect(Collectors.toList());
+	}
+
+	@Override
+	public PageResponseDto<UserCouponDto> getUserCoponByUserId(Integer userId , int page, int size) throws Exception {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<UserCoupon> userCouponPage = userCouponRepository.findAllCouponsByUserId(userId,pageable);
+		
+		List<UserCouponDto> dtoList = userCouponPage.getContent().stream()
+				.map(UserCoupon::toDto)
+				.collect(Collectors.toList());
+		
+		return PageResponseDto.<UserCouponDto>builder()
+				.content(dtoList)
+				.currentPage(userCouponPage.getNumber()+1)
+				.totalPages(userCouponPage.getTotalPages())
+				.totalElements(userCouponPage.getTotalElements())
+				.build();
 	}
 }
