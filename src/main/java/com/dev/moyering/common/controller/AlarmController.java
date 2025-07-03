@@ -34,19 +34,17 @@ public class AlarmController {
 		}
 		return new ResponseEntity<String>("true", HttpStatus.OK);
 	}
-	@PostMapping("/sendAlarm")
-	public ResponseEntity<Boolean> sendAlarm(@RequestBody AlarmDto alarmDto) {
-		Boolean sendSucces = false;
-		try {
-			System.out.println("알람 보내기 테스트");
-			sendSucces = alarmService.sendAlarm(alarmDto);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new ResponseEntity<Boolean>(sendSucces, HttpStatus.OK);
-	}
-
-
+//	@PostMapping("/sendAlarm")
+//	public ResponseEntity<Boolean> sendAlarm(@RequestBody AlarmDto alarmDto) {
+//		Boolean sendSucces = false;
+//		try {
+//			System.out.println("알람 보내기 테스트");
+//			sendSucces = alarmService.sendAlarm(alarmDto);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return new ResponseEntity<Boolean>(sendSucces, HttpStatus.OK);
+//	}
 	@PostMapping("/confirm/{num}")
 	public ResponseEntity<Boolean> confirmAlarm(@PathVariable Integer num) throws Exception {
 		Boolean confirm = alarmService.confirmAlarm(num);
