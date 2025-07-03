@@ -7,31 +7,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.querydsl.core.Tuple;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.dev.moyering.auth.PrincipalDetails;
-import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.dto.GatheringInquiryDto;
-import com.dev.moyering.gathering.service.GatheringApplyService;
 import com.dev.moyering.gathering.service.GatheringInquiryService;
 import com.dev.moyering.gathering.service.GatheringService;
-import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.service.UserService;
 import com.dev.moyering.util.PageInfo;
 @RestController 
@@ -119,7 +110,7 @@ public class GatheringInquiryController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	@GetMapping("/user/getGatheringInquiriesByOrganizerUserId")
+	@PostMapping("/user/getGatheringInquiriesByOrganizerUserId")
 	public ResponseEntity<Map<String,Object>> getGatheringInquiriesByOrganizerUserId(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestBody(required=false) Map<String, Object> param) {
 		//마이페이지를 위한 문의내역 불러오기(주최자 입장)
@@ -131,20 +122,29 @@ public class GatheringInquiryController {
 		    Date startDate = null;
 		    Date endDate = null;
 		    Boolean isAnswered=null;
-			if(param != null) {
+		    if(param != null) {
 				if(param.get("page")!=null) {
 					pageInfo.setCurPage((Integer) param.get("page"));
 				}
-				if(param.get("isAnswered")!=null) {
-					isAnswered = (Boolean)param.get("isAnswered");
-				} 
-				if(param.get("startDate")!=null) {
-					startDate = (Date)param.get("startDate");
-				} 
-				if(param.get("endDate")!=null) {
-					endDate = (Date)param.get("endDate");
-				} 
+				if(param.get("isAnswered") != null) {
+	              isAnswered = (Boolean) param.get("isAnswered");
+	            } 
+				if(param.get("startDate") != null) {
+	                String startDateStr = (String) param.get("startDate");
+	                if (!startDateStr.trim().isEmpty()) {
+	                    startDate = Date.valueOf(startDateStr); 
+	                }
+	            }
+	            if(param.get("endDate") != null) {
+	                String endDateStr = (String) param.get("endDate");
+	                if (!endDateStr.trim().isEmpty()) {
+	                    endDate = Date.valueOf(endDateStr);
+	                }
+	            }
 			}
+		    System.out.println("startDate: " + startDate);
+		    System.out.println("endDate: " + endDate);
+		    System.out.println("isAnswered: " + isAnswered);
 			Integer findInquirieCntReceivedByOrganizer = gatheringInquiryService.findInquirieCntReceivedByOrganizer(loginId, startDate, endDate, isAnswered);
 			Integer findInquirieCntSentByUser = gatheringInquiryService.findInquirieCntSentByUser(loginId, startDate, endDate, isAnswered);
 			
@@ -167,7 +167,7 @@ public class GatheringInquiryController {
 		}
 	}	
 	
-	@GetMapping("/user/getGatheringInquiriesByUserId")
+	@PostMapping("/user/getGatheringInquiriesByUserId")
 	public ResponseEntity<Map<String,Object>> getGatheringInquiriesByUserId(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestBody(required=false) Map<String, Object> param) {
 		//마이페이지를 위한 문의내역 불러오기(문의자 입장)
@@ -183,15 +183,21 @@ public class GatheringInquiryController {
 				if(param.get("page")!=null) {
 					pageInfo.setCurPage((Integer) param.get("page"));
 				}
-				if(param.get("isAnswered")!=null) {
-					isAnswered = (Boolean)param.get("isAnswered");
-				} 
-				if(param.get("startDate")!=null) {
-					startDate = (Date)param.get("startDate");
-				} 
-				if(param.get("endDate")!=null) {
-					endDate = (Date)param.get("endDate");
-				} 
+				 if(param.get("isAnswered") != null) {
+	                isAnswered = (Boolean) param.get("isAnswered");
+	            } 
+				if(param.get("startDate") != null) {
+	                String startDateStr = (String) param.get("startDate");
+	                if (!startDateStr.trim().isEmpty()) {
+	                    startDate = Date.valueOf(startDateStr); 
+	                }
+	            }
+	            if(param.get("endDate") != null) {
+	                String endDateStr = (String) param.get("endDate");
+	                if (!endDateStr.trim().isEmpty()) {
+	                    endDate = Date.valueOf(endDateStr);
+	                }
+	            }
 			}
 			Integer findInquirieCntReceivedByOrganizer = gatheringInquiryService.findInquirieCntReceivedByOrganizer(loginId, startDate, endDate, isAnswered);
 			Integer findInquirieCntSentByUser = gatheringInquiryService.findInquirieCntSentByUser(loginId, startDate, endDate, isAnswered);
