@@ -109,4 +109,9 @@ public class FollowServiceImpl implements FollowService {
         int offset = pagem * size;
         return followRepository.findFollowingsWithPaging(followerId, offset, size, search);
     }
+
+    @Override
+    public List<Integer> getFollowingUserIds(Integer followerId) {
+        return followRepository.findFollowingIdsByFollowerId(followerId);
+    }
 }
