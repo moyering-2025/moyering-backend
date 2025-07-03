@@ -7,13 +7,17 @@ import com.dev.moyering.socialing.entity.Comment;
 import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.user.entity.User;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CommentDto {
 
     private Integer commentId;
