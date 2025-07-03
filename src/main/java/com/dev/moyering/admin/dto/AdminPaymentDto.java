@@ -26,6 +26,16 @@ public class AdminPaymentDto {
     private String paymentType;     // 결제 유형
     private String status;          // 결제 상태
 
+    // getter에서 null 체크
+    public Integer getClassAmount() {
+        return classAmount != null ? classAmount : 0; // 기본값 0 반환
+    }
+
+    // 또는 intValue() 호출하는 곳에서 안전하게 처리
+    public int getClassAmountValue() {
+        return classAmount != null ? classAmount.intValue() : 0;
+    }
+
     public AdminPaymentDto(Integer paymentId, String orderNo, String studentId,
                            String className, Integer classAmount, String couponType,
                            String discountType, Integer discountAmount,  Integer calculatedDiscountAmount, Integer totalAmount,

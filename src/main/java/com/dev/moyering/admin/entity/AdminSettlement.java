@@ -23,6 +23,10 @@ public class AdminSettlement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer settlementId; // 정산 ID
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "calendar_id", nullable = false)
+    private ClassCalendar classCalendar; // 클래스 일정 정보
+
     @Column(nullable = false)
     private Integer hostId; // 강사 ID
 
@@ -32,53 +36,39 @@ public class AdminSettlement {
     @Column
     private LocalDateTime settledAt; // 실제 지급일
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private String settlementStatus; // 정산 상태 (PENDING/COMPLETED/CANCELLED)
 
     @Column
-    private String bankType;
+    private String bankName;
 
     @Column
-    private String bankAccount; // 지급계좌
+    private String accNum; // 지급계좌
 
-    @Column(precision = 15, scale = 2)
-    private BigDecimal totalIncome; // 총 수입 (뷰에서 가져온 값)
+    @Column
+    private Integer settleAmountToDo; // 정산예정금액
 
-    @Column(precision = 15, scale = 2)
-    private BigDecimal platformFee; // 정산 수수료 (뷰에서 계산된 값)
 
-    @Column(precision = 15, scale = 2, nullable = false)
-    private BigDecimal settlementAmount; // 실제 지급액 (뷰에서 계산된 값)
+    @Column
+    private Integer settlementAmount; // 실제 지급액
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", nullable = false)
-    private UserPayment userPayment; // 결제 정보
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "calendar_id", nullable = false)
-    private ClassCalendar classCalendar; // 클래스 일정 정보
 
     @Builder
-    public AdminSettlement(Integer settlementId, Integer hostId, LocalDate settlementDate,
-                           LocalDateTime settledAt, String settlementStatus, String bankType,  String bankAccount,
-                           BigDecimal totalIncome, BigDecimal platformFee, BigDecimal settlementAmount,
-                           ClassCalendar classCalendar) {
+    public AdminSettlement(Integer settlementId, ClassCalendar classCalendar, Integer hostId, LocalDate settlementDate, LocalDateTime settledAt, String settlementStatus, String bankName, String accNum, Integer settleAmountToDo, Integer settlementAmount) {
         this.settlementId = settlementId;
         this.classCalendar = classCalendar;
         this.hostId = hostId;
         this.settlementDate = settlementDate;
         this.settledAt = settledAt;
         this.settlementStatus = settlementStatus;
-        this.bankType = bankType;
-        this.bankAccount = bankAccount;
-        this.totalIncome = totalIncome;
-        this.platformFee = platformFee;
+        this.bankName = bankName;
+        this.accNum = accNum;
+        this.settleAmountToDo = settleAmountToDo;
         this.settlementAmount = settlementAmount;
     }
 
-    /**
-     * 엔티티 → DTO 변환
-     */
+
+    /*** 엔티티 → DTO 변환*/
     public AdminSettlementDto toDto() {
         return AdminSettlementDto.builder()
                 .settlementId(settlementId)
@@ -87,10 +77,9 @@ public class AdminSettlement {
                 .settlementDate(settlementDate)
                 .settledAt(settledAt)
                 .settlementStatus(settlementStatus)
-                .bankType(bankType)
-                .bankAccount(bankAccount)
-                .totalIncome(totalIncome)
-                .platformFee(platformFee)
+                .bankName(bankName)
+                .accNum(accNum)
+                .settleAmountToDo(settleAmountToDo)
                 .settlementAmount(settlementAmount)
                 .build();
     }
