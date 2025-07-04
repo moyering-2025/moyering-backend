@@ -15,12 +15,14 @@ import com.dev.moyering.admin.dto.AdminCouponDto;
 import com.dev.moyering.admin.entity.AdminNotice;
 import com.dev.moyering.admin.service.AdminCouponService;
 import com.dev.moyering.admin.service.AdminNoticeService;
+import com.dev.moyering.host.dto.CalendarUserDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostPageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.dto.InquirySearchRequestDto;
 import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.dto.ReviewSearchRequestDto;
+import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.ClassRegistRepository;
 import com.dev.moyering.host.service.HostClassService;
@@ -208,7 +210,45 @@ public class HostClassController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		
+	}
+	
+	@PostMapping("/host/student/search")
+	public ResponseEntity<HostPageResponseDto<UserDto>> studentSearch(@RequestBody StudentSearchRequestDto dto){
+		try {
+			Page<UserDto> page = hostClassService.searchStudents(dto);
+			
+			PageInfo pageInfo = new PageInfo();
+			int curPage = page.getNumber() + 1;
+			int allPage = page.getTotalPages();
+			int blockSize = 5;
+			int startPage = ((curPage - 1) / blockSize) * blockSize + 1;
+			int endPage = Math.min(startPage + blockSize - 1, allPage);
+
+			pageInfo.setCurPage(curPage);
+			pageInfo.setAllPage(allPage);
+			pageInfo.setStartPage(startPage);
+			pageInfo.setEndPage(endPage);
+			
+			HostPageResponseDto<UserDto> response = HostPageResponseDto.<UserDto>builder()
+					.content(page.getContent()).pageInfo(pageInfo).build();
+			
+			return new ResponseEntity<>(response,HttpStatus.OK);			
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/host/student/classes")
+	public ResponseEntity<List<CalendarUserDto>> studentClass(@RequestParam Integer hostId,
+			@RequestParam Integer userId){
+		try {
+			List<CalendarUserDto> list = hostClassService.searchStudentClass(hostId, userId);
+			return new ResponseEntity<>(list,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		
 	}
 	

@@ -30,7 +30,12 @@ public interface FeedService {
     // 피드 작성
     Integer createFeed(FeedDto feedDto, List<MultipartFile> images) throws Exception;
 
-    void updateFeed(Integer feedId, FeedDto feedDto,List<MultipartFile> umages, List<String> removeUrls) throws Exception;
+    void updateFeed(Integer feedId
+//            , FeedDto feedDto
+                    ,String text,List<String> tags
+            ,List<MultipartFile> umages
+//            , List<String> removeUrls
+    ) throws Exception;
 
     boolean isLikedByUser(Integer feedId, Integer userId);
 

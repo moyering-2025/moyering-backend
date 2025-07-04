@@ -4,6 +4,7 @@ import com.dev.moyering.admin.dto.AdminSettlementDto;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,8 +18,15 @@ import java.util.Optional;
 import static com.dev.moyering.admin.entity.QAdminSettlement.adminSettlement;
 import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
 import static com.dev.moyering.host.entity.QHost.host;
+import static com.dev.moyering.host.entity.QHostClass.hostClass;
 import static com.dev.moyering.user.entity.QUser.user;
 import static com.dev.moyering.user.entity.QUserPayment.userPayment;
+
+//private String username; // 강사 로그인 아이디
+//private String hostName; // 강사 이름 (user.name)
+//private String className; // 클래스명
+
+
 
 @Repository
 @RequiredArgsConstructor
@@ -28,13 +36,16 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
     @Override
     public Optional<AdminSettlementDto> getSettlementBySettlementId(Integer settlementId) {
         AdminSettlementDto content = queryFactory
-                .select(Projections.constructor(AdminSettlementDto.class,
+                .selectDistinct(Projections.constructor(AdminSettlementDto.class,
                         adminSettlement.settlementId,
                         adminSettlement.classCalendar.calendarId,
                         adminSettlement.hostId,
+                        user.username, // 강사 로그인 아이디
+                        user.name, // 강사 이름
+                        hostClass.name, // 클래스 이름
                         adminSettlement.settlementDate,
                         adminSettlement.settledAt,
-                        adminSettlement.settlementStatus, // PENDING, COMPLETED, CANCELLED
+                        adminSettlement.settlementStatus, // WP, CP, RQ
                         host.bankName,
                         host.accNum,
                         userPayment.amount.sum()
@@ -47,13 +58,18 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                         userPayment.classCalendar.calendarId.eq(classCalendar.calendarId)
                                 .and(userPayment.status.eq("결제완료")) // 결제완료된 건만
                 )
-                .leftJoin(host).on(host.hostId.eq(adminSettlement.hostId))
-                .leftJoin(user).on(host.userId.eq(user.userId))
+                .join(host).on(host.hostId.eq(adminSettlement.hostId))
+                .join(hostClass).on(host.hostId.eq(hostClass.host.hostId)
+                        .and(hostClass.classId.eq(classCalendar.hostClass.classId)))
+                .join(user).on(host.userId.eq(user.userId))
                 .where(adminSettlement.settlementId.eq(settlementId))
                 .groupBy(
                         adminSettlement.settlementId,
                         adminSettlement.classCalendar.calendarId,
                         adminSettlement.hostId,
+                        user.username, // 강사 로그인 아이디
+                        user.name, // 강사 이름
+                        hostClass.name, // 클래스 이름
                         adminSettlement.settlementDate,
                         adminSettlement.settledAt,
                         adminSettlement.settlementStatus,
@@ -69,10 +85,13 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
     public Page<AdminSettlementDto> getSettlementList(String searchKeyword, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         // 1. 데이터 조회 (List로 받음)
         List<AdminSettlementDto> content = queryFactory
-                .select(Projections.constructor(AdminSettlementDto.class,
+                .selectDistinct(Projections.constructor(AdminSettlementDto.class,
                         adminSettlement.settlementId,
                         adminSettlement.classCalendar.calendarId,
                         adminSettlement.hostId,
+                        user.username, // 강사 로그인 아이디
+                        user.name, // 강사 이름
+                        hostClass.name, // 클래스 이름
                         adminSettlement.settlementDate,
                         adminSettlement.settledAt,
                         adminSettlement.settlementStatus, // PENDING, COMPLETED, CANCELLED
@@ -88,8 +107,10 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                         userPayment.classCalendar.calendarId.eq(classCalendar.calendarId)
                                 .and(userPayment.status.eq("결제완료")) // 결제완료된 건만
                 )
-                .leftJoin(host).on(host.hostId.eq(adminSettlement.hostId))
-                .leftJoin(user).on(host.userId.eq(user.userId))
+                .join(host).on(host.hostId.eq(adminSettlement.hostId))
+                .join(hostClass).on(host.hostId.eq(hostClass.host.hostId)
+                        .and(hostClass.classId.eq(classCalendar.hostClass.classId)))
+                .join(user).on(host.userId.eq(user.userId))
                 .where(
                         searchSettlement(searchKeyword),
                         settlementDateBetween(startDate, endDate)
@@ -98,6 +119,9 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                         adminSettlement.settlementId,
                         adminSettlement.classCalendar.calendarId,
                         adminSettlement.hostId,
+                        user.username, // 강사 로그인 아이디
+                        user.name, // 강사 이름
+                        hostClass.name, // 클래스 이름
                         adminSettlement.settlementDate,
                         adminSettlement.settledAt,
                         adminSettlement.settlementStatus,
@@ -105,7 +129,14 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                         host.accNum,
                         adminSettlement.settlementAmount
                 )
-                .orderBy(adminSettlement.settlementDate.desc())
+                .orderBy(
+                        Expressions.cases()
+                                .when(adminSettlement.settlementStatus.in("RQ")).then(0)
+                                .when(adminSettlement.settlementStatus.in("WT")).then(1)
+                                .when(adminSettlement.settlementStatus.in("CP")).then(2)
+                                .otherwise(3).asc(),
+                        adminSettlement.settlementDate.desc()
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -120,7 +151,7 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
     @Override
     public Long getSettlementListCount(String searchKeyword, LocalDate startDate, LocalDate endDate) {
         Long count = queryFactory
-                .select(adminSettlement.settlementId.count())
+                .selectDistinct(adminSettlement.settlementId.count())
                 .from(adminSettlement)
                 .leftJoin(adminSettlement.classCalendar, classCalendar)
                 .leftJoin(host).on(host.hostId.eq(adminSettlement.hostId))

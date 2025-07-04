@@ -32,7 +32,7 @@ public class BannerServiceImpl implements BannerService {
 	@Override
 	public List<BannerDto> getMainBnanerList(Integer status) throws Exception {
 		List<Banner> banners = bannerRepository.findByStatus(status);
-		return banners.stream().map(m->m.toDto()).collect(Collectors.toList()); 
+		return banners.stream().map(m->m.toDto()).collect(Collectors.toList());
 	}
 
 
@@ -64,31 +64,31 @@ public class BannerServiceImpl implements BannerService {
 			File UpFile = new File(bannerUploadPath + ifile.getOriginalFilename());
 			ifile.transferTo(UpFile);
 		}
-			try {
-				// 날짜 수동 설정
-				bannerDto.setCreatedAt(new java.sql.Date(System.currentTimeMillis()));
-				log.info("=== 배너 등록 시작 ===");
-				log.info("제목: {}, 내용 : {}, 등록일 : {}",
-						bannerDto.getTitle(), bannerDto.getContent(), bannerDto.getCreatedAt());
+		try {
+			// 날짜 수동 설정
+			bannerDto.setCreatedAt(new java.sql.Date(System.currentTimeMillis()));
+			log.info("=== 배너 등록 시작 ===");
+			log.info("제목: {}, 내용 : {}, 등록일 : {}",
+					bannerDto.getTitle(), bannerDto.getContent(), bannerDto.getCreatedAt());
 
-				// 1. DTO -> Entity 변환
-				Banner banner = bannerDto.toEntity();
-				log.debug("DTO -> Entity 변환 완료!");
+			// 1. DTO -> Entity 변환
+			Banner banner = bannerDto.toEntity();
+			log.debug("DTO -> Entity 변환 완료!");
 
-				// 2. 영속화
-				Banner savedBanner = bannerRepository.save(banner);
-				log.info("배너 저장 완료 = ID = {}", savedBanner.getBannerId());
+			// 2. 영속화
+			Banner savedBanner = bannerRepository.save(banner);
+			log.info("배너 저장 완료 = ID = {}", savedBanner.getBannerId());
 
-				// 3. Entity -> DTO 변환 및 반환
-				BannerDto result = savedBanner.toDto();
-				log.info("배너 등록 완료 : ID = {}", savedBanner.getBannerId());
-				return result;
+			// 3. Entity -> DTO 변환 및 반환
+			BannerDto result = savedBanner.toDto();
+			log.info("배너 등록 완료 : ID = {}", savedBanner.getBannerId());
+			return result;
 
-			} catch (Exception e) {
-				log.error("배너 등록 실패 : {}", e.getMessage(), e);
-				throw e;
-			}
+		} catch (Exception e) {
+			log.error("배너 등록 실패 : {}", e.getMessage(), e);
+			throw e;
 		}
+	}
 
 
 

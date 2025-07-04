@@ -21,8 +21,7 @@ public interface GatheringService {
 
 	Integer selectMyGatheringListCount(Integer userId, String word, String status) throws Exception;
 	void updateGatheringStatus(Integer gatheringId, Boolean canceled) throws Exception;
-	List<GatheringDto> myGatheringApplyList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception;
-	
+
 	//메인페이지 게더링
 	List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception;
 	PageResponseDto<GatheringDto> searchGathers(GatheringSearchRequestDto dto)throws Exception;

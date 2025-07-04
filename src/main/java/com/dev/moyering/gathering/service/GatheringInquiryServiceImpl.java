@@ -7,18 +7,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.dev.moyering.common.dto.AlarmDto;
+import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.gathering.dto.GatheringInquiryDto;
+import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringInquiry;
 import com.dev.moyering.gathering.repository.GatheringInquiryRepository;
+import com.dev.moyering.gathering.repository.GatheringRepository;
 import com.dev.moyering.util.PageInfo;
 @Service
 public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	@Autowired
 	GatheringInquiryRepository gatheringInquiryRepository;
+	@Autowired
+	GatheringRepository gatheringRepository;
+	
+	@Autowired
+	private AlarmService alarmService;
 	@Override
 	public Integer writeGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception {
 		GatheringInquiry gatheringInquiry = gatheringInquiryDto.toEntity();
 		gatheringInquiryRepository.save(gatheringInquiry);
+
+		Gathering gathering = gatheringRepository.findById(gatheringInquiryDto.getGatheringId()).get();
+		AlarmDto alarmDto = AlarmDto.builder()
+				.alarmType(3)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
+				.title(gatheringInquiryDto.getTitle()+"에 대한 문의가 등록되었어요.") // 필수 사항
+				.receiverId(gathering.getUser().getUserId())
+				.senderId(gatheringInquiryDto.getUserId())
+				.senderNickname(gatheringInquiryDto.getNickName())
+				.content(gathering.getTitle()+"에 대한 문의가 등록되었어요.")//알림 내용
+				.build();
+		alarmService.sendAlarm(alarmDto);
 		return gatheringInquiry.getInquiryId();
 	}
 	@Override
@@ -32,6 +52,16 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	@Override
 	public void responseToGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception {
 		gatheringInquiryRepository.responseToGatheringInquiry(gatheringInquiryDto);
+		Gathering gathering = gatheringRepository.findById(gatheringInquiryDto.getGatheringId()).get();
+		AlarmDto alarmDto = AlarmDto.builder()
+				.alarmType(3)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
+				.title(gatheringInquiryDto.getTitle()+"에 대한 문의에 대한 답변이 등록되었어요.") // 필수 사항
+				.receiverId(gatheringInquiryDto.getUserId())
+				.senderId(gathering.getUser().getUserId())
+				.senderNickname(gathering.getUser().getNickName())
+				.content(gathering.getTitle()+"에 대한 문의에 대한 답변이 등록되었어요. 등록되었어요.")//알림 내용
+				.build();
+		alarmService.sendAlarm(alarmDto);
 	}
 	@Override
 	public Integer findInquirieCntReceivedByOrganizer(Integer loginId, Date startDate, Date endDate, Boolean isAnswered)

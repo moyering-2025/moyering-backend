@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -172,7 +173,7 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public Map<String ,Object> getFeedsByUserId(Integer userId) throws Exception {
+    public Map<String, Object> getFeedsByUserId(Integer userId) throws Exception {
         List<Feed> feedList = feedRepository.findByUserUserId(userId);
         List<FeedDto> dtoList = new ArrayList<>();
         List<LikeList> likeList = new ArrayList<>();
@@ -182,12 +183,12 @@ public class FeedServiceImpl implements FeedService {
             dtoList.add(feed.toDto());
             likeList = likeListRepository.findByFeedFeedId(feed.getFeedId());
         }
-        for(LikeList like : likeList){
+        for (LikeList like : likeList) {
             likeListDtos.add(like.toDto());
         }
-        Map<String ,Object> map = new HashMap<>();
-        map.put("likeList",likeListDtos);
-        map.put("feedList",dtoList);
+        Map<String, Object> map = new HashMap<>();
+        map.put("likeList", likeListDtos);
+        map.put("feedList", dtoList);
 
         return map;
     }
@@ -249,25 +250,59 @@ public class FeedServiceImpl implements FeedService {
 
     @Override
     @Transactional
-    public void updateFeed(Integer feedId, FeedDto feedDto, List<MultipartFile> images, List<String> removeUrls) throws Exception {
+    public void updateFeed(Integer feedId
+//            , FeedDto feedDto
+            , String text, List<String> tags
+            , List<MultipartFile> images
+//            , List<String> removeUrls
+    ) throws Exception {
         Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new Exception("수정하려고 하는 피드가 없습니다"));
 
-        feed.setContent(feedDto.getContent());
+        /*feed.setContent(feedDto.getContent());
         feed.setTag1(feedDto.getTag1());
         feed.setTag2(feedDto.getTag2());
         feed.setTag3(feedDto.getTag3());
         feed.setTag4(feedDto.getTag4());
-        feed.setTag5(feedDto.getTag5());
+        feed.setTag5(feedDto.getTag5());*/
 
-        List<String> currentUrls = new ArrayList<>();
+        if (tags.size() > 0) feed.setTag1(tags.get(0));
+        if (tags.size() > 1 ) feed.setTag2(tags.get(1));
+        if (tags.size() > 2 ) feed.setTag3(tags.get(2));
+        if (tags.size() > 3 ) feed.setTag4(tags.get(3));
+        if (tags.size() > 4 ) feed.setTag5(tags.get(4));
+
+        /*List<String> currentUrls = new ArrayList<>();
         if (feed.getImg1() != null) currentUrls.add(feed.getImg1());
         if (feed.getImg2() != null) currentUrls.add(feed.getImg2());
         if (feed.getImg3() != null) currentUrls.add(feed.getImg3());
         if (feed.getImg4() != null) currentUrls.add(feed.getImg4());
-        if (feed.getImg5() != null) currentUrls.add(feed.getImg5());
+        if (feed.getImg5() != null) currentUrls.add(feed.getImg5());*/
 
-        // 3) 삭제할 기존 이미지 파일 삭제
+//        if (images.get(0) != null ) feed.setImg1(images.get(0).getOriginalFilename());
+//        if (images.get(1) != null) feed.setImg2(images.get(1).getOriginalFilename());
+//        if (images.get(2) != null ) feed.setImg3(images.get(2).getOriginalFilename());
+//        if (images.get(3) != null && images.get(3).isEmpty()) feed.setImg4(images.get(3).getOriginalFilename());
+//        if (images.get(4) != null && images.get(4).isEmpty()) feed.setImg5(images.get(4).getOriginalFilename());
+//        if (images.size() > 0) feed.setImg1(images.get(0).getOriginalFilename());
+//        if (images.size() > 1) feed.setImg2(images.get(1).getOriginalFilename());
+//        if (images.size() > 2) feed.setImg3(images.get(2).getOriginalFilename());
+//        if (images.size() > 3) feed.setImg4(images.get(3).getOriginalFilename());
+//        if (images.size() > 4) feed.setImg5(images.get(4).getOriginalFilename());
+        feed.setImg1(images.size() > 0 ? images.get(0).getOriginalFilename() : null);
+        feed.setImg2(images.size() > 1 ? images.get(1).getOriginalFilename() : null);
+        feed.setImg3(images.size() > 2 ? images.get(2).getOriginalFilename() : null);
+        feed.setImg4(images.size() > 3 ? images.get(3).getOriginalFilename() : null);
+        feed.setImg5(images.size() > 4 ? images.get(4).getOriginalFilename() : null);
+
+
+        if (text!=null) feed.setContent(text);
+
         Path dir = Paths.get(iuploadPath);
+        if (!Files.exists(dir)) {
+            Files.createDirectories(dir);
+        }
+
+        /*// 삭제 요청된 파일 제거
         if (removeUrls != null && !removeUrls.isEmpty()) {
             for (String url : removeUrls) {
                 String filename = Paths.get(url).getFileName().toString();
@@ -277,27 +312,32 @@ public class FeedServiceImpl implements FeedService {
                     e.printStackTrace();
                 }
             }
+            // currentUrls 에서 제거
             currentUrls = currentUrls.stream()
                     .filter(u -> !removeUrls.contains(u))
                     .collect(Collectors.toList());
         }
-        // 새 이미지 저장
+*/
+        /*// 새로운 이미지 저장
         if (images != null && !images.isEmpty()) {
             for (MultipartFile img : images) {
                 if (img.isEmpty()) continue;
                 String orig = img.getOriginalFilename();
-                String fname = /*System.currentTimeMillis() + "_" +*/iuploadPath + orig;
+                String fname = System.currentTimeMillis() + "_" + orig;
                 Path target = dir.resolve(fname);
-                try {
-                    Files.copy(img.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+
+                try (InputStream is = img.getInputStream()) {
+                    Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
                     e.printStackTrace();
                     throw new RuntimeException("이미지 저장 실패: " + fname, e);
                 }
-                currentUrls.add("/uploads/feeds/" + feedId + "/" + fname);
-            }
 
+                // DB에는 파일명만 넣어둠
+                currentUrls.add(fname);
+            }
         }
+
         // 엔티티 이미지 필드 초기화
         feed.setImg1(null);
         feed.setImg2(null);
@@ -305,12 +345,12 @@ public class FeedServiceImpl implements FeedService {
         feed.setImg4(null);
         feed.setImg5(null);
 
-        // 최종 URL 매핑
+        // 최대 5개 까지 세팅
         if (currentUrls.size() > 0) feed.setImg1(currentUrls.get(0));
         if (currentUrls.size() > 1) feed.setImg2(currentUrls.get(1));
         if (currentUrls.size() > 2) feed.setImg3(currentUrls.get(2));
         if (currentUrls.size() > 3) feed.setImg4(currentUrls.get(3));
-        if (currentUrls.size() > 4) feed.setImg5(currentUrls.get(4));
+        if (currentUrls.size() > 4) feed.setImg5(currentUrls.get(4));*/
 
         feedRepository.save(feed);
     }

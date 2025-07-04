@@ -57,7 +57,6 @@ public class GatheringApply {
 	    return GatheringApplyDto.builder()
 	    		.gatheringApplyId(gatheringApplyId)
 	    		.gatheringId(gathering.getGatheringId())
-	    		
 	    		.title(gathering.getTitle())
 	    		.thumbnailFileName(gathering.getThumbnail())
 	    		.meetingDate(gathering.getMeetingDate())

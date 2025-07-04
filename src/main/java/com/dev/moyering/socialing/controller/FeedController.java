@@ -1,5 +1,6 @@
 package com.dev.moyering.socialing.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class FeedController {
     public ResponseEntity<List<FeedDto>> getFeeds(
             @RequestParam(defaultValue = "all") String sort,
 //            @RequestParam(required = false) String userId
-            @RequestHeader(value = "Authorization",required = false) String header
+            @RequestHeader(value = "Authorization", required = false) String header
     ) {
         System.out.println("==== CONTROLLER /socialing/feeds ====");
         System.out.println("▶▶▶ Authorization header = " + header);
@@ -167,38 +168,45 @@ public class FeedController {
         }
     }
 
-//    @PatchMapping(value = "/user/socialing/feed/{feedId}")
-//    public ResponseEntity<Void> updateFeed(
-//            @PathVariable Integer feedId,
-//            @RequestPart("feed") FeedDto feedDto,
-//            @RequestPart(value = "images", required = false) List<MultipartFile> images,
-//            @RequestPart(value = "removeUrls", required = false) List<String> removeUrls,
-//            @AuthenticationPrincipal PrincipalDetails principal
-//    ) throws Exception {
-//        FeedDto existing = feedService.getFeedDetail(feedId, principal.getUser().getUserId());
-//        if (!existing.getWriterId().equals(principal.getUser().getUsername())) {
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
-//        feedService.updateFeed(feedId, feedDto, images, removeUrls);
-//        return ResponseEntity.noContent().build();
-//    }
-
-    @PostMapping(value = "/socialing/feed", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/user/socialing/feed/{feedId}")
     public ResponseEntity<Void> updateFeed(
-            @RequestPart Integer feedId,
-            @RequestPart Integer userId,
-            @RequestPart("feed") FeedDto feedDto,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @RequestPart(value = "removeUrls", required = false) List<String> removeUrls
-
+            @PathVariable Integer feedId,
+//            @RequestPart("feed") FeedDto feedDto,
+            @RequestParam String text,
+            @RequestParam List<String> tags,
+            @RequestPart(value = "img1", required = false) MultipartFile image1,
+            @RequestPart(value = "img2", required = false) MultipartFile image2,
+            @RequestPart(value = "img3", required = false) MultipartFile image3,
+            @RequestPart(value = "img4", required = false) MultipartFile image4,
+            @RequestPart(value = "img5", required = false) MultipartFile image5,
+            @RequestPart(value = "removeUrls", required = false) List<String> removeUrls,
+            @AuthenticationPrincipal PrincipalDetails principal
     ) throws Exception {
-        FeedDto existing = feedService.getFeedDetail(feedId, userId);
-        if (!existing.getWriterId().equals(userId)) {
+        List<MultipartFile> images = new ArrayList<>();
+        if (image1 != null && !image1.isEmpty()) images.add(image1);
+        if (image2 != null && !image2.isEmpty()) images.add(image2);
+        if (image3 != null && !image3.isEmpty()) images.add(image3);
+        if (image4 != null && !image4.isEmpty()) images.add(image4);
+        if (image5 != null && !image5.isEmpty()) images.add(image5);
+
+//        System.out.println(text);
+//        System.out.println(tags);
+//        System.out.println(image1.getOriginalFilename());
+//        System.out.println(image2.getOriginalFilename());
+//        System.out.println(image3.getOriginalFilename());
+//        System.out.println(image4.getOriginalFilename());
+//        System.out.println(image5.getOriginalFilename());
+        System.out.println("==========================================" + removeUrls);
+        FeedDto existing = feedService.getFeedDetail(feedId, principal.getUser().getUserId());
+        if (!existing.getWriterUserId().equals(principal.getUser().getUserId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        feedService.updateFeed(feedId, feedDto, images, removeUrls);
+        feedService.updateFeed(feedId, text, tags, images
+//                , removeUrls
+        );
         return ResponseEntity.noContent().build();
     }
+
 
     @GetMapping("/socialing/feeds/{feedId}/liked")
     public ResponseEntity<Map<String, Boolean>> isFeedLiked(
@@ -219,11 +227,11 @@ public class FeedController {
     }
 
     @GetMapping("/socialing/feeds/myFeeds")
-    public ResponseEntity<Map<String ,Object>> getMyFeeds(@RequestParam Integer userId ) {
-        try{
+    public ResponseEntity<Map<String, Object>> getMyFeeds(@RequestParam Integer userId) {
+        try {
             Map<String, Object> feedsByUserId = feedService.getFeedsByUserId(userId);
             return new ResponseEntity<>(feedsByUserId, HttpStatus.OK);
-        }catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

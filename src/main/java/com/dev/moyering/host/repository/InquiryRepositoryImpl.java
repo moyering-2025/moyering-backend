@@ -71,6 +71,12 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 		if (dto.getEndDate() != null && !dto.getEndDate().isBlank()) {
 			builder.and(inquiry.inquiryDate.loe(Date.valueOf(LocalDate.parse(dto.getEndDate(), formatter))));
 		}
+		if(dto.getHostClassId()!=null) {
+			builder.and(hostClass.classId.eq(dto.getHostClassId()));
+		}
+		if(dto.getCalendarId()!=null) {
+			builder.and(classCalendar.calendarId.eq(dto.getCalendarId()));
+		}
 
 		// 답변 상태 필터
 		if ("답변완료".equals(dto.getReplyStatus())) {
