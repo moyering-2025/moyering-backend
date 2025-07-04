@@ -26,7 +26,7 @@ public class AdminBannerController {
     /*** 배너 등록*/
     @PostMapping("/create")
     public ResponseEntity<BannerDto> bannerCreate(BannerDto bannerDto,
-                                                  @RequestPart(name = "ifile", required = false) MultipartFile bannerImg) {
+                                                  @RequestPart(name = "bannerImg", required = false) MultipartFile bannerImg) {
 
         log.info("배너 등록 요청 : {}", bannerDto.getBannerId());
         log.info(bannerImg != null ? bannerImg.getOriginalFilename() : "null",
@@ -52,7 +52,7 @@ public class AdminBannerController {
                 @RequestParam(required = false) String title,
                 @RequestParam(required = false) String content,
 //                @RequestPart(name="bannerDto") BannerDto bannerDto,
-                @RequestPart(name = "ifile", required = false) MultipartFile bannerImg) {
+                @RequestPart(name = "bannerImg", required = false) MultipartFile bannerImg) {
         log.info("배너 수정 요청 - bannerId : {}, title : {}, content : {}, bannerImg : {}", bannerId, title, content,  bannerImg);
         log.info("받은 파일: {}", bannerImg != null ? bannerImg.getOriginalFilename() : "파일 없음");
 
