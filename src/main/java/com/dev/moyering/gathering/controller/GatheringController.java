@@ -86,7 +86,7 @@ public class GatheringController {
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
 			List<GatheringApplyDto> member = gatheringApplyService.findApprovedUserListByGatheringId(gatheringId);
 			List<GatheringDto> recommendations = gatheringService.findGatheringWithCategory(nGatheringDto.getGatheringId(), nGatheringDto.getSubCategoryId(), nGatheringDto.getCategoryId());
-
+			
 	        Integer acceptedCount = gatheringApplyService.findApprovedUserCountByGatheringId(gatheringId);
 	        nGatheringDto.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);
 			userDto.setPassword(null);

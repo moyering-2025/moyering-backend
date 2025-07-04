@@ -17,4 +17,5 @@ public interface AlarmService {
 	List<AlarmDto> findAlarmListByReceiverUserId(PageInfo pageInfo, Integer loginId, Integer alarmType, Date startDate,
 			Date endDate, Boolean isConfirmed) throws Exception;
 	List<AlarmDto> getAlarmList(Integer loginId) throws Exception;
+	Integer getUnConfirmedAlarmListCnt(Integer loginId) throws Exception;
 }

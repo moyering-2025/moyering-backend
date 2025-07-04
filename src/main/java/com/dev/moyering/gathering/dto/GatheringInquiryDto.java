@@ -36,6 +36,7 @@ public class GatheringInquiryDto {
 	private String responseState;
 	private String organizerNicknNme;
 	private String organizerProfile;
+
 	
 
 	//답변 등록용 생성자

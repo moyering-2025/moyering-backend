@@ -25,8 +25,7 @@ public class AlarmController {
 	private AlarmService alarmService;
 
 	@PostMapping("/fcmToken")
-	public ResponseEntity<String> fcmToken(@RequestBody Map<String, Object> param) {
-		System.out.println(param);
+	public ResponseEntity<String> fcmToken(@RequestBody Map<String, Object> param) throws Exception{
 		try {
 			alarmService.registFcmToken((Integer)param.get("userId"), (String)param.get("fcmToken"));
 		} catch (Exception e) {
@@ -34,32 +33,28 @@ public class AlarmController {
 		}
 		return new ResponseEntity<String>("true", HttpStatus.OK);
 	}
-//	@PostMapping("/sendAlarm")
-//	public ResponseEntity<Boolean> sendAlarm(@RequestBody AlarmDto alarmDto) {
-//		Boolean sendSucces = false;
-//		try {
-//			System.out.println("알람 보내기 테스트");
-//			sendSucces = alarmService.sendAlarm(alarmDto);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		return new ResponseEntity<Boolean>(sendSucces, HttpStatus.OK);
-//	}
-	@PostMapping("/confirm/{num}")
-	public ResponseEntity<Boolean> confirmAlarm(@PathVariable Integer num) throws Exception {
-		Boolean confirm = alarmService.confirmAlarm(num);
+	@PostMapping("/confirm/{alarmId}")
+	public ResponseEntity<Boolean> confirmAlarm(@PathVariable Integer alarmId) throws Exception {
+		Boolean confirm = alarmService.confirmAlarm(alarmId);
 		return new ResponseEntity<Boolean>(confirm, HttpStatus.OK);
 	}
-
 	@PostMapping("/confirmAll")
-	public ResponseEntity<Boolean> confirmAlarmAll(@RequestBody Map<String, List<Integer>> param) throws Exception {
+	public ResponseEntity<Boolean> confirmAlarmAll(@RequestBody Map<String, List<Integer>> param) {
 		System.out.println("param : " +param);
-		Boolean confirm = alarmService.confirmAlarmAll(param.get("alarmList"));
-		return new ResponseEntity<Boolean>(confirm, HttpStatus.OK);
+		Boolean confirm;
+		try {
+			confirm = alarmService.confirmAlarmAll(param.get("alarmList"));
+			return new ResponseEntity<Boolean>(confirm, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 	@PostMapping("/user/alarmList")
 	public ResponseEntity<Map<String, Object>> alarmList(@AuthenticationPrincipal PrincipalDetails principal, @RequestBody(required=false) Map<String, Object> param){
 		System.out.println("로그인 아이디 : "+principal.getUser().getUserId());
+		System.out.println("검색 조건 : "+param);
 		Integer loginId = principal.getUser().getUserId();
 		Map<String, Object> res = new HashMap<>();
 		PageInfo pageInfo = new PageInfo(1);
@@ -111,6 +106,17 @@ public class AlarmController {
 		try {
 			List<AlarmDto> alarms =  alarmService.getAlarmList(loginId);
 			return new ResponseEntity<>(alarms, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	@GetMapping("/user/unConfirmedAlarmCnt")
+	public ResponseEntity<Integer> getUnConfirmedAlarmListCnt(@AuthenticationPrincipal PrincipalDetails principal) throws Exception {
+		Integer loginId = principal.getUser().getUserId();
+		try {
+			Integer unConfirmedAlarmListCnt = alarmService.getUnConfirmedAlarmListCnt(loginId);
+			return new ResponseEntity<>(unConfirmedAlarmListCnt, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

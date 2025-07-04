@@ -9,4 +9,6 @@ import com.dev.moyering.common.entity.Alarm;
 public interface AlarmRepository extends JpaRepository<Alarm, Integer>, AlarmRepositoryCustom {
 
 	List<Alarm> findByReceiverIdAndConfirmFalseOrderByAlarmIdDesc(Integer receiverId);
+
+	Integer countByReceiverIdAndConfirmIsFalse(Integer loginId);
 }

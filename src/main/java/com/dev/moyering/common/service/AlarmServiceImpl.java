@@ -71,6 +71,10 @@ public class AlarmServiceImpl implements AlarmService {
 		
 	}
 	@Override
+	public Integer getUnConfirmedAlarmListCnt (Integer loginId) throws Exception {
+		return alarmRepository.countByReceiverIdAndConfirmIsFalse(loginId);
+	}
+	@Override
 	public Long countAlarmsByReceiverUserId(Integer loginId, Integer alarmType, Date startDate, Date endDate, Boolean isConfirmed) throws Exception {
 		return alarmRepository.countAlarmsByReceiverUserId(loginId, alarmType, startDate, endDate, isConfirmed);
 	}
@@ -129,11 +133,11 @@ public class AlarmServiceImpl implements AlarmService {
 		return true;
 	}
 
-		//알람목록 확인(알람번호)
+	//알람목록 확인(알람번호)
 	@Override
-	public Boolean confirmAlarmAll(List<Integer> alarmList) {
-		for(Integer num : alarmList) {
-			Optional<Alarm> oalarm = alarmRepository.findById(num);
+	public Boolean confirmAlarmAll(List<Integer> alarmIdList) {
+		for(Integer alarmId : alarmIdList) {
+			Optional<Alarm> oalarm = alarmRepository.findById(alarmId);
 			if(oalarm.isPresent()) {
 				Alarm alarm = oalarm.get();
 				alarm.setConfirm(true);
