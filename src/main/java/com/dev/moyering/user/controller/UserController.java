@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.dev.moyering.user.dto.UserBadgeDto;
 import com.dev.moyering.user.dto.UserProfileDto;
 import com.dev.moyering.user.dto.UserProfileUpdateDto;
+import com.dev.moyering.user.entity.UserBadge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -119,5 +121,42 @@ public class UserController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+	}
+
+	// 내가 가진 배지 리스트
+	@GetMapping("/user/badges")
+	public ResponseEntity<List<UserBadgeDto>> getMyBadges(
+			@AuthenticationPrincipal PrincipalDetails principal
+	) {
+		Integer userId = principal.getUser().getUserId();
+		List<UserBadgeDto> badges = userService.getUserBadges(userId);
+		return ResponseEntity.ok(badges);
+	}
+
+	// 대표 배지 변경
+	@PatchMapping("/user/mypage/badge")
+	public ResponseEntity<?> updateMyBadge(
+			@AuthenticationPrincipal PrincipalDetails principal,
+			@RequestBody UserBadgeDto dto
+	) {
+		Integer userId = principal.getUser().getUserId();
+        try {
+            userService.updateRepresentativeBadge(userId, dto.getUserBadgeId());
+			return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+	}
+
+	@GetMapping("/user/firstBadge")
+	public ResponseEntity<UserBadgeDto> getFirstBadge(
+			@AuthenticationPrincipal PrincipalDetails principal
+	){
+		System.out.println("아이디"+principal.getUser().getUserId());
+		UserBadge badge = userService.getUserFirstBadge(principal.getUser().getUserId());
+
+		return new ResponseEntity<>(badge.toDto(),HttpStatus.OK);
 	}
 }

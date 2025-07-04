@@ -4,8 +4,11 @@ import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
 import com.dev.moyering.common.service.EmailService;
 
+import com.dev.moyering.user.dto.UserBadgeDto;
 import com.dev.moyering.user.dto.UserProfileDto;
 import com.dev.moyering.user.dto.UserProfileUpdateDto;
+import com.dev.moyering.user.entity.UserBadge;
+import com.dev.moyering.user.repository.UserBadgeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,6 +43,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    private UserBadgeRepository userBadgeRepository;
 
     @Value("${iupload.path}")
     private String iuploadPath;
@@ -200,12 +207,18 @@ public class UserServiceImpl implements UserService {
         user.setBirthday(dto.getBirthday());
         user.setIntro(dto.getIntro());
 
-        int size = dto.getCategories() != null ? dto.getCategories().size() : 0;
-        user.setCategory1(size > 0 ? dto.getCategories().get(0) : null);
-        user.setCategory2(size > 1 ? dto.getCategories().get(1) : null);
-        user.setCategory3(size > 2 ? dto.getCategories().get(2) : null);
-        user.setCategory4(size > 3 ? dto.getCategories().get(3) : null);
-        user.setCategory5(size > 4 ? dto.getCategories().get(4) : null);
+//        int size = dto.getCategories() != null ? dto.getCategories().size() : 0;
+//        user.setCategory1(size > 0 ? dto.getCategories().get(0) : null);
+//        user.setCategory2(size > 1 ? dto.getCategories().get(1) : null);
+//        user.setCategory3(size > 2 ? dto.getCategories().get(2) : null);
+//        user.setCategory4(size > 3 ? dto.getCategories().get(3) : null);
+//        user.setCategory5(size > 4 ? dto.getCategories().get(4) : null);
+
+        user.setCategory1(dto.getCategory1());
+        user.setCategory2(dto.getCategory2());
+        user.setCategory3(dto.getCategory3());
+        user.setCategory4(dto.getCategory4());
+        user.setCategory5(dto.getCategory5());
     }
 
     @Override
@@ -236,8 +249,53 @@ public class UserServiceImpl implements UserService {
                         .filter(s -> s != null && !s.isBlank())
                         .collect(Collectors.toList())
         );
+        dto.setProfile(user.getProfile());
 
         return dto;
+    }
+
+    @Override
+    @Transactional
+    public List<UserBadgeDto> getUserBadges(Integer userId) {
+        return userBadgeRepository.findByUser_UserId(userId)
+                .stream()
+                .map(UserBadge::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public UserBadge getUserFirstBadge(Integer userId) {
+        List<UserBadge> list = userBadgeRepository.findByUser_UserId(userId);
+        UserBadge firstBadge = null;
+        for(UserBadge badge : list) {
+            if(badge.getIsRepresentative() == true){
+                firstBadge = badge;
+            }
+        }
+
+        return firstBadge;
+    }
+
+    @Override
+    @Transactional
+    public void updateRepresentativeBadge(Integer userId, Integer userBadgeId) throws Exception {
+        UserBadge targetBadge = userBadgeRepository.findById(userBadgeId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저 배지가 존재하지 않습니다."));
+
+        // 본인 것인지 확인
+        if (!targetBadge.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("본인의 배지가 아닙니다.");
+        }
+
+        // 기존 대표 배지 false 처리
+        userBadgeRepository.findByUser_UserIdAndIsRepresentativeTrue(userId)
+                .ifPresent(prevBadge -> {
+                    prevBadge.setIsRepresentative(false);
+                });
+
+        // 새로운 대표 배지로
+        targetBadge.setIsRepresentative(true);
     }
 
 }
