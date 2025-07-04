@@ -20,11 +20,11 @@ public interface AdminSettlementService {
     /*** 정산 내역 총 개수*/
     Long getSettlementListCount(String searchKeyword, LocalDate startDate, LocalDate endDate);
 
-//    /*** 정산 예정금액 계산 및 업데이트*/
-//    void calculateAndUpdateSettlementAmountToDo(Integer settlementId);
-    }
+    boolean completeSettlement(Integer settlementId);
 
 
+
+}
 
 
 //    // ========== 정산 대기 목록 조회 ==========

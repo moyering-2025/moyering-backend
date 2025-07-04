@@ -1,14 +1,8 @@
 package com.dev.moyering.admin.entity;
-
-
 import com.dev.moyering.admin.dto.AdminSettlementDto;
 import com.dev.moyering.host.entity.ClassCalendar;
-import com.dev.moyering.user.entity.UserPayment;
 import lombok.*;
-
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -37,7 +31,7 @@ public class AdminSettlement {
     private LocalDateTime settledAt; // 실제 지급일
 
     @Column(nullable = false)
-    private String settlementStatus; // 정산 상태 (PENDING/COMPLETED/CANCELLED)
+    private String settlementStatus; // 정산 상태 (WT/CP/RQ)
 
     @Column
     private String bankName;
@@ -84,13 +78,20 @@ public class AdminSettlement {
                 .build();
     }
 
-    /**
-     * 정산 상태 업데이트
-     */
-    public void updateStatus(String status) {
-        this.settlementStatus = status;
-        if ("COMPLETED".equals(status)) {
-            this.settledAt = LocalDateTime.now();
-        }
+    /*** 정산 완료 처리*/
+    public AdminSettlement completeSettlement() {
+        return AdminSettlement.builder()
+                .settlementId(this.settlementId)
+                .classCalendar(this.classCalendar)
+                .hostId(this.hostId)
+                .settlementDate(this.settlementDate)
+                .settlementStatus("CP") //완료 상태로 변경
+                .settledAt(LocalDateTime.now()) // 정산 완료일 설정
+                .settlementAmount(this.settleAmountToDo) // 정산예정금액 -> 정산 금액
+                .bankName(this.bankName)
+                .accNum(this.accNum)
+                .settleAmountToDo(this.settlementAmount)
+                .build();
     }
-}
+       }
+
