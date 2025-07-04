@@ -21,6 +21,7 @@ import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.dto.InquirySearchRequestDto;
 import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.dto.ReviewSearchRequestDto;
+import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.ClassRegistRepository;
 import com.dev.moyering.host.service.HostClassService;
@@ -208,8 +209,14 @@ public class HostClassController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	@PostMapping("/host/stuent/search")
+	public ResponseEntity<List<StudentSearchRequestDto>> studentSearch(){
 		
 		
+		
+		return null;
 	}
 	
 	

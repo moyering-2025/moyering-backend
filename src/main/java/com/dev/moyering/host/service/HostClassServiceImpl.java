@@ -316,11 +316,11 @@ public class HostClassServiceImpl implements HostClassService {
 			stream = stream.filter(c -> c.getStatus() != null && c.getStatus().equals(dto.getStatus()));
 		}
 
-		if (dto.getStartDate() != null && !dto.getStartDate().isEmpty() && dto.getStartDate() != null
-				&& !dto.getStartDate().isEmpty()) {
+		if (dto.getStartDate() != null && !dto.getStartDate().isEmpty() && dto.getEndDate() != null
+				&& !dto.getEndDate().isEmpty()) {
 
 			LocalDate start = LocalDate.parse(dto.getStartDate());
-			LocalDate end = LocalDate.parse(dto.getStartDate());
+			LocalDate end = LocalDate.parse(dto.getEndDate());
 
 			stream = stream.filter(c -> {
 				if (c.getStartDate() == null)

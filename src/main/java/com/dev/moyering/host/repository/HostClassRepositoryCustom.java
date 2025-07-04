@@ -20,6 +20,8 @@ public interface HostClassRepositoryCustom {
     List <AdminClassDto> searchClassForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception;
     Long countClasses(AdminClassSearchCond cond) throws Exception;
 //    AdminClassDto findClassByClassId(Integer classId) throws Exception;
+    Page<User> searchClassStudent
+    
 }
 
 
