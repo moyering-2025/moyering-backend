@@ -112,7 +112,8 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	            hc.name,
 	            cc.startDate,
 	            cr.classCalendar.calendarId,
-	            cr.user.userId
+	            cr.user.userId,
+	            hc.host.hostId
 	        ))
 	        .from(cr)
 	        .join(cr.classCalendar, cc)
@@ -122,6 +123,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 	            .and(r.user.userId.eq(cr.user.userId))
 	        )
 	        .where(builder)
+	        .orderBy(cc.startDate.asc())
 	        .offset(pageable.getOffset())
 	        .limit(pageable.getPageSize())
 	        .fetch();
@@ -166,12 +168,14 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		    	        r.star,
 		    	        r.content,
 		    	        r.revRegCotnent,
-		    	        r.responseDate
+		    	        r.responseDate,
+		    	        r.reviewImg
 		    	    ))
 		        .from(r)
 		        .join(r.classCalendar, cc)
 		        .join(cc.hostClass, hc)
 		        .where(builder)
+		        .orderBy(r.reviewId.desc())
 		        .offset(pageable.getOffset())
 		        .limit(pageable.getPageSize())
 		        .fetch();

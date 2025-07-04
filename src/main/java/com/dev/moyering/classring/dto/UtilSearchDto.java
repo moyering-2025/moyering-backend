@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UtilSearchDto {
-    private String tab; // "writable", "done"
+    private String tab; 
     private int page = 0;
     private int size = 10;
 
@@ -18,4 +18,5 @@ public class UtilSearchDto {
     private Date endDate;   // 최대 날짜
 
     private Integer userId;
+    private String keywords; //혹사라도 검색어 
 }

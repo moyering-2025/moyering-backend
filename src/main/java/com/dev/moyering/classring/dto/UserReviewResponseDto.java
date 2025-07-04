@@ -23,4 +23,5 @@ public class UserReviewResponseDto {
     // 강사 답변
     private String teacherReply;
     private Date responseDate;
+    private String reviewImgName;
 }

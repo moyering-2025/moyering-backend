@@ -41,15 +41,15 @@ public class UserReviewController {
 		}
     }
     
+    //마이페이지 클래스 리뷰 => 작성 가능한 것
     @PostMapping("/user/mypage/reviewList/writable")
     public ResponseEntity<PageResponseDto<WritableReviewResponseDto>> getWritableReviewList(
         @RequestBody UtilSearchDto dto,
         @AuthenticationPrincipal PrincipalDetails principal
     ) {
-    	System.out.println("skdfhikalshfase"+dto);
         dto.setUserId(principal.getUser().getUserId());
         try {
-            var result = reviewService.getWritableReviews(dto); // ↓서비스 분리
+        	PageResponseDto<WritableReviewResponseDto> result = reviewService.getWritableReviews(dto); // ↓서비스 분리
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,6 +57,7 @@ public class UserReviewController {
         }
     }
 
+    //마이페이지 리뷰 작성 완료한 것
     @PostMapping("/user/mypage/reviewList/done")
     public ResponseEntity<PageResponseDto<UserReviewResponseDto>> getDoneReviewList(
         @RequestBody UtilSearchDto dto,
@@ -64,7 +65,7 @@ public class UserReviewController {
     ) {
         dto.setUserId(principal.getUser().getUserId());
         try {
-            var result = reviewService.getDoneReviews(dto); // ↓서비스 분리
+        	PageResponseDto<UserReviewResponseDto> result = reviewService.getDoneReviews(dto); // ↓서비스 분리
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,6 +73,7 @@ public class UserReviewController {
         }
     }
     
+    //마이페이지 리뷰 작성하기
     @PostMapping("/user/mypage/write-review")
     public ResponseEntity<Integer> uploadReview(
 		@ModelAttribute ReviewDto reviewDto,

@@ -127,7 +127,7 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewRepository.save(reviewDto.toEntity());
 		
 	}
-	
+	@Override
 	public PageResponseDto<WritableReviewResponseDto> getWritableReviews(UtilSearchDto dto) throws Exception {
 	    Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
 	    Page<WritableReviewResponseDto> pageResult = reviewRepository.findWritableReviews(dto, pageable);
@@ -139,7 +139,7 @@ public class ReviewServiceImpl implements ReviewService {
 	            .totalElements(pageResult.getTotalElements())
 	            .build();
 	}
-
+	@Override
 	public PageResponseDto<UserReviewResponseDto> getDoneReviews(UtilSearchDto dto) throws Exception {
 	    Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
 	    Page<UserReviewResponseDto> pageResult = reviewRepository.findDoneReviews(dto, pageable);

@@ -14,4 +14,5 @@ public class WritableReviewResponseDto {
     private Date classDate;
     private Integer calendarId;
     private Integer userId;
+    private Integer hostId;
 }

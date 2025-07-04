@@ -7,15 +7,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.auth.PrincipalDetails;
+import com.dev.moyering.classring.dto.InquiryResponseDto;
+import com.dev.moyering.classring.dto.UserReviewResponseDto;
+import com.dev.moyering.classring.dto.UtilSearchDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.service.InquiryService;
-import com.dev.moyering.host.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,6 @@ public class UserInquiryController {
 	@PostMapping("/user/writeClassInquiry")
 	public ResponseEntity<Integer> writeClassInquiry(
 			@RequestBody InquiryDto dto,@AuthenticationPrincipal PrincipalDetails principal) {
-		
 		Integer userId = principal.getUser().getUserId();
 		dto.setUserId(userId);
 		try {
@@ -56,5 +56,39 @@ public class UserInquiryController {
 		} catch (Exception e) {
 	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			
 		}
+    }
+    
+    //마이페이지 클래스 질문 => 답변 대기 중인 것
+    @PostMapping("/user/mypage/inquiry-list/pending")
+    public ResponseEntity<PageResponseDto<InquiryResponseDto>> getPendingInquiries(
+        @RequestBody UtilSearchDto dto,
+        @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        dto.setUserId(principal.getUser().getUserId());
+        try {
+    		System.out.println("sdflisjfliwse");
+    		System.out.println(dto);
+        	PageResponseDto<InquiryResponseDto> result = inquiryService.getMyInquiries(dto);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    //마이페이지 클래스 질문 => 답변 완료된 것
+    @PostMapping("/user/mypage/inquiry-list/completed")
+    public ResponseEntity<PageResponseDto<InquiryResponseDto>> getDoneReviewList(
+        @RequestBody UtilSearchDto dto,
+        @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        dto.setUserId(principal.getUser().getUserId());
+        try {
+        	PageResponseDto<InquiryResponseDto> result = inquiryService.getMyInquiries(dto); 
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
