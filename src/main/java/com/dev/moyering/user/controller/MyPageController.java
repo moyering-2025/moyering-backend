@@ -22,31 +22,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/user/mypage")
 public class MyPageController {
 	private final MyScheduleService myScheduleService;
-	private final UserCouponService couponService;
     @GetMapping("/schedule")
     public ResponseEntity<MyScheduleResponseDto> getMySchedule(@AuthenticationPrincipal PrincipalDetails principal) {
     	Integer userId = principal.getUser().getUserId();
         MyScheduleResponseDto dto;
 		try {
 			dto = myScheduleService.getMySchedule(userId);
-	        return ResponseEntity.ok(dto);
-		} catch (Exception e) {
-			e.printStackTrace();
-	        return ResponseEntity.internalServerError().build(); // 500 에러 응답
-		}
-    }
-
-    @GetMapping("/myCouponList")
-    public ResponseEntity<PageResponseDto<UserCouponDto>> getMyCoupon(@AuthenticationPrincipal PrincipalDetails principal,
-    		@RequestParam(defaultValue = "0") int page,
-    		@RequestParam(defaultValue = "10") int size) {
-    	
-        System.out.println(principal+"sdlfkjhlsijdfsjflj");
-    	Integer userId = principal.getUser().getUserId();
-        System.out.println("sdlfkjhlsijdfsjflj");
-        PageResponseDto<UserCouponDto> dto;
-		try {
-			dto = couponService.getUserCoponByUserId(userId,page, size);
 	        return ResponseEntity.ok(dto);
 		} catch (Exception e) {
 			e.printStackTrace();

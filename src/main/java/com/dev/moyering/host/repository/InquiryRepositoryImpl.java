@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import com.dev.moyering.classring.dto.InquiryResponseDto;
+import com.dev.moyering.classring.dto.UtilSearchDto;
 import com.dev.moyering.host.dto.InquirySearchRequestDto;
 import com.dev.moyering.host.entity.Inquiry;
 import com.dev.moyering.host.entity.QClassCalendar;
@@ -17,6 +19,7 @@ import com.dev.moyering.host.entity.QHostClass;
 import com.dev.moyering.host.entity.QInquiry;
 import com.dev.moyering.user.entity.QUser;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -93,6 +96,68 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 				.where(builder).fetchCount();
 
 		return new PageImpl<>(content, pageable, total);
+	}
+
+
+	@Override
+	public Page<InquiryResponseDto> findInquriesByUserId(UtilSearchDto dto, Pageable pageable) throws Exception {
+		QInquiry iq = QInquiry.inquiry;
+	    QClassCalendar cc = QClassCalendar.classCalendar;
+	    QHostClass hc = QHostClass.hostClass;
+	    QHost h = QHost.host;
+	    
+	    BooleanBuilder builder = new BooleanBuilder();
+	    builder.and(iq.user.userId.eq(dto.getUserId()));
+	    
+	    if (dto.getStartDate() != null) {
+	        builder.and(iq.inquiryDate.goe(dto.getStartDate()));
+	    }
+	    if (dto.getEndDate() != null) {
+	        builder.and(iq.inquiryDate.loe(dto.getEndDate()));
+	    }
+
+	    if (dto.getKeywords() != null && !dto.getKeywords().isBlank()) {
+	        builder.and(hc.name.containsIgnoreCase(dto.getKeywords()));
+	    }
+
+
+	    if (dto.getTab().equals("pending")) {
+	    	builder.and(iq.state.eq(0));
+	    } else {
+	    	builder.and(iq.state.eq(1));
+	    }
+	    List<InquiryResponseDto> content = jpaQueryFactory
+	    		.select(Projections.constructor(InquiryResponseDto.class,
+	    				iq.InquiryId,
+	    				iq.content,
+	    				iq.inquiryDate,
+	    				iq.iqResContent,
+	    				iq.responseDate,
+	    				hc.name,
+	    				h.name,
+	    				cc.startDate,
+	    				iq.state
+	    				))
+	    		.from(iq)
+	    		.join(iq.classCalendar,cc)
+	    		.join(cc.hostClass, hc)
+	    		.join(iq.host,h)
+	    		.where(builder)
+	    		.orderBy(iq.inquiryDate.desc())
+	    		.offset(pageable.getOffset())
+	    		.limit(pageable.getPageSize())
+	    		.fetch();
+	    
+	    Long total = jpaQueryFactory
+	    		.select(iq.count())
+	    		.from(iq)
+	    		.join(iq.classCalendar,cc)
+	    		.join(cc.hostClass, hc)
+	    		.join(iq.host,h)
+	    		.where(builder)
+	    		.fetchOne();
+	    
+		return new PageImpl<InquiryResponseDto>(content,pageable,total);
 	}
 
 }

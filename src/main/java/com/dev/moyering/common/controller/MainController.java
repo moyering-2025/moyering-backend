@@ -86,6 +86,7 @@ public class MainController {
     public ResponseEntity<PageResponseDto<HostClassDto>> searchClasses(
             @RequestBody ClassSearchRequestDto dto) {
     	PageResponseDto<HostClassDto> response;
+    	dto.setSize(16);
 
 		try {
 			response = hostClassService.searchClasses(dto);
