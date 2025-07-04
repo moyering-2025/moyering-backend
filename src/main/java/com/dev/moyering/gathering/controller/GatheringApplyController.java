@@ -50,10 +50,13 @@ public class GatheringApplyController {
 			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
 			Integer gatheringId = (Integer) param.get("gatheringId");
 			String aspiration = (String) param.get("aspiration");
+			String title = (String) param.get("title");
 			GatheringApplyDto gatheringApplyDto = new GatheringApplyDto();
 			gatheringApplyDto.setGatheringId(gatheringId);
+			gatheringApplyDto.setNickName(principal.getUser().getNickName());
 			gatheringApplyDto.setUserId(principal.getUser().getUserId());
 			gatheringApplyDto.setAspiration(aspiration);
+			gatheringApplyDto.setTitle(title);
 			Integer res = gatheringApplyService.applyToGathering(gatheringApplyDto);
 			return String.valueOf(res!=null);
 		} catch(Exception e) {

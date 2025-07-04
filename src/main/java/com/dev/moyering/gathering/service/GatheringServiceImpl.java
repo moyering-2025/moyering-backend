@@ -210,8 +210,8 @@ public class GatheringServiceImpl implements GatheringService {
 	            .build();
 	}
 	@Override
-	public List<GatheringDto> findGatheringWithCategory(Integer subCategoryId, Integer categoryId) throws Exception {
-		return gatheringRepository.findRecommendGatheringForUser(subCategoryId, categoryId);
+	public List<GatheringDto> findGatheringWithCategory(Integer originalGatheringId, Integer subCategoryId, Integer categoryId) throws Exception {
+		return gatheringRepository.findRecommendGatheringForUser(originalGatheringId, subCategoryId, categoryId);
 	}
 	@Override
 	public List<GatheringDto> getMyGatheringSchedule(Integer userId) throws Exception {

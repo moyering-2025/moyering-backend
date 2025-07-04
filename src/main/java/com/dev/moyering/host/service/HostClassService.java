@@ -11,10 +11,12 @@ import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.PageResponseDto;
+import com.dev.moyering.host.dto.CalendarUserDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostClassSearchRequestDto;
 import com.dev.moyering.host.dto.HostPageResponseDto;
+import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.user.dto.UserDto;
 
 public interface HostClassService {
@@ -34,4 +36,9 @@ public interface HostClassService {
 	
 	List<UserDto> selectClassStudentList(Integer calendarId) throws Exception;
 	List<UserDto> selectStudentList(Integer hostId)throws Exception;
+	
+	Page<UserDto> searchStudents(StudentSearchRequestDto dto) throws Exception;
+	
+	List<CalendarUserDto> searchStudentClass(Integer hostId,Integer userId)throws Exception;
+	
 }

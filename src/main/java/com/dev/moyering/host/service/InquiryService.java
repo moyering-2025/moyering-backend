@@ -14,4 +14,5 @@ public interface InquiryService {
 	List<InquiryDto> selectInquiryByHostId(Integer hostId)throws Exception;
 	void replyInquiry(Integer inquiryId,Integer hostId,String iqResContent)throws Exception;
 	Page<InquiryDto> searchInquiries(InquirySearchRequestDto dto) throws Exception;
+	
 }

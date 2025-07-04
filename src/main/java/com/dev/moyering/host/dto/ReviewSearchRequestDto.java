@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class ReviewSearchRequestDto {
 	private Integer hostId;
+	private Integer calendarId;
 	private String searchFilter;
 	private String searchQuery;
 	private String startDate;

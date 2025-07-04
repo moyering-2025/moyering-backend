@@ -4,8 +4,10 @@ import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,10 +28,12 @@ import com.dev.moyering.admin.dto.AdminClassSearchCond;
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.common.repository.SubCategoryRepository;
+import com.dev.moyering.host.dto.CalendarUserDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostClassSearchRequestDto;
 import com.dev.moyering.host.dto.HostPageResponseDto;
+import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.ClassRegist;
 import com.dev.moyering.host.entity.HostClass;
@@ -316,11 +320,11 @@ public class HostClassServiceImpl implements HostClassService {
 			stream = stream.filter(c -> c.getStatus() != null && c.getStatus().equals(dto.getStatus()));
 		}
 
-		if (dto.getStartDate() != null && !dto.getStartDate().isEmpty() && dto.getStartDate() != null
-				&& !dto.getStartDate().isEmpty()) {
+		if (dto.getStartDate() != null && !dto.getStartDate().isEmpty() && dto.getEndDate() != null
+				&& !dto.getEndDate().isEmpty()) {
 
 			LocalDate start = LocalDate.parse(dto.getStartDate());
-			LocalDate end = LocalDate.parse(dto.getStartDate());
+			LocalDate end = LocalDate.parse(dto.getEndDate());
 
 			stream = stream.filter(c -> {
 				if (c.getStartDate() == null)
@@ -468,5 +472,20 @@ public class HostClassServiceImpl implements HostClassService {
 		
 		return userDtoList;
 	}
+
+	@Override
+	public Page<UserDto> searchStudents(StudentSearchRequestDto dto) throws Exception {
+		PageRequest pageable = PageRequest.of(dto.getPage(),dto.getSize());
+		Page<User> resultPage = hostClassRepository.searchClassStudent(dto, pageable);
+		return resultPage.map(User::toDto);
+	}
+
+	@Override
+	public List<CalendarUserDto> searchStudentClass(Integer hostId, Integer userId) throws Exception {
+		List<CalendarUserDto> dtoList=classRegistRepository.findByStudentClass(hostId, userId);
+		return dtoList;
+	}
+
+	
 
 }

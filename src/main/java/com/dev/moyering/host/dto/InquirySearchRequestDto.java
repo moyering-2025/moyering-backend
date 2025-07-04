@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class InquirySearchRequestDto {
 	private Integer hostId;
+	private Integer hostClassId;
+	private Integer calendarId;
 	private String searchFilter;
 	private String searchQuery;
 	private String startDate;

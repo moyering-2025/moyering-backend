@@ -1,5 +1,9 @@
 package com.dev.moyering.host.repository;
 
+import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
+import static com.dev.moyering.host.entity.QHostClass.hostClass;
+import static com.dev.moyering.user.entity.QUser.user;
+
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,34 +13,31 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import com.dev.moyering.admin.dto.AdminClassDto;
-import com.dev.moyering.admin.dto.AdminClassSearchCond;
-import com.dev.moyering.host.entity.*;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
-
+import com.dev.moyering.admin.dto.AdminClassDto;
+import com.dev.moyering.admin.dto.AdminClassSearchCond;
 import com.dev.moyering.host.dto.ClassCalendarDto;
+import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.QClassCalendar;
+import com.dev.moyering.host.entity.QClassRegist;
+import com.dev.moyering.host.entity.QHost;
 import com.dev.moyering.host.entity.QHostClass;
+import com.dev.moyering.user.entity.QUser;
 import com.dev.moyering.user.entity.User;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
-import static com.dev.moyering.common.entity.QSubCategory.subCategory;
-import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
-import static com.dev.moyering.host.entity.QHostClass.hostClass;
-import static com.dev.moyering.user.entity.QUser.user;
-import static org.springframework.data.relational.core.sql.Functions.count;
 
 @Repository
 @RequiredArgsConstructor
@@ -173,4 +174,44 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		if (fromDate == null || toDate == null) return null;
 		return hostClass.regDate.between(fromDate, toDate);
 	}
+
+	@Override
+	public Page<User> searchClassStudent(StudentSearchRequestDto dto, Pageable pageable) throws Exception {
+		QUser user = QUser.user;
+		QHostClass hostClass = QHostClass.hostClass;
+		QClassCalendar calendar = QClassCalendar.classCalendar;
+		QHost host = QHost.host;
+		QClassRegist regist = QClassRegist.classRegist;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		
+		builder.and(host.hostId.eq(dto.getHostId()));
+		
+		if(dto.getKeyword() != null && !dto.getKeyword().isBlank()) {
+			builder.and(user.name.containsIgnoreCase(dto.getKeyword()));
+		}
+		
+		List<User> content = jpaQueryFactory
+				.select(user)
+				.from(regist)
+				.leftJoin(regist.user,user)
+				.leftJoin(regist.classCalendar,calendar)
+				.leftJoin(calendar.hostClass,hostClass)
+				.leftJoin(hostClass.host,host)
+				.where(builder)
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
+				.fetch();
+		
+		long totla =jpaQueryFactory.select(user).from(regist)
+				.leftJoin(regist.user,user)
+				.leftJoin(regist.classCalendar,calendar)
+				.leftJoin(calendar.hostClass,hostClass)
+				.leftJoin(hostClass.host,host)
+				.where(builder)
+				.fetchCount();
+		return new PageImpl<>(content,pageable,totla);
+	}
+
+	
 }
