@@ -209,13 +209,14 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 		return preferred;
 	}
 	@Override
-	public List<GatheringDto> findRecommendGatheringForUser(Integer subCategoryId, Integer categoryId) throws Exception {
+	public List<GatheringDto> findRecommendGatheringForUser(Integer originalGatheringId, Integer subCategoryId, Integer categoryId) throws Exception {
 	    QGathering gathering = QGathering.gathering;
 	    QCategory category = QCategory.category;
 	    QSubCategory subCategory = QSubCategory.subCategory;
 	    
 	    BooleanBuilder baseCondition = new BooleanBuilder()
 	        .and(gathering.canceled.isFalse())
+	        .and(gathering.gatheringId.ne(originalGatheringId))
 	        .and(gathering.meetingDate.goe(Date.valueOf(LocalDate.now())));
 	    
 	    if (subCategoryId != null) {
