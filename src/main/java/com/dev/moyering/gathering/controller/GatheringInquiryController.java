@@ -95,7 +95,6 @@ public class GatheringInquiryController {
 		@RequestBody  Map<String, Object> requestData) {
 		try {
 			GatheringInquiryDto gatheringInquiryDto = new GatheringInquiryDto();
-			gatheringInquiryDto.setGatheringId((Integer) requestData.get("gatheringId"));
 			gatheringInquiryDto.setInquiryContent(requestData.get("inquiryContent").toString());
 			gatheringInquiryDto.setUserId(principal.getUser().getUserId());
 			gatheringInquiryDto.setNickName(principal.getUser().getNickName());
@@ -223,8 +222,14 @@ public class GatheringInquiryController {
 	}	
 	@PostMapping("/user/responseToGatheringInquiry")
 	public ResponseEntity<GatheringInquiryDto> responseToGatheringInquiry(@AuthenticationPrincipal PrincipalDetails principal, 
-			@ModelAttribute GatheringInquiryDto gatheringInquiryDto) {
+			@ModelAttribute GatheringInquiryDto gatheringInquiryDto,  
+	@RequestBody  Map<String, Object> requestData) {
 		try {
+			gatheringInquiryDto.setInquiryContent(requestData.get("inquiryContent").toString());
+			gatheringInquiryDto.setUserId(principal.getUser().getUserId());
+			gatheringInquiryDto.setNickName(principal.getUser().getNickName());
+			gatheringInquiryDto.setTitle((String) requestData.get("title"));
+			System.out.println("gatheringInquiryDto "+gatheringInquiryDto);
 			gatheringInquiryService.responseToGatheringInquiry(gatheringInquiryDto);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch(Exception e) {
