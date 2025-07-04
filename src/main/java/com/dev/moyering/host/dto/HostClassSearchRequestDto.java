@@ -12,4 +12,5 @@ public class HostClassSearchRequestDto {
 	private Integer category2;
 	private String status;
 	private String startDate;
+	private String endDate;
 }

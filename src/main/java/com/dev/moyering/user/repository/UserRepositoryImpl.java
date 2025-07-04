@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.List;
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
+import com.dev.moyering.user.entity.User;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -51,6 +52,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 				)
 				.fetchOne();
 	}
+
+
 
 	// 관리자용 쿼리 조건 메서드 (키워드, 회원구분, 가입기간)
 	private BooleanExpression likeUsername(String keyword) {  // 키워드

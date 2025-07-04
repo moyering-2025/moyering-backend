@@ -204,6 +204,7 @@ public class HostController {
 	public ResponseEntity<HostPageResponseDto<HostClassDto>> getClassListByHostIdWithPagination(
 	        @RequestBody HostClassSearchRequestDto dto) {
 	    try {
+	    	System.out.println(dto);
 	    	HostPageResponseDto<HostClassDto> response = hostClassService.selectHostClassByHostIdWithPagination(dto);
 	        return ResponseEntity.ok(response);
 	    } catch (Exception e) {

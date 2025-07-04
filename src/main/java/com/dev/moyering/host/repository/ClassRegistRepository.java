@@ -8,5 +8,6 @@ import com.dev.moyering.host.entity.ClassRegist;
 
 public interface ClassRegistRepository extends JpaRepository<ClassRegist, Integer>,ClassRegistRepositoryCustom {
 	List<ClassRegist> findByClassCalendarCalendarId(Integer calendarId)throws Exception;
+	ClassRegist findByUserUserId(Integer userInd)throws Exception;
 
 }

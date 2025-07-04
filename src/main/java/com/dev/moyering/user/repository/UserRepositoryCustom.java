@@ -3,6 +3,7 @@ package com.dev.moyering.user.repository;
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
 
+import com.dev.moyering.user.entity.User;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
