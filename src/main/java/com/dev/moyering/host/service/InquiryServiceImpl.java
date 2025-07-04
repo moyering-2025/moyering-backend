@@ -3,7 +3,6 @@ package com.dev.moyering.host.service;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.dev.moyering.classring.dto.InquiryResponseDto;
+import com.dev.moyering.classring.dto.UtilSearchDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.dto.InquirySearchRequestDto;
@@ -63,6 +64,7 @@ public class InquiryServiceImpl implements InquiryService {
 	    		.user(user)
 	    		.content(dto.getContent())
 	    		.inquiryDate(Date.valueOf(LocalDate.now()))
+	    		.state(0)
 	    		.build();
 	    inquiryRepository.save(inquiry);
 	    
@@ -107,6 +109,18 @@ public class InquiryServiceImpl implements InquiryService {
 		PageRequest pageable = PageRequest.of(dto.getPage(),dto.getSize());
 		Page<Inquiry> resultPage = inquiryRepository.searchInquiries(dto, pageable);
 		return resultPage.map(Inquiry::toDto);
+	}
+	@Override
+	public PageResponseDto<InquiryResponseDto> getMyInquiries(UtilSearchDto dto) throws Exception {
+		Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
+		Page<InquiryResponseDto> pageResult = inquiryRepository.findInquriesByUserId(dto, pageable);
+		
+		return PageResponseDto.<InquiryResponseDto>builder()
+				.content(pageResult.getContent())
+				.currentPage(pageResult.getNumber()+1)
+				.totalPages(pageResult.getTotalPages())
+				.totalElements(pageResult.getTotalElements())
+				.build();
 	}
 
 }

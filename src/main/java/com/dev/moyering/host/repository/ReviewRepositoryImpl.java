@@ -7,18 +7,22 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.StringUtils;
 import org.threeten.bp.format.DateTimeFormatter;
 
+import com.dev.moyering.classring.dto.UserReviewResponseDto;
+import com.dev.moyering.classring.dto.UtilSearchDto;
+import com.dev.moyering.classring.dto.WritableReviewResponseDto;
+import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.dto.ReviewSearchRequestDto;
 import com.dev.moyering.host.entity.QClassCalendar;
+import com.dev.moyering.host.entity.QClassRegist;
 import com.dev.moyering.host.entity.QHost;
 import com.dev.moyering.host.entity.QHostClass;
 import com.dev.moyering.host.entity.QReview;
 import com.dev.moyering.host.entity.Review;
 import com.dev.moyering.user.entity.QUser;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -84,6 +88,110 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 				.where(builder).fetchCount();
 		
 		return new PageImpl<>(content,pageable,total);
+	}
+
+	@Override
+	public Page<WritableReviewResponseDto> findWritableReviews(UtilSearchDto dto, Pageable pageable) throws Exception {
+	    QClassRegist cr = QClassRegist.classRegist;
+	    QClassCalendar cc = QClassCalendar.classCalendar;
+	    QHostClass hc = QHostClass.hostClass;
+	    QReview r = QReview.review;
+
+	    BooleanBuilder builder = new BooleanBuilder();
+	    builder.and(cr.user.userId.eq(dto.getUserId()));
+	    builder.and(cc.status.eq("종료"));
+	    builder.and(r.reviewId.isNull());
+
+	    if (dto.getStartDate() != null) {
+	        builder.and(cc.startDate.goe(dto.getStartDate()));
+	    }
+	    if (dto.getEndDate() != null) {
+	        builder.and(cc.startDate.loe(dto.getEndDate()));
+	    }
+
+	    List<WritableReviewResponseDto> content = jpaQueryFactory
+	        .select(Projections.constructor(WritableReviewResponseDto.class,
+	            hc.name,
+	            cc.startDate,
+	            cr.classCalendar.calendarId,
+	            cr.user.userId,
+	            hc.host.hostId
+	        ))
+	        .from(cr)
+	        .join(cr.classCalendar, cc)
+	        .join(cc.hostClass, hc)
+	        .leftJoin(r).on(
+	            r.classCalendar.calendarId.eq(cr.classCalendar.calendarId)
+	            .and(r.user.userId.eq(cr.user.userId))
+	        )
+	        .where(builder)
+	        .orderBy(cc.startDate.asc())
+	        .offset(pageable.getOffset())
+	        .limit(pageable.getPageSize())
+	        .fetch();
+
+	    Long total = jpaQueryFactory
+	        .select(cr.count())
+	        .from(cr)
+	        .join(cr.classCalendar, cc)
+	        .join(cc.hostClass, hc)
+	        .leftJoin(r).on(
+	            r.classCalendar.calendarId.eq(cr.classCalendar.calendarId)
+	            .and(r.user.userId.eq(cr.user.userId))
+	        )
+	        .where(builder)
+	        .fetchOne();
+
+	    return new PageImpl<>(content, pageable, total);
+	}
+
+	@Override
+	public Page<UserReviewResponseDto> findDoneReviews(UtilSearchDto dto, Pageable pageable) throws Exception {
+		    QReview r = QReview.review;
+		    QClassCalendar cc = QClassCalendar.classCalendar;
+		    QHostClass hc = QHostClass.hostClass;
+
+		    BooleanBuilder builder = new BooleanBuilder();
+		    builder.and(r.user.userId.eq(dto.getUserId()));
+
+		    if (dto.getStartDate() != null) {
+		        builder.and(r.reviewDate.goe(dto.getStartDate()));
+		    }
+		    if (dto.getEndDate() != null) {
+		        builder.and(r.reviewDate.loe(dto.getEndDate()));
+		    }
+
+		    List<UserReviewResponseDto> content = jpaQueryFactory
+		    	    .select(Projections.constructor(UserReviewResponseDto.class,
+		    	        r.reviewId,
+		    	        hc.name,
+		    	        cc.startDate,
+		    	        r.reviewDate,
+		    	        r.star,
+		    	        r.content,
+		    	        r.revRegCotnent,
+		    	        r.responseDate,
+		    	        r.reviewImg
+		    	    ))
+		        .from(r)
+		        .join(r.classCalendar, cc)
+		        .join(cc.hostClass, hc)
+		        .where(builder)
+		        .orderBy(r.reviewId.desc())
+		        .offset(pageable.getOffset())
+		        .limit(pageable.getPageSize())
+		        .fetch();
+
+		    Long total = jpaQueryFactory
+		        .select(r.count())
+		        .from(r)
+		        .join(r.classCalendar, cc)
+		        .join(cc.hostClass, hc)
+		        .where(builder)
+		        .fetchOne();
+
+		    return new PageImpl<>(content, pageable, total);
+
 	}
 
 }
