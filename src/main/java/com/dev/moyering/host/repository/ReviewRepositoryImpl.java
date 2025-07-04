@@ -64,7 +64,9 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		if(requestDto.getEndDate() != null && !requestDto.getEndDate().isBlank()) {
 			builder.and(review.reviewDate.loe(Date.valueOf(LocalDate.parse(requestDto.getEndDate()))));
 		}
-		
+		if(requestDto.getCalendarId() != null) {
+			builder.and(calendar.calendarId.eq(requestDto.getCalendarId()));
+		}
 		// 답변 상태 필터
 		if ("답변완료".equals(requestDto.getReplyStatus())) {
 			builder.and(review.state.eq(1));

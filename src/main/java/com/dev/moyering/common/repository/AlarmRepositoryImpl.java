@@ -39,7 +39,6 @@ public class AlarmRepositoryImpl implements AlarmRepositoryCustom {
 	}
 	private BooleanExpression[] createAlarmConditions(Integer alarmType, Date startDate, Date endDate, Boolean isConfirmed) {
 	    QAlarm alarm = QAlarm.alarm;
-	    
 	    return new BooleanExpression[] {
 	        alarmType != null ? alarm.alarmType.eq(alarmType) : null,
 	        startDate != null && endDate != null ? alarm.alarmDate.between(startDate, endDate) :

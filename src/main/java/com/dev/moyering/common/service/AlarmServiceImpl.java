@@ -99,17 +99,13 @@ public class AlarmServiceImpl implements AlarmService {
 			.content(alarmDto.getContent())
 			.confirm(false).build();
 			alarmRepository.save(alarm);
-
-
 		Message message = Message.builder()
 				.setToken(fcmToken)
-//				.setNotification(notification)
 				.putData("alarmId", alarm.getAlarmId()+"")
 				.putData("title", alarmDto.getTitle())
 				.putData("content", alarmDto.getContent())
 				.putData("sender", alarmDto.getSenderNickname())
 				.build();
-
 			try {
 				firebaseMessaging.send(message);
 				return true;
@@ -118,8 +114,6 @@ public class AlarmServiceImpl implements AlarmService {
 				return false;
 			}
 	}
-
-
 	//특정알람 확인(알람번호)
 	@Override
 	public Boolean confirmAlarm(Integer alarmNum) {
