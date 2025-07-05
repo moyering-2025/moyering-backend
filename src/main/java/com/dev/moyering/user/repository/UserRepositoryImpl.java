@@ -1,16 +1,20 @@
 package com.dev.moyering.user.repository;
 
+import static com.dev.moyering.user.entity.QUser.user;
+
 import java.sql.Date;
 import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
-import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.entity.QUser;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import static com.dev.moyering.user.entity.QUser.user;
 
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepositoryCustom {
@@ -67,4 +71,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 		//return user.regDate.between(fromDate, toDate);
 		return null;
 	}
+
+	
 }
