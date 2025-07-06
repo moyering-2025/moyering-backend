@@ -29,5 +29,6 @@ public interface GatheringRepositoryCustom {
 	List<GatheringDto> findRecommendGatheringForUser(Integer originalGatheringId, Integer subCategoryId, Integer categoryId) throws Exception;
 
 	//마이페이지 스케줄
+	List<GatheringDto> findMyApplyGatheringSchedule(Integer userId) throws Exception;
 	List<GatheringDto> findMyGatheringSchedule(Integer userId) throws Exception;
 }

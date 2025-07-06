@@ -19,4 +19,5 @@ public class UtilSearchDto {
 
     private Integer userId;
     private String keywords; //혹사라도 검색어 
+   
 }
