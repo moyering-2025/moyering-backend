@@ -1,6 +1,7 @@
 package com.dev.moyering.socialing.service;
 
 import com.dev.moyering.socialing.dto.ScrapDto;
+import com.dev.moyering.socialing.dto.ScrapListDto;
 import com.dev.moyering.socialing.entity.Scrap;
 import com.dev.moyering.socialing.repository.ScrapRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,4 +53,11 @@ public class ScrapServiceImpl implements ScrapService {
     public boolean isScrapped(Integer userId, Integer feedId) {
         return scrapRepository.findScrapByUserIdAndFeedId(userId, feedId).isPresent();
     }
+
+    @Override
+    public List<ScrapListDto> getMyScrapsCursor(Integer userId, Integer lastScrapId, int size) {
+        return scrapRepository.findMyScrapsCursor(userId, lastScrapId, size);
+    }
+
+
 }
