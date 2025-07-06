@@ -21,10 +21,15 @@ public class MyScheduleServiceImpl implements MyScheduleService {
 	@Override
 	public MyScheduleResponseDto getMySchedule(Integer userId) throws Exception {
 		List<ClassCalendarDto> classList = classCalendarService.getMyClassSchedule(userId);
-		List<GatheringDto> gatheringList = gatheringService.getMyGatheringSchedule(userId);
+		//내가 지원한 게더링
+		List<GatheringDto> gatheringList = gatheringService.getMyApplyGatheringSchedule(userId);
+		//내가 개설한 게더링
+		List<GatheringDto> gatheringList2 = gatheringService.getMyGatheringSchedule(userId);
+
 		return MyScheduleResponseDto.builder()
 				.classSchedules(classList)
 				.gatheringSchedules(gatheringList)
+				.gatheringSchedules2(gatheringList2)
 				.build();
 	}
 

@@ -3,6 +3,7 @@ package com.dev.moyering.host.service;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,14 @@ public class ScheduleDetailServiceImpl implements ScheduleDetailService {
 			scheduleDetailRespository.save(schedule);
 		}
 
+	}
+
+	@Override
+	public List<ScheduleDetailDto> getScheduleByClassId(Integer classId) throws Exception {
+		List<ScheduleDetailDto> result = scheduleDetailRespository.findAllByHostClass_ClassIdOrderByScheduleIdDesc(classId)
+				.stream().map(s->s.toDto()).collect(Collectors.toList());
+		return result;
+		 
 	}
 
 }

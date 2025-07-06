@@ -207,6 +207,10 @@ public class GatheringServiceImpl implements GatheringService {
 		return gatheringRepository.findRecommendGatheringForUser(originalGatheringId, subCategoryId, categoryId);
 	}
 	@Override
+	public List<GatheringDto> getMyApplyGatheringSchedule(Integer userId) throws Exception {
+		return gatheringRepository.findMyApplyGatheringSchedule(userId);
+	}
+	@Override
 	public List<GatheringDto> getMyGatheringSchedule(Integer userId) throws Exception {
 		return gatheringRepository.findMyGatheringSchedule(userId);
 	}
