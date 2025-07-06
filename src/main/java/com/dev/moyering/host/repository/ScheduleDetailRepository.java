@@ -11,4 +11,5 @@ public interface ScheduleDetailRepository extends JpaRepository<ScheduleDetail, 
 
 	List<ScheduleDetail> findByHostClassClassId(Integer classId)throws Exception;
     Optional<ScheduleDetail> findFirstByHostClass_ClassIdOrderByStartTimeAsc(Integer classId);
+    List<ScheduleDetail> findAllByHostClass_ClassIdOrderByScheduleIdDesc(Integer classId) throws Exception ;
 }

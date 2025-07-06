@@ -8,6 +8,7 @@ import com.dev.moyering.host.dto.ClassCouponDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.dto.ReviewDto;
+import com.dev.moyering.host.dto.ScheduleDetailDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,4 +29,5 @@ public class ClassRingDetailResponseDto {
     private List<ReviewDto> reviews;
     private List<ClassCouponDto> coupons;
     private List<UserCouponDto> userCoupons;
+    private List<ScheduleDetailDto> detailDtos;
 }
