@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.classring.dto.InquiryResponseDto;
-import com.dev.moyering.classring.dto.UserReviewResponseDto;
 import com.dev.moyering.classring.dto.UtilSearchDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;

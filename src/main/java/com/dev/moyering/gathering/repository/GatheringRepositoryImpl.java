@@ -245,7 +245,7 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	        .fetch();
 	}
 	@Override
-	public List<GatheringDto> findMyGatheringSchedule(Integer userId) throws Exception {
+	public List<GatheringDto> findMyApplyGatheringSchedule(Integer userId) throws Exception {
         QGatheringApply apply = QGatheringApply.gatheringApply;
         QGathering gathering = QGathering.gathering;
         List<Gathering> result = jpaQueryFactory
@@ -254,6 +254,19 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
                 .join(apply.gathering, gathering)
                 .where(apply.user.userId.eq(userId)
                     .and(apply.isApproved.isTrue()))
+                .fetch();
+
+		return result.stream()
+				.map(g -> g.toDto()).collect(Collectors.toList());
+	}
+	@Override
+	public List<GatheringDto> findMyGatheringSchedule(Integer userId) throws Exception {
+        QGathering gathering = QGathering.gathering;
+        List<Gathering> result = jpaQueryFactory
+                .select(gathering)
+                .from(gathering)
+                .where(gathering.user.userId.eq(userId)
+                    .and(gathering.canceled.isFalse()))
                 .fetch();
 
 		return result.stream()
