@@ -16,9 +16,9 @@ import lombok.Setter;
 public class InquiryResponseDto {
 	private Integer InquiryId;
 	private String content;
-	private Date inquiryDate;
+    private Date inquiryDate;
 	private String iqResContent;
-	private Date responseDate;
+    private Date responseDate;
 	private String className;
 	private String hostName;
 	private Date classDate;

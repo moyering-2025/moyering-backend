@@ -30,12 +30,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/class")
 public class ClassDetailController {
-
-	private final HostClassService hostClassService;
-	private final HostService hostService;
-	private final ReviewService reviewService;
-	private final ClassCouponService classCouponService; 
-	private final ClassCalendarService classCalendarService;
 	
 	private final UserClassService userClassService;
 
@@ -45,33 +39,20 @@ public class ClassDetailController {
     		@AuthenticationPrincipal PrincipalDetails principal) {
     	System.out.println("==============="+principal);
     	try {
-//			HostClassDto hostclass = hostClassService.getClassDetailByClassID(classId);
-//	        List<ClassCalendarDto> classCalendar = classCalendarService.getClassCalendarByHostClassId(classId);
-//	        HostDto host = hostService.getHostById(hostclass.getHostId());
-//	        List<ReviewDto> reviews = reviewService.getReviewByHostId(hostclass.getHostId());
-//	        List<ClassCouponDto> classCoupons = classCouponService.getCouponByClassId(classId);
-//	        
-//	        ClassRingDetailResponseDto result = ClassRingDetailResponseDto.builder()
-//	                .hostClass(hostclass)
-//	                .calendarList(classCalendar)
-//	                .currList(classCalendar) // 혹시 다르면 따로 분리
-//	                .host(host)
-//	                .reviews(reviews)
-//	                .coupons(classCoupons)
-//	                .build();
-//    		
+	
     		  Integer userId = (principal != null)
     			      ? principal.getUser().getUserId()
     			      : null;
 
     		ClassRingDetailResponseDto result = userClassService.getClassRingDetail(classId, userId);
-    		System.out.println(result.getCoupons());
+    		System.out.println(result.getDetailDtos());
 	        return ResponseEntity.ok(result);
 
 		} catch (Exception e) {
 	        e.printStackTrace();   
 	        return ResponseEntity
 	                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body(null);		}
+	                .body(null);		
+        }
     }
 }

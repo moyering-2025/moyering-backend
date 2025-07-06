@@ -26,5 +26,6 @@ public interface GatheringService {
 	List<GatheringDto> getMainGathersForUser(Integer userId) throws Exception;
 	PageResponseDto<GatheringDto> searchGathers(GatheringSearchRequestDto dto)throws Exception;
 	//마이페이지 게더링
+	List<GatheringDto> getMyApplyGatheringSchedule(Integer userId) throws Exception;
 	List<GatheringDto> getMyGatheringSchedule(Integer userId) throws Exception;
 }

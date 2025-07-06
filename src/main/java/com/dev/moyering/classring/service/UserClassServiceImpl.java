@@ -13,11 +13,13 @@ import com.dev.moyering.host.dto.ClassCouponDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.dto.ReviewDto;
+import com.dev.moyering.host.dto.ScheduleDetailDto;
 import com.dev.moyering.host.service.ClassCalendarService;
 import com.dev.moyering.host.service.ClassCouponService;
 import com.dev.moyering.host.service.HostClassService;
 import com.dev.moyering.host.service.HostService;
 import com.dev.moyering.host.service.ReviewService;
+import com.dev.moyering.host.service.ScheduleDetailService;
 
 import lombok.RequiredArgsConstructor;
 @Service
@@ -29,7 +31,7 @@ public class UserClassServiceImpl implements UserClassService {
     private final ReviewService reviewService;
     private final ClassCouponService classCouponService;
     private final UserCouponService userCouponService;
-    
+    private final ScheduleDetailService scheduleDetailService;
 	@Override
 	public ClassRingDetailResponseDto getClassRingDetail(Integer classId, Integer userId) throws Exception {
 		HostClassDto     hostclass    = hostClassService.getClassDetailByClassID(classId);
@@ -37,7 +39,8 @@ public class UserClassServiceImpl implements UserClassService {
         HostDto          host         = hostService.getHostById(hostclass.getHostId());
         List<ReviewDto>  reviews      = reviewService.getReviewByHostId(hostclass.getHostId());
         List<ClassCouponDto> classCoupons = classCouponService.getCouponByClassId(classId);
-
+        List<ScheduleDetailDto> detailDtos = scheduleDetailService.getScheduleByClassId(classId);
+        
         List<UserCouponDto> userCoupons = null;
         // ① 이미 다운로드한 쿠폰만
         if (userId != null) {
@@ -52,6 +55,7 @@ public class UserClassServiceImpl implements UserClassService {
             .reviews(reviews)
             .coupons(classCoupons)
             .userCoupons(userCoupons)
+            .detailDtos(detailDtos)
             .build();
     }
 
