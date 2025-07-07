@@ -119,11 +119,18 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	@Override
 	@Transactional
 	public void updateGatheringApplyApproval(Integer gatheringApplyId, boolean isApproved) throws Exception {
-		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
-		JPAUpdateClause clause = jpaQueryFactory.update(gatheringApply)
-				.set(gatheringApply.isApproved, isApproved)
-				.where(gatheringApply.gatheringApplyId.eq(gatheringApplyId));
-		clause.execute();
+	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
+	    JPAUpdateClause clause = jpaQueryFactory.update(gatheringApply)
+	            .set(gatheringApply.isApproved, isApproved)
+	            .where(gatheringApply.gatheringApplyId.eq(gatheringApplyId));
+	    java.sql.Date today = java.sql.Date.valueOf(LocalDate.now());
+	    if(isApproved) {
+	        clause.set(gatheringApply.rejectionDate,(Date) null)
+            .set(gatheringApply.approvalDate, today);
+	    } else {
+	        clause.set(gatheringApply.rejectionDate, today);
+	    }
+	    clause.execute();
 	}
 
 	@Override

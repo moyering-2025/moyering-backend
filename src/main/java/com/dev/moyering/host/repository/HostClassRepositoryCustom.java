@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
 import com.dev.moyering.host.dto.ClassCalendarDto;
+import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.HostClass;
@@ -24,7 +25,8 @@ public interface HostClassRepositoryCustom {
 //    AdminClassDto findClassByClassId(Integer classId) throws Exception;
     Page<User> searchClassStudent(StudentSearchRequestDto dto, Pageable pageable) throws Exception;
     
-    
+    //클래스 상세 3개 추천해주기
+    List<HostClassDto> findRecommendClassesInDetail(Integer subCategoryId, Integer categoryId,Integer classId) throws Exception;
 }
 
 

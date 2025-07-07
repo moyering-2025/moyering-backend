@@ -5,6 +5,7 @@ import java.util.List;
 import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.ClassCouponDto;
+import com.dev.moyering.host.dto.ClassRegistDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.dto.ReviewDto;
@@ -30,4 +31,6 @@ public class ClassRingDetailResponseDto {
     private List<ClassCouponDto> coupons;
     private List<UserCouponDto> userCoupons;
     private List<ScheduleDetailDto> detailDtos;
+    private List<HostClassDto> recommends;
+    private List<ClassRegistDto> registeds;
 }

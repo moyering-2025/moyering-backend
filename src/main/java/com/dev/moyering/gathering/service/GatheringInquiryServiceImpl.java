@@ -38,8 +38,14 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 				.senderNickname(gatheringInquiryDto.getNickName())
 				.content(gathering.getTitle()+"에 대한 문의가 등록되었어요.")//알림 내용
 				.build();
+		System.out.println("41 AlarmDto : "+alarmDto);
 		alarmService.sendAlarm(alarmDto);
 		return gatheringInquiry.getInquiryId();
+	}
+	@Override
+	public GatheringInquiryDto findByInquiryId(Integer inquiryId) throws Exception {
+		GatheringInquiry gatheringInquiry = gatheringInquiryRepository.findById(inquiryId).orElseThrow(()->new Exception("아이디 오류"));
+		return gatheringInquiry.toDto();
 	}
 	@Override
 	public List<GatheringInquiryDto> gatheringInquiryListBygatheringId(Integer gatheringId) throws Exception {
@@ -59,8 +65,10 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 				.receiverId(gatheringInquiryDto.getUserId())
 				.senderId(gathering.getUser().getUserId())
 				.senderNickname(gathering.getUser().getNickName())
-				.content(gathering.getTitle()+"에 대한 문의에 대한 답변이 등록되었어요. 등록되었어요.")//알림 내용
+				.content(gathering.getTitle()+"에 대한 문의에 대한 답변이 등록되었어요.")//알림 내용
 				.build();
+		
+		System.out.println("64 AlarmDto : "+alarmDto);
 		alarmService.sendAlarm(alarmDto);
 	}
 	@Override

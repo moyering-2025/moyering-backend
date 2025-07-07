@@ -64,5 +64,23 @@ public class MessageController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	@PostMapping("/user/messageRoomList")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> messageRoomList(@AuthenticationPrincipal PrincipalDetails principal, 
+			@RequestBody Map<String, Object> param){
+		try {
+			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
+			Integer gatheringId = (Integer) param.get("gatheringId");
+			String messageContent = (String) param.get("content");
+			MessageDto messageDto = new MessageDto(gatheringId, principal.getUser().getUserId(), messageContent);
+			System.out.println("messageDto : "+messageDto);
+
+	        Map<String, Object> res = new HashMap<>();
+	        return new ResponseEntity<>(res, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 }
 

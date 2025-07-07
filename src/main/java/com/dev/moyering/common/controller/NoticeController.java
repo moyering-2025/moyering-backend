@@ -25,7 +25,7 @@ public class NoticeController {
 	private NoticeService noticeService;
 	@PostMapping("/noticeList")
 	public ResponseEntity<Map<String, Object>> getNoticeList(@RequestBody(required=false) Map<String, Object> param) throws Exception {
-	
+		System.out.println("param : "+param);
 		PageInfo pageInfo = new PageInfo(1);
 	    if( param!=null && param.get("page")!=null) {
 	    	pageInfo.setCurPage((Integer)param.get("page"));
