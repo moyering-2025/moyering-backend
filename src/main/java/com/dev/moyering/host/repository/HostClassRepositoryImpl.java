@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
+import com.dev.moyering.common.dto.MainSearchRequestDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
@@ -211,6 +212,21 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 				.where(builder)
 				.fetchCount();
 		return new PageImpl<>(content,pageable,totla);
+	}
+
+	@Override
+	public List<HostClass> findSearchClass(MainSearchRequestDto dto) throws Exception {
+		QHostClass hostClass= QHostClass.hostClass;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.or(hostClass.name.containsIgnoreCase(dto.getSearchQuery()));
+		builder.or(hostClass.detailDescription.containsIgnoreCase(dto.getSearchQuery()));
+		
+		List<HostClass> content = jpaQueryFactory.selectFrom(hostClass).where(builder).fetch();
+		
+		long total = jpaQueryFactory.selectFrom(hostClass).where(builder).fetchCount();
+		
+		return content;
 	}
 
 	

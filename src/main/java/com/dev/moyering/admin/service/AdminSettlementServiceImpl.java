@@ -2,10 +2,12 @@ package com.dev.moyering.admin.service;
 import com.dev.moyering.admin.dto.AdminSettlementDto;
 import com.dev.moyering.admin.entity.AdminSettlement;
 import com.dev.moyering.admin.repository.AdminSettlementRepository;
+import com.dev.moyering.host.dto.SettlementSearchRequestDto;
 import com.dev.moyering.user.repository.UserPaymentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,4 +81,11 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
             throw new RuntimeException("정산 완료 처리 중 시스템 오류 발생", e);
         }
     }
+
+	@Override
+	public Page<AdminSettlementDto> getHostSettlementList(SettlementSearchRequestDto dto) {
+		PageRequest pageable = PageRequest.of(dto.getPage(), dto.getSize());
+		Page<AdminSettlement> resultPage = adminSettlementRepository.getHostSettlementList(dto, pageable);
+		return resultPage.map(AdminSettlement::toDto);
+	}
 }

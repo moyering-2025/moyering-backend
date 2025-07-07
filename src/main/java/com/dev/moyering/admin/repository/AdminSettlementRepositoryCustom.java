@@ -3,6 +3,9 @@ package com.dev.moyering.admin.repository;
 import com.dev.moyering.admin.dto.AdminSettlementDto;
 import com.dev.moyering.admin.dto.PaymentSettlementViewDto;
 import com.dev.moyering.admin.dto.SettlementAggregationDto;
+import com.dev.moyering.admin.entity.AdminSettlement;
+import com.dev.moyering.host.dto.SettlementSearchRequestDto;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,4 +23,6 @@ public interface AdminSettlementRepositoryCustom {
 
     /*** 정산 내역 목록 개수 조회*/
     Long getSettlementListCount(String searchKeyword, LocalDate startDate, LocalDate endDate);
+    
+    Page<AdminSettlement> getHostSettlementList(SettlementSearchRequestDto dto, Pageable pageable);
 }

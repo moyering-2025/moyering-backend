@@ -3,6 +3,8 @@ package com.dev.moyering.admin.service;
 import com.dev.moyering.admin.dto.AdminSettlementDto;
 import com.dev.moyering.admin.dto.PaymentSettlementViewDto;
 import com.dev.moyering.admin.dto.SettlementAggregationDto;
+import com.dev.moyering.host.dto.SettlementSearchRequestDto;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,8 +23,9 @@ public interface AdminSettlementService {
     Long getSettlementListCount(String searchKeyword, LocalDate startDate, LocalDate endDate);
 
     boolean completeSettlement(Integer settlementId);
-
-
+    
+    /*** 특정강사 정산 리스트 조회 */
+    Page<AdminSettlementDto> getHostSettlementList(SettlementSearchRequestDto dto);
 
 }
 

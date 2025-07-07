@@ -11,8 +11,12 @@ import java.util.stream.Stream;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import com.dev.moyering.common.dto.MainSearchRequestDto;
 import com.dev.moyering.common.entity.QCategory;
 import com.dev.moyering.common.entity.QSubCategory;
 import com.dev.moyering.gathering.dto.GatheringDto;
@@ -244,6 +248,8 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	        .limit(3)
 	        .fetch();
 	}
+	
+	
 	@Override
 	public List<GatheringDto> findMyApplyGatheringSchedule(Integer userId) throws Exception {
         QGatheringApply apply = QGatheringApply.gatheringApply;
@@ -271,5 +277,18 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 
 		return result.stream()
 				.map(g -> g.toDto()).collect(Collectors.toList());
+	}
+	@Override
+	public List<Gathering> findSearchGathering(MainSearchRequestDto dto) {
+		QGathering gathering = QGathering.gathering;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.or(gathering.title.containsIgnoreCase(dto.getSearchQuery()));
+		builder.or(gathering.intrOnln.containsIgnoreCase(dto.getSearchQuery()));
+		
+		List<Gathering> content = jpaQueryFactory.selectFrom(gathering).where(builder).fetch();
+		long total = jpaQueryFactory.selectFrom(gathering).where(builder).fetchCount();
+		
+		return content;
 	}
 }
