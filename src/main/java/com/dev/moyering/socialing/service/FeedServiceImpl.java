@@ -20,6 +20,7 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
@@ -252,48 +253,72 @@ public class FeedServiceImpl implements FeedService {
     @Transactional
     public void updateFeed(Integer feedId
 //            , FeedDto feedDto
-            , String text, List<String> tags
-            , List<MultipartFile> images
-//            , List<String> removeUrls
-    ) throws Exception {
+            , String text, String tag1, String tag2, String tag3, String tag4, String tag5
+            , MultipartFile image1, MultipartFile image2, MultipartFile image3, MultipartFile image4, MultipartFile image5
+            , List<String> removeUrls
+                           ) throws Exception {
         Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new Exception("수정하려고 하는 피드가 없습니다"));
 
-        /*feed.setContent(feedDto.getContent());
-        feed.setTag1(feedDto.getTag1());
-        feed.setTag2(feedDto.getTag2());
-        feed.setTag3(feedDto.getTag3());
-        feed.setTag4(feedDto.getTag4());
-        feed.setTag5(feedDto.getTag5());*/
+        feed.setTag1(tag1);
+        feed.setTag2(tag2);
+        feed.setTag3(tag3);
+        feed.setTag4(tag4);
+        feed.setTag5(tag5);
 
-        if (tags.size() > 0) feed.setTag1(tags.get(0));
-        if (tags.size() > 1 ) feed.setTag2(tags.get(1));
-        if (tags.size() > 2 ) feed.setTag3(tags.get(2));
-        if (tags.size() > 3 ) feed.setTag4(tags.get(3));
-        if (tags.size() > 4 ) feed.setTag5(tags.get(4));
 
-        /*List<String> currentUrls = new ArrayList<>();
-        if (feed.getImg1() != null) currentUrls.add(feed.getImg1());
-        if (feed.getImg2() != null) currentUrls.add(feed.getImg2());
-        if (feed.getImg3() != null) currentUrls.add(feed.getImg3());
-        if (feed.getImg4() != null) currentUrls.add(feed.getImg4());
-        if (feed.getImg5() != null) currentUrls.add(feed.getImg5());*/
+        List<String> filenames = new ArrayList<>();
+        if (feed.getImg1() != null && (removeUrls == null || !removeUrls.contains(feed.getImg1())))
+            filenames.add(feed.getImg1());
+        if (feed.getImg2() != null && (removeUrls == null || !removeUrls.contains(feed.getImg2())))
+            filenames.add(feed.getImg2());
+        if (feed.getImg3() != null && (removeUrls == null || !removeUrls.contains(feed.getImg3())))
+            filenames.add(feed.getImg3());
+        if (feed.getImg4() != null && (removeUrls == null || !removeUrls.contains(feed.getImg4())))
+            filenames.add(feed.getImg4());
+        if (feed.getImg5() != null && (removeUrls == null || !removeUrls.contains(feed.getImg5())))
+            filenames.add(feed.getImg5());
 
-//        if (images.get(0) != null ) feed.setImg1(images.get(0).getOriginalFilename());
-//        if (images.get(1) != null) feed.setImg2(images.get(1).getOriginalFilename());
-//        if (images.get(2) != null ) feed.setImg3(images.get(2).getOriginalFilename());
-//        if (images.get(3) != null && images.get(3).isEmpty()) feed.setImg4(images.get(3).getOriginalFilename());
-//        if (images.get(4) != null && images.get(4).isEmpty()) feed.setImg5(images.get(4).getOriginalFilename());
-//        if (images.size() > 0) feed.setImg1(images.get(0).getOriginalFilename());
-//        if (images.size() > 1) feed.setImg2(images.get(1).getOriginalFilename());
-//        if (images.size() > 2) feed.setImg3(images.get(2).getOriginalFilename());
-//        if (images.size() > 3) feed.setImg4(images.get(3).getOriginalFilename());
-//        if (images.size() > 4) feed.setImg5(images.get(4).getOriginalFilename());
-        feed.setImg1(images.size() > 0 ? images.get(0).getOriginalFilename() : null);
-        feed.setImg2(images.size() > 1 ? images.get(1).getOriginalFilename() : null);
-        feed.setImg3(images.size() > 2 ? images.get(2).getOriginalFilename() : null);
-        feed.setImg4(images.size() > 3 ? images.get(3).getOriginalFilename() : null);
-        feed.setImg5(images.size() > 4 ? images.get(4).getOriginalFilename() : null);
+//        for (MultipartFile image : images) {
+//            filenames.add(image.getOriginalFilename());
+//        }
+//        if (image1 != null && !image1.isEmpty()) filenames.add(image1.getOriginalFilename());
+//        if (image2 != null && !image2.isEmpty()) filenames.add(image2.getOriginalFilename());
+//        if (image3 != null && !image3.isEmpty()) filenames.add(image3.getOriginalFilename());
+//        if (image4 != null && !image4.isEmpty()) filenames.add(image4.getOriginalFilename());
+//        if (image5 != null && !image5.isEmpty()) filenames.add(image5.getOriginalFilename());
 
+        if (image1 != null && !image1.isEmpty()) {
+            filenames.add(image1.getOriginalFilename());
+            image1.transferTo(new File(iuploadPath, image1.getOriginalFilename()));
+        }
+        if (image2 != null && !image2.isEmpty()) {
+            filenames.add(image2.getOriginalFilename());
+            image2.transferTo(new File(iuploadPath, image2.getOriginalFilename()));
+        }
+        if (image3 != null && !image3.isEmpty()) {
+            filenames.add(image3.getOriginalFilename());
+            image3.transferTo(new File(iuploadPath, image3.getOriginalFilename()));
+        }
+        if (image4 != null && !image4.isEmpty()) {
+            filenames.add(image4.getOriginalFilename());
+            image4.transferTo(new File(iuploadPath, image4.getOriginalFilename()));
+        }
+        if (image5 != null && !image5.isEmpty()) {
+            filenames.add(image5.getOriginalFilename());
+            image5.transferTo(new File(iuploadPath, image5.getOriginalFilename()));
+        }
+
+        feed.setImg1(filenames.size() > 0 ? filenames.get(0) : null);
+        feed.setImg2(filenames.size() > 1 ? filenames.get(1) : null);
+        feed.setImg3(filenames.size() > 2 ? filenames.get(2) : null);
+        feed.setImg4(filenames.size() > 3 ? filenames.get(3) : null);
+        feed.setImg5(filenames.size() > 4 ? filenames.get(4) : null);
+
+/*        feed.setImg1(images.size() > 0 ? images.get(0).getOriginalFilename() : feed.getImg1());
+        feed.setImg2(images.size() > 1 ? images.get(1).getOriginalFilename() : feed.getImg2());
+        feed.setImg3(images.size() > 2 ? images.get(2).getOriginalFilename() : feed.getImg3());
+        feed.setImg4(images.size() > 3 ? images.get(3).getOriginalFilename() : feed.getImg4());
+        feed.setImg5(images.size() > 4 ? images.get(4).getOriginalFilename() : feed.getImg5());*/
 
         if (text!=null) feed.setContent(text);
 
@@ -302,57 +327,8 @@ public class FeedServiceImpl implements FeedService {
             Files.createDirectories(dir);
         }
 
-        /*// 삭제 요청된 파일 제거
-        if (removeUrls != null && !removeUrls.isEmpty()) {
-            for (String url : removeUrls) {
-                String filename = Paths.get(url).getFileName().toString();
-                try {
-                    Files.deleteIfExists(dir.resolve(filename));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            // currentUrls 에서 제거
-            currentUrls = currentUrls.stream()
-                    .filter(u -> !removeUrls.contains(u))
-                    .collect(Collectors.toList());
-        }
-*/
-        /*// 새로운 이미지 저장
-        if (images != null && !images.isEmpty()) {
-            for (MultipartFile img : images) {
-                if (img.isEmpty()) continue;
-                String orig = img.getOriginalFilename();
-                String fname = System.currentTimeMillis() + "_" + orig;
-                Path target = dir.resolve(fname);
-
-                try (InputStream is = img.getInputStream()) {
-                    Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("이미지 저장 실패: " + fname, e);
-                }
-
-                // DB에는 파일명만 넣어둠
-                currentUrls.add(fname);
-            }
-        }
-
-        // 엔티티 이미지 필드 초기화
-        feed.setImg1(null);
-        feed.setImg2(null);
-        feed.setImg3(null);
-        feed.setImg4(null);
-        feed.setImg5(null);
-
-        // 최대 5개 까지 세팅
-        if (currentUrls.size() > 0) feed.setImg1(currentUrls.get(0));
-        if (currentUrls.size() > 1) feed.setImg2(currentUrls.get(1));
-        if (currentUrls.size() > 2) feed.setImg3(currentUrls.get(2));
-        if (currentUrls.size() > 3) feed.setImg4(currentUrls.get(3));
-        if (currentUrls.size() > 4) feed.setImg5(currentUrls.get(4));*/
-
         feedRepository.save(feed);
+
     }
 
     @Override

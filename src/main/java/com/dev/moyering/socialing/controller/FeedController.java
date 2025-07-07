@@ -1,8 +1,6 @@
 package com.dev.moyering.socialing.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +25,8 @@ import com.dev.moyering.socialing.service.FeedService;
 import com.dev.moyering.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -172,38 +172,37 @@ public class FeedController {
     public ResponseEntity<Void> updateFeed(
             @PathVariable Integer feedId,
 //            @RequestPart("feed") FeedDto feedDto,
-            @RequestParam String text,
-            @RequestParam List<String> tags,
+            @RequestPart String text,
+//            @RequestPart String[] tags,
+            @RequestPart(required = false) String tag1,
+            @RequestPart(required = false) String tag2,
+            @RequestPart(required = false) String tag3,
+            @RequestPart(required = false) String tag4,
+            @RequestPart(required = false) String tag5,
             @RequestPart(value = "img1", required = false) MultipartFile image1,
             @RequestPart(value = "img2", required = false) MultipartFile image2,
             @RequestPart(value = "img3", required = false) MultipartFile image3,
             @RequestPart(value = "img4", required = false) MultipartFile image4,
             @RequestPart(value = "img5", required = false) MultipartFile image5,
-            @RequestPart(value = "removeUrls", required = false) List<String> removeUrls,
+            @RequestPart(value = "removeUrls", required = false) String[] removeUrls,
             @AuthenticationPrincipal PrincipalDetails principal
-    ) throws Exception {
+            , HttpServletRequest request
+            ) throws Exception {
         List<MultipartFile> images = new ArrayList<>();
         if (image1 != null && !image1.isEmpty()) images.add(image1);
         if (image2 != null && !image2.isEmpty()) images.add(image2);
         if (image3 != null && !image3.isEmpty()) images.add(image3);
         if (image4 != null && !image4.isEmpty()) images.add(image4);
         if (image5 != null && !image5.isEmpty()) images.add(image5);
+        List<String> removeList = removeUrls != null ? Arrays.asList(removeUrls) : Collections.emptyList();
 
-//        System.out.println(text);
-//        System.out.println(tags);
-//        System.out.println(image1.getOriginalFilename());
-//        System.out.println(image2.getOriginalFilename());
-//        System.out.println(image3.getOriginalFilename());
-//        System.out.println(image4.getOriginalFilename());
-//        System.out.println(image5.getOriginalFilename());
         System.out.println("==========================================" + removeUrls);
         FeedDto existing = feedService.getFeedDetail(feedId, principal.getUser().getUserId());
         if (!existing.getWriterUserId().equals(principal.getUser().getUserId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        feedService.updateFeed(feedId, text, tags, images
-//                , removeUrls
-        );
+        feedService.updateFeed(feedId, text, tag1, tag2, tag3, tag4, tag5,  image1, image2, image3, image4, image5, removeList);
+        System.out.println(">>>> Content-Type: " + request.getContentType());
         return ResponseEntity.noContent().build();
     }
 
