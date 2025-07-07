@@ -196,7 +196,7 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		}
 		
 		List<User> content = jpaQueryFactory
-				.select(user)
+				.select(user).distinct()
 				.from(regist)
 				.leftJoin(regist.user,user)
 				.leftJoin(regist.classCalendar,calendar)
