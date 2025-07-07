@@ -1,5 +1,6 @@
 package com.dev.moyering.socialing.repository;
 
+import com.dev.moyering.socialing.dto.ScrapListDto;
 import com.dev.moyering.socialing.entity.Scrap;
 
 import java.util.List;
@@ -11,4 +12,6 @@ public interface ScrapRepositoryCustom {
     List<Integer> findFeedIdsByUserId(Integer userId);
 
     void deleteByUserIdAndFeedId(Integer userId, Integer feedId);
+
+    List<ScrapListDto> findMyScrapsCursor(Integer userId, Integer lastScrapId, int size);
 }

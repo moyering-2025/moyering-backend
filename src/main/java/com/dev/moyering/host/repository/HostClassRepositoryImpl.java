@@ -22,7 +22,9 @@ import org.springframework.stereotype.Repository;
 import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
 import com.dev.moyering.common.dto.MainSearchRequestDto;
+import com.dev.moyering.common.entity.QSubCategory;
 import com.dev.moyering.host.dto.ClassCalendarDto;
+import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.HostClass;
@@ -36,6 +38,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -227,6 +230,48 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		long total = jpaQueryFactory.selectFrom(hostClass).where(builder).fetchCount();
 		
 		return content;
+	}
+	public List<HostClassDto> findRecommendClassesInDetail(Integer subCategoryId,Integer categoryId,Integer classId) throws Exception {
+		QHostClass hc = QHostClass.hostClass;
+		QClassCalendar cc = QClassCalendar.classCalendar;
+		QSubCategory sc = QSubCategory.subCategory;
+		List<HostClass> firstList = jpaQueryFactory
+				.selectFrom(hc)
+				.where(
+					hc.subCategory.subCategoryId.eq(subCategoryId),
+					hc.classId.ne(classId),
+			        JPAExpressions.selectOne()
+		            .from(cc)
+		            .where(cc.hostClass.classId.eq(hc.classId)
+		                  .and(cc.status.eq("모집중")))
+		            .exists()
+	            ).limit(3)
+				.fetch();
+		
+		if (firstList.size()<3) {
+			int remain = 3 - firstList.size();
+	        List<Integer> excludeIds = firstList.stream()
+	                .map(HostClass::getClassId)
+	                .collect(Collectors.toList());
+
+	        List<HostClass> secondList = jpaQueryFactory
+	            .selectFrom(hc)
+	            .where(
+	                hc.subCategory.firstCategory.categoryId.eq(categoryId),
+	                hc.subCategory.subCategoryId.ne(subCategoryId),
+	                hc.classId.notIn(excludeIds),
+	                JPAExpressions.selectOne()
+	                    .from(cc)
+	                    .where(cc.hostClass.classId.eq(hc.classId)
+	                          .and(cc.status.eq("모집중")))
+	                    .exists()
+	            )
+	            .limit(remain)
+	            .fetch();
+
+	        firstList.addAll(secondList);
+		}
+		return firstList.stream().map(h->h.toDto()).collect(Collectors.toList());
 	}
 
 	

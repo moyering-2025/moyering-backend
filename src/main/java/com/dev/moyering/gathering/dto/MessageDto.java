@@ -31,10 +31,16 @@ public class MessageDto {
 	private Integer senderId;//메시지 작성자
 	private String senderNickname;
     private String senderProfile;
+    private Date approvedDate;
     
     private String messageContent;
 	private Date writeDate;
 	private Boolean messageHide;
+
+    private Date approvalDate;
+    private Date rejectionDate;
+    private Boolean hasLeft;
+    
 	public Message toEntity() {
 		Message.MessageBuilder builder = Message.builder()
 				.messageId(messageId)
@@ -42,9 +48,11 @@ public class MessageDto {
 				.user(User.builder().userId(senderId).build())
 				.messageContent(messageContent)
 				.writeDate(writeDate)
-				.messageHide(messageHide);
+				.messageHide(messageHide)
+				.hasLeft(hasLeft);
 	    	return builder.build();
 	}
+
 	public MessageDto(Integer gatheringId, Integer senderId, String messageContent) {
 		super();
 		this.gatheringId = gatheringId;

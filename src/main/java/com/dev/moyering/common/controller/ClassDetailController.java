@@ -45,7 +45,6 @@ public class ClassDetailController {
     			      : null;
 
     		ClassRingDetailResponseDto result = userClassService.getClassRingDetail(classId, userId);
-    		System.out.println(result.getDetailDtos());
 	        return ResponseEntity.ok(result);
 
 		} catch (Exception e) {

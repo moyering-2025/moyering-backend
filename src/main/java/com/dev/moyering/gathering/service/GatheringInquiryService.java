@@ -20,5 +20,6 @@ public interface GatheringInquiryService {
 			Boolean isAnswered) throws Exception;
 	List<GatheringInquiryDto> findInquiriesSentByUser(PageInfo pageInfo, Integer loginId, Date startDate, Date endDate,
 			Boolean isAnswered) throws Exception;
+	GatheringInquiryDto findByInquiryId(Integer inquiryId) throws Exception;
 
 }

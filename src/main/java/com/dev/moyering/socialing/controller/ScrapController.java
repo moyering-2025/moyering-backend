@@ -2,6 +2,7 @@ package com.dev.moyering.socialing.controller;
 
 import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.socialing.dto.ScrapDto;
+import com.dev.moyering.socialing.dto.ScrapListDto;
 import com.dev.moyering.socialing.service.ScrapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -63,5 +64,16 @@ public class ScrapController {
         Integer userId = principal.getUser().getUserId();
         List<Integer> feedIds = scrapService.getScrapFeedIds(userId);
         return ResponseEntity.ok(feedIds); // [1,2,5,7] 이런 feedId 리스트
+    }
+
+    @GetMapping("/myScraps")
+    public ResponseEntity<List<ScrapListDto>> getMyScrapsCursor(
+            @AuthenticationPrincipal PrincipalDetails principal,
+            @RequestParam(required = false) Integer lastScrapId,
+            @RequestParam(defaultValue = "12") int size) {
+
+        Integer userId = principal.getUser().getUserId();
+        List<ScrapListDto> scraps = scrapService.getMyScrapsCursor(userId, lastScrapId, size);
+        return ResponseEntity.ok(scraps);
     }
 }

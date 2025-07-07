@@ -40,5 +40,7 @@ public interface HostClassService {
 	Page<UserDto> searchStudents(StudentSearchRequestDto dto) throws Exception;
 	
 	List<CalendarUserDto> searchStudentClass(Integer hostId,Integer userId)throws Exception;
+	//클래스 상세 추천 강의
+	List<HostClassDto> getRecommendClassesInDetail(Integer subCategoryId, Integer classId)throws Exception;
 	
 }
