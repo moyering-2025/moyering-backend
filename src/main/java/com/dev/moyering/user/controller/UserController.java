@@ -4,24 +4,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.dev.moyering.user.dto.UserBadgeDto;
-import com.dev.moyering.user.dto.UserProfileDto;
-import com.dev.moyering.user.dto.UserProfileUpdateDto;
-import com.dev.moyering.user.entity.UserBadge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.common.dto.SubCategoryDto;
 import com.dev.moyering.common.service.SubCategoryService;
 import com.dev.moyering.host.service.HostService;
+import com.dev.moyering.user.dto.UserBadgeDto;
 import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.dto.UserProfileDto;
+import com.dev.moyering.user.dto.UserProfileUpdateDto;
 import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.entity.UserBadge;
 import com.dev.moyering.user.service.UserService;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class UserController {
@@ -159,4 +167,46 @@ public class UserController {
 
 		return new ResponseEntity<>(badge.toDto(),HttpStatus.OK);
 	}
+	
+	
+	@PostMapping("/api/auth/findId")
+	public ResponseEntity<String> findId(@RequestBody UserDto dto){
+		try {
+			System.out.println("이름"+dto.getName()+"전화번호"+dto.getTel());
+			String id = userService.findId(dto.getName(), dto.getTel());
+			return new ResponseEntity<>(id,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping("/api/auth/findPassword")
+	public ResponseEntity<String> findPassword(@RequestBody UserDto dto){
+		try {
+			String email = dto.getEmail();
+			String name = dto.getName();
+			String username = dto.getUsername();
+			String password = userService.findPass(name, username, email);
+			return new ResponseEntity<>(password,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping("/changePassword")
+	public ResponseEntity<Object> changePassword(@RequestBody Map<String,String> params){
+		try {
+			String password = params.get("password");
+			String username = params.get("username");
+			userService.changePassword(password, username);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	
 }

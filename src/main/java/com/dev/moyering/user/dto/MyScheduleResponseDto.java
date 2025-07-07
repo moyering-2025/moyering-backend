@@ -15,4 +15,5 @@ import lombok.Getter;
 public class MyScheduleResponseDto {
     private List<ClassCalendarDto> classSchedules;
     private List<GatheringDto> gatheringSchedules;
+    private List<GatheringDto> gatheringSchedules2;
 }

@@ -47,4 +47,12 @@ public interface UserService {
     void updateRepresentativeBadge(Integer userId, Integer userBadgeId) throws Exception;
 
     UserBadge getUserFirstBadge(Integer userId);
+    
+    String findId(String name,String phone);
+    
+    String findPass(String name,String username,String email);
+    
+    void sendEamilVerifiedTokenForPassword(String email,String username,String name)throws Exception;
+    
+    void changePassword(String password,String username) throws Exception;
 }
