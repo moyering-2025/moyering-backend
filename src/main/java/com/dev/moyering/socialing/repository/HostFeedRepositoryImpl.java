@@ -19,7 +19,7 @@ public class HostFeedRepositoryImpl implements HostFeedRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<HostFeedDto> findHostFeeds(Integer hostId, int offset, int size) {
+    public List<HostFeedDto> findHostFeeds(int offset, int size) {
         QHostFeed feed = QHostFeed.hostFeed;
         QHost host = QHost.host;
 
@@ -47,7 +47,7 @@ public class HostFeedRepositoryImpl implements HostFeedRepositoryCustom {
                 ))
                 .from(feed)
                 .join(feed.host, host)
-                .where(feed.host.hostId.eq(hostId))
+                .where(feed.isDeleted.eq(false))
                 .offset(offset)
                 .limit(size)
                 .orderBy(feed.createDate.desc())

@@ -15,8 +15,8 @@ public class HostFeedServiceImpl implements HostFeedService {
     private final HostFeedRepository hostFeedRepository;
 
     @Override
-    public List<HostFeedDto> getHostFeeds(Integer hostId, int offset, int size) throws Exception {
-        return hostFeedRepository.findHostFeeds(hostId, offset, size);
+    public List<HostFeedDto> getHostFeeds(int offset, int size) throws Exception {
+        return hostFeedRepository.findHostFeeds(offset, size);
     }
 
     @Override
