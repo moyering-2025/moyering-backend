@@ -1,13 +1,12 @@
 package com.dev.moyering.gathering.repository;
 
 import java.util.List;
-import java.util.Map;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
-import org.springframework.data.domain.PageRequest;
-
-import com.dev.moyering.gathering.dto.GatheringApplyDto;
+import com.dev.moyering.common.dto.MainSearchRequestDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.user.entity.User;
@@ -31,4 +30,6 @@ public interface GatheringRepositoryCustom {
 	//마이페이지 스케줄
 	List<GatheringDto> findMyApplyGatheringSchedule(Integer userId) throws Exception;
 	List<GatheringDto> findMyGatheringSchedule(Integer userId) throws Exception;
+	
+	List<Gathering> findSearchGathering(MainSearchRequestDto dto);
 }

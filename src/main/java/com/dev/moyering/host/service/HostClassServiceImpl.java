@@ -130,6 +130,9 @@ public class HostClassServiceImpl implements HostClassService {
 
 		return hostClass.getClassId();
 	}
+	
+	
+	
 
 	@Override
 	public PageResponseDto<HostClassDto> searchClasses(ClassSearchRequestDto dto) throws Exception {
