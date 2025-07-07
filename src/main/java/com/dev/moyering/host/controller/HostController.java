@@ -77,9 +77,9 @@ public class HostController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
 		}
 	}
+	
 	
 	@GetMapping("/host/getMyHostInfo")
 	public ResponseEntity<Integer> getMyHostInfo(Integer userId){
@@ -157,6 +157,8 @@ public class HostController {
 		}
 	}
 	
+	
+	
 	@GetMapping("/host/classRegistCategory")
 	public ResponseEntity<Map<String,Object>> classRegistCategory(){
 		try {
@@ -171,33 +173,6 @@ public class HostController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-//	
-//	@PostMapping("/host/classRegist/save")
-//	public ResponseEntity<Integer> saveTemp(HostClassDto hostClassDto, Date[] dates,@RequestPart("coupons") String couponsJson,
-//			@RequestPart("scheduleDetail") String scheduleDetail){
-//		try {
-//			Integer classId = hostClassService.registClass(hostClassDto, Arrays.asList(dates));
-//			System.out.println(hostClassDto.getCategory1());
-//			System.out.println(hostClassDto.getCategory2());
-//			scheduleDetailService.registScheduleDetail(scheduleDetail, classId);
-//			
-//			 ObjectMapper mapper = new ObjectMapper();
-//		        mapper.registerModule(new JavaTimeModule()); // LocalDateTime용
-//		        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-//
-//		        List<ClassCouponDto> coupons = mapper.readValue(
-//		                couponsJson,
-//		                new TypeReference<List<ClassCouponDto>>() {}
-//		        );
-//			
-//			couponService.insertHostSelectedCoupon(coupons, classId);
-//			return new ResponseEntity<>(classId, HttpStatus.OK);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-//	}
-//	
 
 	
 	@PostMapping("/host/class/list")

@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.admin.dto.AdminCouponDto;
+import com.dev.moyering.admin.dto.AdminSettlementDto;
 import com.dev.moyering.admin.entity.AdminNotice;
 import com.dev.moyering.admin.service.AdminCouponService;
 import com.dev.moyering.admin.service.AdminNoticeService;
+import com.dev.moyering.admin.service.AdminSettlementService;
 import com.dev.moyering.host.dto.CalendarUserDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.HostPageResponseDto;
@@ -22,6 +24,7 @@ import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.dto.InquirySearchRequestDto;
 import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.dto.ReviewSearchRequestDto;
+import com.dev.moyering.host.dto.SettlementSearchRequestDto;
 import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.ClassRegistRepository;
@@ -45,8 +48,8 @@ public class HostClassController {
 	private final UserService userService;
 	private final ReviewService reviewService;
 	private final AdminNoticeService adminNoticeService;
-	
-	
+	private final AdminSettlementService settlementService;
+
 	@GetMapping("/host/calendar")
 	public ResponseEntity<List<HostClassDto>> selectClassCalendar(@RequestParam Integer hostId) {
 		try {
@@ -67,7 +70,6 @@ public class HostClassController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
 
 	@PostMapping("/host/inquiry/search")
 	public ResponseEntity<HostPageResponseDto<InquiryDto>> searchInquries(@RequestBody InquirySearchRequestDto dto) {
@@ -89,8 +91,8 @@ public class HostClassController {
 
 			HostPageResponseDto<InquiryDto> response = HostPageResponseDto.<InquiryDto>builder()
 					.content(page.getContent()).pageInfo(pageInfo).build();
-			
-			for(InquiryDto inquiryDto : response.getContent()) {
+
+			for (InquiryDto inquiryDto : response.getContent()) {
 				UserDto user = userService.findUserByUserId(inquiryDto.getUserId());
 				inquiryDto.setStudentName(user.getNickName());
 			}
@@ -101,23 +103,23 @@ public class HostClassController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@GetMapping("/host/review")
-	public ResponseEntity<List<ReviewDto>> selectReview(@RequestParam Integer hostId){
+	public ResponseEntity<List<ReviewDto>> selectReview(@RequestParam Integer hostId) {
 		try {
 			List<ReviewDto> reviewList = reviewService.getReviews(hostId);
-			return new ResponseEntity<>(reviewList,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<>(reviewList, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@PostMapping("/host/review/search")
-	public ResponseEntity<HostPageResponseDto<ReviewDto>> studentReview(@RequestBody ReviewSearchRequestDto dto){
+	public ResponseEntity<HostPageResponseDto<ReviewDto>> studentReview(@RequestBody ReviewSearchRequestDto dto) {
 		try {
 			Page<ReviewDto> page = reviewService.searchReviews(dto);
-			
+
 			PageInfo pageInfo = new PageInfo();
 			int curPage = page.getNumber() + 1;
 			int allPage = page.getTotalPages();
@@ -129,28 +131,28 @@ public class HostClassController {
 			pageInfo.setAllPage(allPage);
 			pageInfo.setStartPage(startPage);
 			pageInfo.setEndPage(endPage);
-			
+
 			HostPageResponseDto<ReviewDto> response = HostPageResponseDto.<ReviewDto>builder()
 					.content(page.getContent()).pageInfo(pageInfo).build();
-			
-			for(ReviewDto reviewDto : response.getContent()) {
+
+			for (ReviewDto reviewDto : response.getContent()) {
 				UserDto user = userService.findUserByUserId(reviewDto.getUserId());
 				reviewDto.setStudentName(user.getNickName());
 			}
-			return new ResponseEntity<>(response,HttpStatus.OK);			
-		}catch (Exception e) {
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@PostMapping("/host/reviewReply")
 	public ResponseEntity<Object> reviewReply(@RequestParam Integer reviewId, @RequestParam Integer hostId,
-			@RequestParam String revRegContent){
+			@RequestParam String revRegContent) {
 		try {
 			reviewService.replyReview(reviewId, hostId, revRegContent);
 			return new ResponseEntity<>(HttpStatus.OK);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
@@ -178,44 +180,84 @@ public class HostClassController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@GetMapping("/host/classStudentList")
-	public ResponseEntity<List<UserDto>> classStudentList(@RequestParam Integer calendarId){
+	public ResponseEntity<List<UserDto>> classStudentList(@RequestParam Integer calendarId) {
 		try {
 			List<UserDto> studnetList = hostClassService.selectClassStudentList(calendarId);
-			return new ResponseEntity<>(studnetList,HttpStatus.OK); 
-		}catch (Exception e) {
+			return new ResponseEntity<>(studnetList, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@GetMapping("/host/studentList")
 	public ResponseEntity<List<UserDto>> studentList(@RequestParam Integer hostId) {
 		try {
 			List<UserDto> studentList = hostClassService.selectStudentList(hostId);
-			return new ResponseEntity<>(studentList,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<>(studentList, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@GetMapping("/host/notice")
-	public ResponseEntity<List<AdminNotice>> hostNotice(){
+	public ResponseEntity<List<AdminNotice>> hostNotice() {
 		try {
 			List<AdminNotice> list = adminNoticeService.selectAllNotice();
-			return new ResponseEntity<>(list,HttpStatus.OK);
-		}catch (Exception e) {
+			return new ResponseEntity<>(list, HttpStatus.OK);
+		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
+
 	@PostMapping("/host/student/search")
-	public ResponseEntity<HostPageResponseDto<UserDto>> studentSearch(@RequestBody StudentSearchRequestDto dto){
+	public ResponseEntity<HostPageResponseDto<UserDto>> studentSearch(@RequestBody StudentSearchRequestDto dto) {
 		try {
 			Page<UserDto> page = hostClassService.searchStudents(dto);
+
+			PageInfo pageInfo = new PageInfo();
+			int curPage = page.getNumber() + 1;
+			int allPage = page.getTotalPages();
+			int blockSize = 5;
+			int startPage = ((curPage - 1) / blockSize) * blockSize + 1;
+			int endPage = Math.min(startPage + blockSize - 1, allPage);
+
+			pageInfo.setCurPage(curPage);
+			pageInfo.setAllPage(allPage);
+			pageInfo.setStartPage(startPage);
+			pageInfo.setEndPage(endPage);
+
+			HostPageResponseDto<UserDto> response = HostPageResponseDto.<UserDto>builder().content(page.getContent())
+					.pageInfo(pageInfo).build();
+
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping("/host/student/classes")
+	public ResponseEntity<List<CalendarUserDto>> studentClass(@RequestParam Integer hostId,
+			@RequestParam Integer userId) {
+		try {
+			List<CalendarUserDto> list = hostClassService.searchStudentClass(hostId, userId);
+			return new ResponseEntity<>(list, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+	}
+
+	@PostMapping("/host/settlementList")
+	public ResponseEntity<HostPageResponseDto<AdminSettlementDto>> settlementList(@RequestBody SettlementSearchRequestDto dto){
+		try {
+			Page<AdminSettlementDto> page = settlementService.getHostSettlementList(dto);
 			
 			PageInfo pageInfo = new PageInfo();
 			int curPage = page.getNumber() + 1;
@@ -229,29 +271,14 @@ public class HostClassController {
 			pageInfo.setStartPage(startPage);
 			pageInfo.setEndPage(endPage);
 			
-			HostPageResponseDto<UserDto> response = HostPageResponseDto.<UserDto>builder()
-					.content(page.getContent()).pageInfo(pageInfo).build();
+			HostPageResponseDto<AdminSettlementDto> response = HostPageResponseDto.<AdminSettlementDto>builder().content(page.getContent())
+					.pageInfo(pageInfo).build();
 			
-			return new ResponseEntity<>(response,HttpStatus.OK);			
+			return new ResponseEntity<>(response,HttpStatus.OK);
 		}catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 		}
 	}
-	
-	@GetMapping("/host/student/classes")
-	public ResponseEntity<List<CalendarUserDto>> studentClass(@RequestParam Integer hostId,
-			@RequestParam Integer userId){
-		try {
-			List<CalendarUserDto> list = hostClassService.searchStudentClass(hostId, userId);
-			return new ResponseEntity<>(list,HttpStatus.OK);
-		}catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-		
-	}
-	
-	
 
 }

@@ -1,26 +1,37 @@
 package com.dev.moyering.admin.repository;
 
-import com.dev.moyering.admin.dto.AdminSettlementDto;
-
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import static com.dev.moyering.admin.entity.QAdminSettlement.adminSettlement;
 import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
 import static com.dev.moyering.host.entity.QHost.host;
 import static com.dev.moyering.host.entity.QHostClass.hostClass;
 import static com.dev.moyering.user.entity.QUser.user;
 import static com.dev.moyering.user.entity.QUserPayment.userPayment;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+
+import com.dev.moyering.admin.dto.AdminSettlementDto;
+import com.dev.moyering.admin.entity.AdminSettlement;
+import com.dev.moyering.admin.entity.QAdminSettlement;
+import com.dev.moyering.host.dto.SettlementSearchRequestDto;
+import com.dev.moyering.host.entity.QClassCalendar;
+import com.dev.moyering.host.entity.QHost;
+import com.dev.moyering.host.entity.QHostClass;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
 
 //private String username; // 강사 로그인 아이디
 //private String hostName; // 강사 이름 (user.name)
@@ -183,4 +194,40 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
         }
         return null;
     }
+
+	@Override
+	public Page<AdminSettlement> getHostSettlementList(SettlementSearchRequestDto dto, Pageable pageable) {
+		QAdminSettlement settlement = QAdminSettlement.adminSettlement;
+		QHost host = QHost.host;
+		QClassCalendar calendar = QClassCalendar.classCalendar;
+		QHostClass hostClass = QHostClass.hostClass;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		
+		builder.and(host.hostId.eq(dto.getHostId()));
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		if(dto.getStartDate() != null && !dto.getStartDate().isBlank()) {
+			builder.and(settlement.settlementDate.goe(LocalDate.parse(dto.getStartDate(),formatter)));
+		}
+		
+		if(dto.getEndDate() !=null && !dto.getEndDate().isBlank()) {
+			builder.and(settlement.settlementDate.loe(LocalDate.parse(dto.getEndDate(),formatter)));
+		}
+		
+		List<AdminSettlement> content = queryFactory.selectFrom(settlement)
+				.join(settlement.classCalendar,calendar)
+				.join(calendar.hostClass,hostClass)
+				.join(hostClass.host,host).where(builder)
+				.orderBy(settlement.settlementDate.desc()).offset(pageable.getOffset())
+				.limit(pageable.getPageSize()).fetch();
+		
+		long total = queryFactory.selectFrom(settlement)
+				.join(settlement.classCalendar,calendar)
+				.join(calendar.hostClass,hostClass)
+				.join(hostClass.host,host).where(builder).fetchCount();
+		
+		
+		return new PageImpl<>(content,pageable,total);
+	}
 }
