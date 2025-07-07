@@ -27,6 +27,7 @@ import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.PageResponseDto;
+import com.dev.moyering.common.entity.SubCategory;
 import com.dev.moyering.common.repository.SubCategoryRepository;
 import com.dev.moyering.host.dto.CalendarUserDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
@@ -484,6 +485,13 @@ public class HostClassServiceImpl implements HostClassService {
 	public List<CalendarUserDto> searchStudentClass(Integer hostId, Integer userId) throws Exception {
 		List<CalendarUserDto> dtoList=classRegistRepository.findByStudentClass(hostId, userId);
 		return dtoList;
+	}
+
+	@Override
+	public List<HostClassDto> getRecommendClassesInDetail(Integer subCategoryId,Integer classId) throws Exception {
+		SubCategory subCategory = subCategoryRepository.findById(subCategoryId).orElseThrow(()-> new Exception("해당 카테고리가 존재하지 않습니다.ㄴ"));
+		List<HostClassDto> result =hostClassRepository.findRecommendClassesInDetail(subCategoryId, subCategory.getFirstCategory().getCategoryId(), classId);
+		return 	result;
 	}
 
 	
