@@ -48,6 +48,8 @@ public class GatheringApplyDto {
     private String intro;
     private Date applyDate;   
     private Boolean isApprove;
+    private Date approvalDate;
+    private Date rejectionDate;
     private String aspiration;
     private Integer acceptedCount;
     
@@ -58,6 +60,8 @@ public class GatheringApplyDto {
     			.user(User.builder().userId(userId).build())
     			.applyDate(applyDate)
     			.isApproved(isApprove)
+    			.approvalDate(approvalDate)
+    			.rejectionDate(rejectionDate)
     			.aspiration(aspiration)
     			.build();
     }

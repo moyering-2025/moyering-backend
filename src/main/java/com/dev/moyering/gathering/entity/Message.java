@@ -55,6 +55,10 @@ public class Message {
     @Column(columnDefinition = "TINYINT")
 	@ColumnDefault("0")
     private Boolean messageHide;
+    
+    @Column(columnDefinition = "TINYINT")
+ 	@ColumnDefault("0")
+    private Boolean hasLeft;
     public MessageDto toDto() {
     	MessageDto.MessageDtoBuilder builder = MessageDto.builder()
 				.messageId(messageId)
@@ -69,7 +73,8 @@ public class Message {
 				.senderProfile(user.getProfile())
 				.messageContent(messageContent)
 				.writeDate(writeDate)
-				.messageHide(messageHide);
+				.messageHide(messageHide)
+				.hasLeft(hasLeft);
 	    	return builder.build();
     }
     
