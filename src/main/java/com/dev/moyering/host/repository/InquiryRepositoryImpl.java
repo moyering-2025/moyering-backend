@@ -143,7 +143,7 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 	    		.join(cc.hostClass, hc)
 	    		.join(iq.host,h)
 	    		.where(builder)
-	    		.orderBy(iq.inquiryDate.desc())
+	    		.orderBy(iq.InquiryId.desc())
 	    		.offset(pageable.getOffset())
 	    		.limit(pageable.getPageSize())
 	    		.fetch();

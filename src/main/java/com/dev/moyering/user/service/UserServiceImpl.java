@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.dev.moyering.user.dto.UserDto;
@@ -84,6 +85,8 @@ public class UserServiceImpl implements UserService {
         }
         return false;
     }
+    
+   
 
     @Override
     public void completeJoin(UserDto userDto) throws Exception {
@@ -297,5 +300,39 @@ public class UserServiceImpl implements UserService {
         // 새로운 대표 배지로
         targetBadge.setIsRepresentative(true);
     }
+
+	@Override
+	public String findId(String name, String tel) {
+		User user = userRepository.findByNameAndTel(name, tel).get();
+		
+		return user.getUsername();
+	}
+
+	@Override
+	public void sendEamilVerifiedTokenForPassword(String email,String username,String name) throws Exception {
+		User user = userRepository.findByEmailAndNameAndUsername(email,name,username).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 이메일 입니다."));
+		
+		String code = UUID.randomUUID().toString();
+		
+		user.setEmailVerificationToken(code);
+		userRepository.save(user);
+		
+		emailService.sendVerificationEmail(email, code);
+	}
+
+	@Override
+	public String findPass(String name, String username, String email) {
+		User user = userRepository.findByEmailAndNameAndUsername(email, name, username).get();
+		return user.getPassword();
+	}
+
+	@Override
+	public void changePassword(String password,String username) throws Exception {
+		User user = userRepository.findByUsername(username).get();
+		user.setPassword(bCryptPasswordEncoder.encode(password));
+		userRepository.save(user);
+	}
+	
+	
 
 }

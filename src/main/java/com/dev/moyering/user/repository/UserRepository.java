@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, Integer>,  UserRepos
 	Optional<User> findByUsername(String username);
 	Optional<User> findByProviderAndProviderId(String provider,String providerId);
 	Optional<User> findByEmailVerificationToken(String token);
+	Optional<User> findByEmailAndNameAndUsername(String email,String name,String username);
 
 
 	//feed
@@ -24,4 +25,6 @@ public interface UserRepository extends JpaRepository<User, Integer>,  UserRepos
 	@Modifying
 	@Query("update User u set u.fcmToken=:fcmToken where u.userId=:userId")
 	void updateFcmToken(@Param("userId") Integer userId, @Param("fcmToken") String fcmToken);
+	
+	Optional<User> findByNameAndTel(String name,String tel);
 }

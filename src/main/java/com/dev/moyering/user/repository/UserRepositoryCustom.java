@@ -14,6 +14,7 @@ public interface UserRepositoryCustom {
 
     // 검색 후 조회 건수
     Long countMembers(AdminMemberSearchCond cond);
+    
 }
 
 
