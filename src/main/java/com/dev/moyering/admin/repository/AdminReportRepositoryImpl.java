@@ -31,14 +31,10 @@ public class AdminReportRepositoryImpl implements AdminReportRepositoryCustom {
                         // ReportDto의 생성자에 들어갈 컬럼 순서
                         adminReport.reportId,
                         adminReport.reporterId,
-                        adminReport.targetOwnerId,
                         adminReport.reportType,
                         adminReport.targetId,
-                        adminReport.title,
                         adminReport.content,
                         adminReport.createdAt,
-                        adminReport.processorId,
-                        adminReport.processedDate,
                         adminReport.processStatus
                         ))
                         .from(adminReport)
@@ -72,7 +68,6 @@ public class AdminReportRepositoryImpl implements AdminReportRepositoryCustom {
                     return null; //검색 없으면 전체 조회
                 }
                 // 검색어가 있으면 제목 또는 내용에 포함된 데이터 찾기
-                return adminReport.title.containsIgnoreCase(keyword)  // 제목에 검색어 포함 (대소문자 무시)
-                        .or(adminReport.content.containsIgnoreCase(keyword)); // 또는 내용에 검색어 포함
+                 return adminReport.content.containsIgnoreCase(keyword); // 또는 내용에 검색어 포함
             }
         }
