@@ -42,4 +42,6 @@ public interface FeedService {
     boolean isLikedByUser(Integer feedId, Integer userId);
 
     List<FeedDto> getPopularFeeds(Integer page, Integer size) throws Exception;
+
+    void deleteFeed(Integer feedId,Integer userId) throws Exception;
 }

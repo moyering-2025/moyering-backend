@@ -2,19 +2,12 @@ package com.dev.moyering.socialing.controller;
 
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.auth.PrincipalDetails;
@@ -52,8 +45,6 @@ public class FeedController {
         List<FeedDto> feeds = null;
         try {
             feeds = feedService.getFeeds(sort, userId);
-            System.out.println("********************************************************"+feeds);
-            System.out.println("feeds.size = " + feeds.size());
             return new ResponseEntity<>(feeds, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,7 +120,7 @@ public class FeedController {
             @RequestPart(value = "removeUrls", required = false) String[] removeUrls,
             @AuthenticationPrincipal PrincipalDetails principal
             , HttpServletRequest request
-            ) throws Exception {
+    ) throws Exception {
         List<MultipartFile> images = new ArrayList<>();
         if (image1 != null && !image1.isEmpty()) images.add(image1);
         if (image2 != null && !image2.isEmpty()) images.add(image2);
@@ -138,13 +129,13 @@ public class FeedController {
         if (image5 != null && !image5.isEmpty()) images.add(image5);
         List<String> removeList = removeUrls != null ? Arrays.asList(removeUrls) : Collections.emptyList();
 
-        System.out.println("==========================================" + removeUrls);
+//        System.out.println("==========================================" + removeUrls);
         FeedDto existing = feedService.getFeedDetail(feedId, principal.getUser().getUserId());
         if (!existing.getWriterUserId().equals(principal.getUser().getUserId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        feedService.updateFeed(feedId, text, tag1, tag2, tag3, tag4, tag5,  image1, image2, image3, image4, image5, removeList);
-        System.out.println(">>>> Content-Type: " + request.getContentType());
+        feedService.updateFeed(feedId, text, tag1, tag2, tag3, tag4, tag5, image1, image2, image3, image4, image5, removeList);
+//        System.out.println(">>>> Content-Type: " + request.getContentType());
         return ResponseEntity.noContent().build();
     }
 
@@ -188,6 +179,29 @@ public class FeedController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/user/{feedId}")
+    public ResponseEntity<String> deleteFeed(
+            @PathVariable Integer feedId,
+            @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        if (principal == null || principal.getUser() == null) {
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+        Integer userId = principal.getUser().getUserId();
+
+
+        try {
+            feedService.deleteFeed(feedId, userId);
+            return ResponseEntity.ok("삭제 완료 (soft delete)");
+        } catch (IllegalArgumentException e) {
+            // 존재하지 않거나 권한 없을 때
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("삭제 실패: " + e.getMessage());
         }
     }
 }

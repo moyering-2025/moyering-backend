@@ -24,4 +24,7 @@ public interface FeedRepositoryCustom {
     // 좋아요여부 없이 조회
     List<FeedDto> findFeedsWithoutLiked(String sortType);
 
+    // 피드 삭제
+    void softDeleteById(Integer feedId, Integer userId);
+
 }

@@ -240,6 +240,18 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public void softDeleteById(Integer feedId, Integer userId) {
+        QFeed feed = QFeed.feed;
+        long updatedCount = jpaQueryFactory.update(feed)
+                .set(feed.isDeleted, true)
+                .where(
+                        feed.feedId.eq(feedId),
+                        feed.user.userId.eq(userId)
+                )
+                .execute();
+    }
+
     /**
      * 정렬 기준에 따라 OrderSpecifier를 반환
      */

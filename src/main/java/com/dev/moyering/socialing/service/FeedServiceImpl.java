@@ -351,6 +351,23 @@ public class FeedServiceImpl implements FeedService {
         return feedRepository.findTopLikedFeeds(offset, size);
     }
 
+    @Override
+    @Transactional
+    public void deleteFeed(Integer feedId, Integer userId) throws Exception {
+        log.info(">> deleteFeed 실행, feedId={}, userId={}", feedId, userId);
+
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 피드"));
+        log.info(">> Feed 존재 확인 완료, feed.userId={}", feed.getUser().getUserId());
+
+        if (!feed.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("본인이 작성한 피드만 삭제할 수 있습니다.");
+        }
+
+        feedRepository.softDeleteById(feedId,userId);
+        log.info(">> softDeleteById 완료");
+    }
+
 
 }
 
