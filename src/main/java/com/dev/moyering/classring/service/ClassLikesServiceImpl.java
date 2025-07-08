@@ -22,7 +22,6 @@ public class ClassLikesServiceImpl implements ClassLikesService {
 	@Override
 	public void toggleLike(ClassLikesDto dto) throws Exception {
     	// 이미 좋아요가 있으면 삭제, 없으면 생성
-    	System.out.println("Dddddd");
     	classLikesRepository.findByUser_UserIdAndHostClass_ClassId(dto.getUserId(), dto.getClassId())
             .ifPresentOrElse(
             		classLikesRepository::delete,
