@@ -209,4 +209,18 @@ public class FeedController {
             return ResponseEntity.internalServerError().body("삭제 실패: " + e.getMessage());
         }
     }
+    
+    @GetMapping("/socialing/feeds/myFeedsLikeCount")
+    public ResponseEntity<Map<Integer,Integer>> myFeedsLikeCount(@RequestParam Integer userId){
+    	try{
+    		Map<Integer,Integer> map = feedService.myFeedsLikeCount(userId);
+    		return new ResponseEntity<>(map,HttpStatus.OK);
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    	
+    }
+    
+    
 }
