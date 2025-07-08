@@ -5,6 +5,7 @@ import java.sql.Date;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.Message;
 import com.dev.moyering.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,12 +35,13 @@ public class MessageDto {
     private Date approvedDate;
     
     private String messageContent;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 	private Date writeDate;
 	private Boolean messageHide;
 
     private Date approvalDate;
     private Date rejectionDate;
-    private Boolean hasLeft;
+    private Boolean messageRoomState;
     
 	public Message toEntity() {
 		Message.MessageBuilder builder = Message.builder()
@@ -48,8 +50,7 @@ public class MessageDto {
 				.user(User.builder().userId(senderId).build())
 				.messageContent(messageContent)
 				.writeDate(writeDate)
-				.messageHide(messageHide)
-				.hasLeft(hasLeft);
+				.messageHide(messageHide);
 	    	return builder.build();
 	}
 
@@ -58,5 +59,18 @@ public class MessageDto {
 		this.gatheringId = gatheringId;
 		this.senderId = senderId;
 		this.messageContent = messageContent;
+	}
+	  public MessageDto(Integer gatheringId, String title, String thumbnail, 
+              Boolean canceled, Integer userId, Date meetingDate, 
+              Date latestMessageDate, Date approvalDate, Date rejectionDate) {
+			 this.gatheringId = gatheringId;
+			 this.gatheringTitle = title;
+			 this.thumbnailFileName = thumbnail;
+			 this.gatheringState = canceled;
+			 this.organizerUserId = userId;
+			 this.meetingDate = meetingDate;
+			 this.approvalDate = approvalDate;
+			 this.writeDate = latestMessageDate;
+			 this.rejectionDate = rejectionDate;
 	}
 }

@@ -45,7 +45,7 @@ public class Message {
 	@JoinColumn(name="userId")
 	private User user;
 	
-	@Column
+	@Column(columnDefinition = "DATETIME", nullable = false)
 	@CreationTimestamp
 	private Date writeDate;
 	
@@ -56,9 +56,6 @@ public class Message {
 	@ColumnDefault("0")
     private Boolean messageHide;
     
-    @Column(columnDefinition = "TINYINT")
- 	@ColumnDefault("0")
-    private Boolean hasLeft;
     public MessageDto toDto() {
     	MessageDto.MessageDtoBuilder builder = MessageDto.builder()
 				.messageId(messageId)
@@ -73,8 +70,7 @@ public class Message {
 				.senderProfile(user.getProfile())
 				.messageContent(messageContent)
 				.writeDate(writeDate)
-				.messageHide(messageHide)
-				.hasLeft(hasLeft);
+				.messageHide(messageHide);
 	    	return builder.build();
     }
     

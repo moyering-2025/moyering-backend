@@ -49,10 +49,10 @@ public class GatheringApply {
     @Column()
 	@CreationTimestamp
     private Date applyDate;
-    
-    @Column()
+
+    @Column(columnDefinition = "DATETIME")
     private Date approvalDate;
-    @Column()
+    @Column(columnDefinition = "DATETIME")
     private Date rejectionDate;
 
     @Column(columnDefinition = "TINYINT")

@@ -32,7 +32,7 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 		Gathering gathering = gatheringRepository.findById(gatheringInquiryDto.getGatheringId()).get();
 		AlarmDto alarmDto = AlarmDto.builder()
 				.alarmType(3)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
-				.title(gatheringInquiryDto.getTitle()+"에 대한 문의가 등록 안내.") // 필수 사항
+				.title(gatheringInquiryDto.getTitle()+"에 대한 문의가 등록 안내") // 필수 사항
 				.receiverId(gathering.getUser().getUserId())
 				.senderId(gatheringInquiryDto.getUserId())
 				.senderNickname(gatheringInquiryDto.getNickName())
@@ -61,11 +61,11 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 		Gathering gathering = gatheringRepository.findById(gatheringInquiryDto.getGatheringId()).get();
 		AlarmDto alarmDto = AlarmDto.builder()
 				.alarmType(3)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
-				.title(gatheringInquiryDto.getTitle()+"에 대한 문의에 대한 답변이 등록 안내") // 필수 사항
+				.title("문의에 대한 답변이 등록 안내") // 필수 사항
 				.receiverId(gatheringInquiryDto.getUserId())
 				.senderId(gathering.getUser().getUserId())
 				.senderNickname(gathering.getUser().getNickName())
-				.content(gathering.getTitle()+"에 대한 문의에 대한 답변이 등록되었어요.")//알림 내용
+				.content(gathering.getTitle()+"에 등록하신 문의에 대한 답변이 등록되었어요.")//알림 내용
 				.build();
 		
 		System.out.println("64 AlarmDto : "+alarmDto);

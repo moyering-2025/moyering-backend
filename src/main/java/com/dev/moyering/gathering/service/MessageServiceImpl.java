@@ -32,14 +32,14 @@ public class MessageServiceImpl implements MessageService {
 		return null;
 	}
 	@Override
-	public List<MessageDto> getMessageListByGatheringIdAndUserId(Integer gatheringId, Integer userId) throws Exception {
-		 List<MessageDto> messageList = null;
+	public List<MessageDto> getMessageListByGatheringIdAndUserId(Integer gatheringId, Integer loginId) throws Exception {
+		 List<MessageDto> messageList = messageRepository.getMessageListByGatheringId(gatheringId, loginId);
 		 
 		 return messageList;
 	}
 	@Override
 	public List<MessageDto> getMessageRoomListUserId(Integer userId) throws Exception {
-		 List<MessageDto> messageRoomList = null;
+		 List<MessageDto> messageRoomList = messageRepository.getMessageRoomListUserId(userId);
 			
 		 return messageRoomList;
 	}
