@@ -29,6 +29,6 @@ public interface FeedRepositoryCustom {
     // 좋아요여부 없이 조회
     List<FeedDto> findFeedsWithoutLiked(String sortType);
     
-    List<Feed> findSearchFeed(MainSearchRequestDto dto);
+    Page<Feed> findSearchFeed(MainSearchRequestDto dto,Pageable pageable);
 
 }

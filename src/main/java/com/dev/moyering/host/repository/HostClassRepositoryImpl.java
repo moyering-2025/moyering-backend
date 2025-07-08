@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -218,18 +219,22 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 	}
 
 	@Override
-	public List<HostClass> findSearchClass(MainSearchRequestDto dto) throws Exception {
+	public Page<HostClass> findSearchClass(MainSearchRequestDto dto,Pageable pageable) throws Exception {
 		QHostClass hostClass= QHostClass.hostClass;
 		
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.or(hostClass.name.containsIgnoreCase(dto.getSearchQuery()));
 		builder.or(hostClass.detailDescription.containsIgnoreCase(dto.getSearchQuery()));
 		
-		List<HostClass> content = jpaQueryFactory.selectFrom(hostClass).where(builder).fetch();
+		List<HostClass> content = jpaQueryFactory.selectFrom(hostClass)
+				.where(builder)
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
+				.fetch();
 		
 		long total = jpaQueryFactory.selectFrom(hostClass).where(builder).fetchCount();
 		
-		return content;
+		return new PageImpl<>(content,pageable,total);
 	}
 	public List<HostClassDto> findRecommendClassesInDetail(Integer subCategoryId,Integer categoryId,Integer classId) throws Exception {
 		QHostClass hc = QHostClass.hostClass;
