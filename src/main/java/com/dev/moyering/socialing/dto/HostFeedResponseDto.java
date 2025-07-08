@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class HostFeedResponseDto {
     private Integer feedId;
+    private Integer writerUserId;
+    private String hostName;
     private String content;
     private String img1;
     private String img2;
