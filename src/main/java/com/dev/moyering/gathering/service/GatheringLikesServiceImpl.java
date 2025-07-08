@@ -1,16 +1,16 @@
 package com.dev.moyering.gathering.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dev.moyering.gathering.dto.GatheringLikesDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringLikes;
-import com.dev.moyering.gathering.entity.QGathering;
 import com.dev.moyering.gathering.repository.GatheringLikesRepository;
 import com.dev.moyering.user.entity.User;
-import com.querydsl.core.Tuple;
 @Service
 public class GatheringLikesServiceImpl implements GatheringLikesService {
 
@@ -50,6 +50,12 @@ public class GatheringLikesServiceImpl implements GatheringLikesService {
 			gatheringLikesRepository.deleteGatheringLikes(gatheringLikeNum);
 			return false;
 		}
+	}
+
+	@Override
+	public List<GatheringLikesDto> getGatherlikeListByUserId(Integer userId) throws Exception {
+		return gatheringLikesRepository.findAllByUser_userId(userId)
+				.stream().map(gl -> gl.toDto()).collect(Collectors.toList());
 	}
 
 }

@@ -1,4 +1,5 @@
-package com.dev.moyering.classring.controller;
+package com.dev.moyering.gathering.controller;
+
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -10,23 +11,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dev.moyering.auth.PrincipalDetails;
-import com.dev.moyering.classring.dto.ClassLikesDto;
-import com.dev.moyering.classring.service.ClassLikesService;
+import com.dev.moyering.gathering.dto.GatheringLikesDto;
+import com.dev.moyering.gathering.service.GatheringLikesService;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
-public class ClassLikesController {
-	private final ClassLikesService classLikesService;
+public class GatheringLikesController {
+	private final GatheringLikesService gatheringLikesService;
 	
-	@PostMapping("/toggle-like")
-    public ResponseEntity<Void> toggleLike(@RequestBody ClassLikesDto dto, @AuthenticationPrincipal PrincipalDetails principal) {
+	@PostMapping("/gather-toggle-like")
+    public ResponseEntity<Void> toggleLike(@RequestBody GatheringLikesDto dto, @AuthenticationPrincipal PrincipalDetails principal) {
 		dto.setUserId(principal.getUser().getUserId());
 		System.out.println(dto);
 		try {
-			classLikesService.toggleLike(dto);
+			System.out.println(dto.getGatheringLikeId());
+			gatheringLikesService.toggleGatheringLike(principal.getUser().getUserId(), dto.getGatheringId());
 	        return ResponseEntity.ok().build();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -34,12 +36,11 @@ public class ClassLikesController {
 		}
     }
 	
-	@GetMapping("/class-like-list")
-	public ResponseEntity<List<ClassLikesDto>> userClassLikes( @AuthenticationPrincipal PrincipalDetails principal) {
+	@GetMapping("/gather-like-list")
+	public ResponseEntity<List<GatheringLikesDto>> userGatherLikes( @AuthenticationPrincipal PrincipalDetails principal) {
 		try {
-			List<ClassLikesDto> classLikes = classLikesService.getClasslikeListByUserId(principal.getUser().getUserId());
-			
-	        return ResponseEntity.ok(classLikes);
+			List<GatheringLikesDto> gatherLikes = gatheringLikesService.getGatherlikeListByUserId(principal.getUser().getUserId());
+	        return ResponseEntity.ok(gatherLikes);
 		} catch (Exception e) {
 			e.printStackTrace();
 	        return ResponseEntity.internalServerError().build(); // 500 에러 응답
