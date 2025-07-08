@@ -1,8 +1,13 @@
 package com.dev.moyering.socialing.repository;
 
-import com.dev.moyering.socialing.dto.FeedDto;
-
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.dev.moyering.common.dto.MainSearchRequestDto;
+import com.dev.moyering.socialing.dto.FeedDto;
+import com.dev.moyering.socialing.entity.Feed;
 
 public interface FeedRepositoryCustom {
 
@@ -23,6 +28,8 @@ public interface FeedRepositoryCustom {
 
     // 좋아요여부 없이 조회
     List<FeedDto> findFeedsWithoutLiked(String sortType);
+    
+    List<Feed> findSearchFeed(MainSearchRequestDto dto);
 
     // 피드 삭제
     void softDeleteById(Integer feedId, Integer userId);

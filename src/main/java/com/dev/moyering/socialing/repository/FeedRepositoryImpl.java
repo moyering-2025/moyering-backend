@@ -1,25 +1,30 @@
 package com.dev.moyering.socialing.repository;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
+import com.dev.moyering.common.dto.MainSearchRequestDto;
 import com.dev.moyering.socialing.dto.FeedDto;
+import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.socialing.entity.QComment;
 import com.dev.moyering.socialing.entity.QFeed;
 import com.dev.moyering.socialing.entity.QFollow;
 import com.dev.moyering.socialing.entity.QLikeList;
 import com.dev.moyering.user.entity.QUser;
 import com.dev.moyering.user.entity.QUserBadge;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanTemplate;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
@@ -267,4 +272,17 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 return feed.createDate.desc();
         }
     }
+
+	@Override
+	public List<Feed> findSearchFeed(MainSearchRequestDto dto) {
+		QFeed feed = QFeed.feed;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.or(feed.content.containsIgnoreCase(dto.getSearchQuery()));
+		
+		List<Feed> content = jpaQueryFactory.selectFrom(feed).where(builder).fetch();
+		long total = jpaQueryFactory.selectFrom(feed).where(builder).fetchCount();
+		
+		return content;
+	}
 }

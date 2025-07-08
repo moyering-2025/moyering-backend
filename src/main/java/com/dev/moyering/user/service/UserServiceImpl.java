@@ -9,6 +9,8 @@ import com.dev.moyering.user.dto.UserProfileDto;
 import com.dev.moyering.user.dto.UserProfileUpdateDto;
 import com.dev.moyering.user.entity.UserBadge;
 import com.dev.moyering.user.repository.UserBadgeRepository;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,13 +30,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -47,6 +49,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserBadgeRepository userBadgeRepository;
+    
+    private final UserBadgeService userBadgeService;
+    
 
     @Value("${iupload.path}")
     private String iuploadPath;
@@ -89,6 +94,7 @@ public class UserServiceImpl implements UserService {
    
 
     @Override
+    @Transactional
     public void completeJoin(UserDto userDto) throws Exception {
         User user = userRepository.findByUsername(userDto.getUsername()).get();
 
@@ -102,8 +108,10 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new Exception("이메일 인증이 완료되지 않았습니다.");
         }
-
+        
+        user.setUserBadgeId(1);
         userRepository.save(user);
+        userBadgeService.giveBadge(user.getUserId(), 1);
     }
 
 

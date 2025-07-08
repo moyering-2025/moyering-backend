@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
+import com.dev.moyering.common.dto.MainSearchRequestDto;
 import com.dev.moyering.common.entity.QSubCategory;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
@@ -217,6 +218,19 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 	}
 
 	@Override
+	public List<HostClass> findSearchClass(MainSearchRequestDto dto) throws Exception {
+		QHostClass hostClass= QHostClass.hostClass;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.or(hostClass.name.containsIgnoreCase(dto.getSearchQuery()));
+		builder.or(hostClass.detailDescription.containsIgnoreCase(dto.getSearchQuery()));
+		
+		List<HostClass> content = jpaQueryFactory.selectFrom(hostClass).where(builder).fetch();
+		
+		long total = jpaQueryFactory.selectFrom(hostClass).where(builder).fetchCount();
+		
+		return content;
+	}
 	public List<HostClassDto> findRecommendClassesInDetail(Integer subCategoryId,Integer categoryId,Integer classId) throws Exception {
 		QHostClass hc = QHostClass.hostClass;
 		QClassCalendar cc = QClassCalendar.classCalendar;

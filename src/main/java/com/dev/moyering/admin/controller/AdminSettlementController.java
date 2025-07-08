@@ -1,5 +1,6 @@
 package com.dev.moyering.admin.controller;
 
+import com.dev.moyering.admin.dto.AdminPaymentDto;
 import com.dev.moyering.admin.dto.AdminSettlementDto;
 import com.dev.moyering.admin.service.AdminSettlementService;
 import com.dev.moyering.admin.service.SettlementSchedulerService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -168,4 +170,24 @@ public class AdminSettlementController {
                 return ResponseEntity.status(500).body(status);
             }
         }
+
+    @GetMapping("/{settlementId}/payments")
+    public ResponseEntity<List<AdminPaymentDto>> getPaymentsBySettlementId(@PathVariable Integer settlementId) {
+        log.info("정산 결제 내역 조회 요청 - settlementId: {}", settlementId);
+
+        try {
+            List<AdminPaymentDto> payments = adminSettlementService.getPaymentListBySettlementId(settlementId);
+
+            log.info("정산 결제 내역 조회 성공 - settlementId: {}, 건수: {}", settlementId, payments.size());
+            return ResponseEntity.ok(payments);
+
+        } catch (IllegalArgumentException e) {
+            log.warn("잘못된 정산 ID - settlementId: {}, error: {}", settlementId, e.getMessage());
+            return ResponseEntity.badRequest().build();
+
+        } catch (Exception e) {
+            log.error("정산 결제 내역 조회 실패 - settlementId: {}, error: {}", settlementId, e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

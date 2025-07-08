@@ -17,7 +17,9 @@ import com.dev.moyering.admin.service.BannerService;
 import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.GatheringSearchRequestDto;
+import com.dev.moyering.common.dto.MainSearchRequestDto;
 import com.dev.moyering.common.dto.PageResponseDto;
+import com.dev.moyering.common.service.MainService;
 import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.service.GatheringService;
 import com.dev.moyering.host.dto.HostClassDto;
@@ -33,6 +35,7 @@ public class MainController {
 	private final GatheringService gatheringService;
 	private final BannerService bannerService;
     private final HostClassService hostClassService;
+    private final MainService mainService;
 
 	//메인페이지
     @GetMapping("/main")
@@ -95,6 +98,21 @@ public class MainController {
 			e.printStackTrace();
 	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			
 		}
+    }
+    
+    @PostMapping("/searchAll")
+    public ResponseEntity<Map<String,Object>> searchAll(
+    		@RequestBody MainSearchRequestDto dto){
+    	try {
+    		Map<String,Object> list = mainService.searchAllBySearchQuery(dto); 
+    		System.out.println(list);
+    		
+    		return new ResponseEntity<>(list,HttpStatus.OK);
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    	
     }
     
 }
