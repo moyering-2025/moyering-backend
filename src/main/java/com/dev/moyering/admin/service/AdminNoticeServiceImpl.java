@@ -19,61 +19,38 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
+
     public class AdminNoticeServiceImpl implements AdminNoticeService {
     private final AdminNoticeRepository adminNoticeRepository;
 
-    /**
-     * 공지사항 등록
-     */
+    /*** 공지사항 등록*/
     @Override
     @Transactional
     public AdminNoticeDto createNotice(AdminNoticeDto noticeDto) {
         try {
-            log.info("=== 공지사항 등록 시작 ===");
-            log.info("제목: {}, 내용 : {},  핀 여부: {}, 등록일 : {}",
-                    noticeDto.getTitle(), noticeDto.getContent(),
-                    noticeDto.isPinYn(), noticeDto.getCreatedAt());
-
-            // 1. DTO -> Entity 변환
             AdminNotice adminNotice = noticeDto.toEntity();
-            log.debug("DTO -> Entity 변환 완료!");
-
-            // 2. 영속화
             AdminNotice savedAdminNotice = adminNoticeRepository.save(adminNotice);
-            log.info("공지사항 저장 완료 = ID = {}", savedAdminNotice.getNoticeId());
-
-            // 3. Entity -> DTO 변환 및 반환
             AdminNoticeDto result = savedAdminNotice.toDto();
-            log.info("공지사항 등록 완료 : ID = {}", savedAdminNotice.getNoticeId());
             return result;
-
         } catch (Exception e) {
             log.error("공지사항 등록 실패 : {}", e.getMessage(), e);
             throw e;
         }
     }
 
-    /**
-     * 공지사항 수정
-     */
+    /*** 공지사항 수정*/
     @Override
     @Transactional
     public AdminNoticeDto updateNotice(Integer noticeId, AdminNoticeDto noticeDto) {
-        log.info("공지사항 수정 시작 : noticeId ={}", noticeId);
-
-        // 엔티티 조회 - orElseThrow 사용
         AdminNotice adminNotice = adminNoticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 공지사항을 찾을 수 없습니다. ID : " + noticeId));
-
         // 비즈니스 메서드 호출해서 값 수정
         adminNotice.changeNotice(noticeDto.getTitle(), noticeDto.getContent());
         adminNotice.changePinStatus(noticeDto.isPinYn());
-
-        log.info("공지사항 수정 완료 : noticeId = {}", noticeId);
         return adminNotice.toDto();
     }
 
-
+    /*** 공지사항 삭제*/
     @Override
     @Transactional
     public void deleteNotice(Integer noticeId) {
@@ -83,40 +60,26 @@ import org.springframework.transaction.annotation.Transactional;
     }
 
 
-    /**
-     * 공지사항 목록 조회 (검색 포함)
-     */
-
+    /*** 공지사항 목록 조회 (검색 포함)*/
     @Override
     public Page<AdminNoticeDto> getNoticeList(String searchKeyword, Pageable pageable) {
-        log.info("=== 공지사항 목록 조회 시작 ===");
-        log.info("검색어: {}, 페이지: {}", searchKeyword, pageable.getPageNumber());
-
         try {
             Page<AdminNoticeDto> result;
-
             if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-                log.info("검색 모드");
                 result = adminNoticeRepository.findNoticesByKeyword(searchKeyword, pageable);
             } else {
-                // 전체 조회
                 log.info("전체 목록 조회");
                 Page<AdminNotice> noticePage = adminNoticeRepository.findAll(pageable);
                 result = noticePage.map(AdminNotice::toDto); // Entity -> DTO 변환
             }
-
-            log.info("조회 완료: 총 {}건", result.getTotalElements());
             return result;
-
         } catch (Exception e) {
             log.error("목록 조회 실패: {}", e.getMessage(), e);
             throw e;
         }
     }
 
-    /**
-     * 공지사항 단건 조회
-     */
+    /*** 공지사항 단건 조회*/
     @Override
     public AdminNoticeDto getNoticeById(Integer noticeId) {
         log.info("공지사항 단건 조회: noticeId={}", noticeId);
@@ -125,14 +88,10 @@ import org.springframework.transaction.annotation.Transactional;
         if (notice == null) {
             throw new IllegalArgumentException("해당 공지사항을 찾을 수 없습니다. ID: " + noticeId);
         }
-
         return notice;
     }
 
-
-    /**
-     * 핀 상태 변경
-     */
+    /*** 핀 상태 변경*/
     @Override
     @Transactional
     public AdminNoticeDto changePinStatus(Integer noticeId, boolean pinYn) {
@@ -140,9 +99,7 @@ import org.springframework.transaction.annotation.Transactional;
 
         AdminNotice adminNotice = adminNoticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 공지사항을 찾을 수 없습니다. ID: " + noticeId));
-
         adminNotice.changePinStatus(pinYn);
-
         log.info("공지사항 핀 상태 변경 완료: noticeId={}", noticeId);
         return adminNotice.toDto();
     }

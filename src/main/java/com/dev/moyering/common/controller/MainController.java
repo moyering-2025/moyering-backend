@@ -37,15 +37,16 @@ public class MainController {
 	private final HostClassService hostClassService;
 	private final MainService mainService;
 
-	// 메인페이지
-	@GetMapping("/main")
-	public ResponseEntity<Map<String, Object>> getMainClasses(@AuthenticationPrincipal PrincipalDetails principal) {
-		List<HostClassDto> classes;
-		List<HostClassDto> hotClasses;
-		List<GatheringDto> gathers;
-		List<BannerDto> banners;
-		Integer userId = null;
-		System.out.println(principal + "sdflsjflskjflaeh;glrikn");
+	
+	//메인페이지
+    @GetMapping("/main")
+    public ResponseEntity<Map<String, Object>> getMainClasses(@AuthenticationPrincipal PrincipalDetails principal) {
+        List<HostClassDto> classes;
+        List<HostClassDto> hotClasses;
+        List<GatheringDto> gathers;
+        List<BannerDto> banners;
+        Integer userId=null;
+//        System.out.println(principal+"sdflsjflskjflaeh;glrikn");
 		try {
 			if (principal != null) {
 				userId = principal.getUser().getUserId();
@@ -57,6 +58,7 @@ public class MainController {
 			hotClasses = classCalendarService.getHotHostClasses();
 			banners = bannerService.getMainBnanerList(1);
 			System.out.println(gathers + "sss");
+//			System.out.println(gathers+"sss");
 			Map<String, Object> result = new HashMap<>();
 			result.put("classes", classes);
 			result.put("hotClasses", hotClasses);

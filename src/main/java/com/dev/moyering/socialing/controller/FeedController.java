@@ -1,22 +1,13 @@
 package com.dev.moyering.socialing.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.auth.PrincipalDetails;
@@ -27,6 +18,8 @@ import com.dev.moyering.socialing.service.FeedService;
 import com.dev.moyering.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,34 +37,14 @@ public class FeedController {
 //            @RequestParam(required = false) String userId
             @RequestHeader(value = "Authorization", required = false) String header
     ) {
-        System.out.println("==== CONTROLLER /socialing/feeds ====");
-        System.out.println("▶▶▶ Authorization header = " + header);
-
-//        try {
-//            Integer userId = principal != null ?
-//                    principal.getUser().getUserId() : null;
-//            List<FeedDto> feeds = feedService.getFeeds(sort, userId);
-//            return new ResponseEntity<>(feeds, HttpStatus.OK);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        try {
-//            Integer userId = jwtUtil.extractUserIdFromHeader(header); // ✅ 로그인한 경우만 값 나옴
-//            System.out.println("▶▶▶ extracted userId = " + userId);
-//            List<FeedDto> feeds = feedService.getFeeds(sort, userId);
-//            return new ResponseEntity<>(feeds, HttpStatus.OK);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
+//        System.out.println("==== CONTROLLER /socialing/feeds ====");
+//        System.out.println("▶▶▶ Authorization header = " + header);
         Integer userId = jwtUtil.extractUserIdFromHeader(header);
-        System.out.println("userId = " + userId);
+//        System.out.println("userId = " + userId);
 
         List<FeedDto> feeds = null;
         try {
             feeds = feedService.getFeeds(sort, userId);
-            System.out.println("feeds.size = " + feeds.size());
             return new ResponseEntity<>(feeds, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,36 +52,6 @@ public class FeedController {
         }
     }
 
-
-//    // ✔ 피드 상세 조회
-//    @GetMapping("/feeds/{feedId}")
-//    public ResponseEntity<Map<String, Object>> getFeedDetail(@PathVariable Integer feedId,
-//                                                             @AuthenticationPrincipal PrincipalDetails principalDetails) {
-//        Map<String, Object> response = new HashMap<>();
-//
-//        // 1. 피드 본문
-//        FeedDto feedDto = feedService.getFeedById(feedId);
-//        response.put("feed", feedDto);
-//
-//        // 2. 댓글 목록
-//        List<CommentDto> comments = feedService.getCommentsByFeedId(feedId);
-//        response.put("comments", comments);
-//
-//        // 3. 좋아요 수
-//        Long likeCount = feedService.getLikeCount(feedId);
-//        response.put("likeCount", likeCount);
-//
-//        // 4. 로그인한 사용자의 좋아요 여부
-//        String loginUserId = principalDetails != null ? principalDetails.getUsername() : null;
-//        boolean isLiked = feedService.checkUserLikedFeed(feedId, loginUserId);
-//        response.put("isLiked", isLiked);
-//
-//        // 5. 기타 (예: 뱃지 정보, 작성자 프로필 등 추가 가능)
-//        response.put("writerBadge", feedDto.getWriterBadge());
-//        response.put("writerProfile", feedDto.getWriterProfile());
-//
-//        return ResponseEntity.ok(response);
-//    }
 
     @GetMapping("/socialing/feed")
     public ResponseEntity<FeedDto> getFeedDetail(
@@ -143,16 +86,6 @@ public class FeedController {
         }
     }
 
-    /*@GetMapping("/socialing/userFeed/{nickName}")
-    public ResponseEntity<List<FeedDto>> getUserByNickName(@PathVariable String nickName) {
-        try {
-            User user = userRepository.findByNickName(nickName).orElseThrow(() -> new Exception("유저를 찾을 수 없습니다"));
-
-        }catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }*/
     @GetMapping("/socialing/memberFeed/{nickName}")
     public ResponseEntity<List<FeedDto>> getFeedsByNickName(
             @PathVariable("nickName") String nickName,
@@ -172,15 +105,21 @@ public class FeedController {
     public ResponseEntity<Void> updateFeed(
             @PathVariable Integer feedId,
 //            @RequestPart("feed") FeedDto feedDto,
-            @RequestParam String text,
-            @RequestParam List<String> tags,
+            @RequestPart String text,
+//            @RequestPart String[] tags,
+            @RequestPart(required = false) String tag1,
+            @RequestPart(required = false) String tag2,
+            @RequestPart(required = false) String tag3,
+            @RequestPart(required = false) String tag4,
+            @RequestPart(required = false) String tag5,
             @RequestPart(value = "img1", required = false) MultipartFile image1,
             @RequestPart(value = "img2", required = false) MultipartFile image2,
             @RequestPart(value = "img3", required = false) MultipartFile image3,
             @RequestPart(value = "img4", required = false) MultipartFile image4,
             @RequestPart(value = "img5", required = false) MultipartFile image5,
-            @RequestPart(value = "removeUrls", required = false) List<String> removeUrls,
+            @RequestParam(value = "removeUrls", required = false) String[] removeUrls,
             @AuthenticationPrincipal PrincipalDetails principal
+            , HttpServletRequest request
     ) throws Exception {
         List<MultipartFile> images = new ArrayList<>();
         if (image1 != null && !image1.isEmpty()) images.add(image1);
@@ -188,22 +127,20 @@ public class FeedController {
         if (image3 != null && !image3.isEmpty()) images.add(image3);
         if (image4 != null && !image4.isEmpty()) images.add(image4);
         if (image5 != null && !image5.isEmpty()) images.add(image5);
-
-//        System.out.println(text);
-//        System.out.println(tags);
-//        System.out.println(image1.getOriginalFilename());
-//        System.out.println(image2.getOriginalFilename());
-//        System.out.println(image3.getOriginalFilename());
-//        System.out.println(image4.getOriginalFilename());
-//        System.out.println(image5.getOriginalFilename());
-        System.out.println("==========================================" + removeUrls);
+        List<String> removeList = removeUrls != null ? Arrays.asList(removeUrls) : Collections.emptyList();
+        System.out.println("img1 = " + image1);
+        System.out.println("img2 = " + image2);
+        System.out.println("img2 = " + image3);
+        System.out.println("img2 = " + image4);
+        System.out.println("img2 = " + image5);
+//        System.out.println("==========================================" + removeUrls);
+        System.out.println("백엔드에서 받은 removeUrls = " + removeUrls);
         FeedDto existing = feedService.getFeedDetail(feedId, principal.getUser().getUserId());
         if (!existing.getWriterUserId().equals(principal.getUser().getUserId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        feedService.updateFeed(feedId, text, tags, images
-//                , removeUrls
-        );
+        feedService.updateFeed(feedId, text, tag1, tag2, tag3, tag4, tag5, image1, image2, image3, image4, image5, removeList);
+//        System.out.println(">>>> Content-Type: " + request.getContentType());
         return ResponseEntity.noContent().build();
     }
 
@@ -247,6 +184,29 @@ public class FeedController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/user/{feedId}")
+    public ResponseEntity<String> deleteFeed(
+            @PathVariable Integer feedId,
+            @AuthenticationPrincipal PrincipalDetails principal
+    ) {
+        if (principal == null || principal.getUser() == null) {
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+        Integer userId = principal.getUser().getUserId();
+
+
+        try {
+            feedService.deleteFeed(feedId, userId);
+            return ResponseEntity.ok("삭제 완료 (soft delete)");
+        } catch (IllegalArgumentException e) {
+            // 존재하지 않거나 권한 없을 때
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("삭제 실패: " + e.getMessage());
         }
     }
 }

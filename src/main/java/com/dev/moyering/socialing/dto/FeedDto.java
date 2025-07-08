@@ -39,6 +39,7 @@ public class FeedDto {
     private Long likesCount;
 
     private Integer writerUserId;
+    private String writerBadgeImg;
 
     // 피드 상세 페이지용
     private LocalDateTime createdAt;
@@ -71,7 +72,7 @@ public class FeedDto {
 
     public FeedDto(Integer feedId, String content, String img1, String img2, String img3, String img4, String img5,
                    String tag1, String tag2, String tag3, String tag4, String tag5, boolean isDeleted,
-                   String writerId, String writerProfile, Integer writerBadge, LocalDateTime createdAt, Boolean likedByUser) {
+                   String writerId, String writerProfile, Integer writerBadge, LocalDateTime createdAt, Boolean likedByUser,String writerBadgeImg) {
         this.feedId = feedId;
         this.content = content;
         this.img1 = img1;
@@ -90,6 +91,7 @@ public class FeedDto {
         this.writerBadge = writerBadge;
         this.createdAt = createdAt;
         this.likedByUser = likedByUser;
+        this.writerBadgeImg = writerBadgeImg;
     }
 }
 
