@@ -48,7 +48,7 @@ public class HostFeedController {
         Integer userId = principal.getUser().getUserId();
         try {
             HostFeedResponseDto result = hostFeedService.createHostFeed(userId, feedDto, images);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(result.getFeedId());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("피드 등록 실패: " + e.getMessage());

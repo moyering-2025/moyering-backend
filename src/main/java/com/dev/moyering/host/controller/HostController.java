@@ -68,8 +68,8 @@ public class HostController {
 			@RequestParam(name = "ifile", required = false) MultipartFile profile,
 			Integer userId) {
 		try {
-			System.out.println("호스트DTO:"+hostDto);
-			System.out.println("유저아이디:"+userId);
+//			System.out.println("호스트DTO:"+hostDto);
+//			System.out.println("유저아이디:"+userId);
 			Integer hostId = hostService.registHost(hostDto, profile);
 			System.out.println(hostId);
 			userService.updateUserRole(userId);

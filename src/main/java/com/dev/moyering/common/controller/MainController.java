@@ -42,7 +42,7 @@ public class MainController {
         List<GatheringDto> gathers;
         List<BannerDto> banners;
         Integer userId=null;
-        System.out.println(principal+"sdflsjflskjflaeh;glrikn");
+//        System.out.println(principal+"sdflsjflskjflaeh;glrikn");
 		try {
 			if (principal != null) {
 				 userId = principal.getUser().getUserId();
@@ -53,7 +53,7 @@ public class MainController {
 			
 			hotClasses = classCalendarService.getHotHostClasses();
 			banners = bannerService.getMainBnanerList(1);
-			System.out.println(gathers+"sss");
+//			System.out.println(gathers+"sss");
 			Map<String, Object> result = new HashMap<>();
 			result.put("classes", classes);
 			result.put("hotClasses", hotClasses);

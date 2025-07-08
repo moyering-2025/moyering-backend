@@ -65,12 +65,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 		Map<String,String> token = objectMapper.readValue(authentication,Map.class);
-		System.out.println(token);
+//		System.out.println(token);
 		
 		//access_token : header로부터 accessToken가져와 bear check
 		String accessToken = token.get("access_token");
-		System.out.println("=============");
-		System.out.println(accessToken);
+//		System.out.println("=============");
+//		System.out.println(accessToken);
 		if(!accessToken.startsWith(JwtProperties.TOKEN_PREFIX)) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인 필요");
 			return;
@@ -86,7 +86,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 						.verify(accessToken)
 						.getClaim("sub")
 						.asString();
-			System.out.println(username);
+//			System.out.println(username);
 			if(username==null || username.equals("")) {
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "로그인 필요");
 				return;
