@@ -32,9 +32,9 @@ public class AdminVisitorLogsServiceImpl implements AdminVisitorLogsService {
                 return; // 이미 기록했으면 리턴!
             }
 
-            log.info(" 요청 URI: {}", request.getRequestURI());
-            log.info(" 세션 ID: {}", sessionId);
-            log.info(" 오늘 기록 존재 여부: {}", visitorLogsRepository.existsBySessionIdAndVisitDate(sessionId, today));
+//            log.info(" 요청 URI: {}", request.getRequestURI());
+//            log.info(" 세션 ID: {}", sessionId);
+//            log.info(" 오늘 기록 존재 여부: {}", visitorLogsRepository.existsBySessionIdAndVisitDate(sessionId, today));
 
 
             // DB조회 전 오늘 이미 기록했는지 체크
@@ -49,7 +49,7 @@ public class AdminVisitorLogsServiceImpl implements AdminVisitorLogsService {
                         .build();
 
                 visitorLogsRepository.save(visitorLog);
-                log.info("방문 기록: 세션={}, 회원={}", sessionId, userId != null);
+//                log.info("방문 기록: 세션={}, 회원={}", sessionId, userId != null);
             }
         } catch (Exception e) {
             log.error("방문 기록 실패", e);

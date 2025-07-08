@@ -3,6 +3,7 @@ package com.dev.moyering.socialing.repository;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.entity.QFeed;
 import com.dev.moyering.socialing.entity.QLikeList;
+import com.dev.moyering.user.entity.QUserBadge;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class LikeListRepositoryImpl implements LikeListRepositoryCustom {
     public List<FeedDto> findAllWithLikedByUser(Integer userId) {
         QFeed feed = QFeed.feed;
         QLikeList likeList = QLikeList.likeList;
+        QUserBadge badge = QUserBadge.userBadge;
 
         return queryFactory
                 .select(Projections.constructor(FeedDto.class,
@@ -49,13 +51,16 @@ public class LikeListRepositoryImpl implements LikeListRepositoryCustom {
                         feed.user.profile,
                         feed.user.userBadgeId,
                         feed.createDate,
-                        likeList.likeid.isNotNull() // 좋아요 눌렀으면 true
+                        likeList.likeid.isNotNull(), // 좋아요 눌렀으면 true
+                        badge.badge_img
                 ))
                 .from(feed)
                 .leftJoin(likeList)
                 .on(likeList.feed.feedId.eq(feed.feedId)
                         .and(likeList.user.userId.eq(userId)))
+                .leftJoin(badge)
+                .on(badge.user.eq(feed.user)
+                        .and(badge.isRepresentative.eq(true)))
                 .fetch();
     }
 }
-

@@ -12,7 +12,7 @@ import com.dev.moyering.socialing.entity.Feed;
 public interface FeedRepositoryCustom {
 
     // 댓글, 조회수 함께 조회
-    List<FeedDto> findAllWithCounts();
+//    List<FeedDto> findAllWithCounts();
 
     // 전체피드 조회
     List<FeedDto> findFeeds(String sortType, Integer userId); //userid는 팔로우용
@@ -30,5 +30,8 @@ public interface FeedRepositoryCustom {
     List<FeedDto> findFeedsWithoutLiked(String sortType);
     
     List<Feed> findSearchFeed(MainSearchRequestDto dto);
+
+    // 피드 삭제
+    void softDeleteById(Integer feedId, Integer userId);
 
 }

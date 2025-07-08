@@ -87,9 +87,9 @@ public class HostServiceImpl implements HostService {
 	public Host updateHostSettlement(Integer hostId, String bankName, String accName, String accNum,
 			MultipartFile idCard)
 			throws Exception {
-		System.out.println(hostId);
+//		System.out.println(hostId);
 		Host host = hostRepository.findById(hostId).get();
-		System.out.println(host);
+//		System.out.println(host);
 		if (host != null) {
 			if (bankName != null)
 				host.setBankName(bankName);

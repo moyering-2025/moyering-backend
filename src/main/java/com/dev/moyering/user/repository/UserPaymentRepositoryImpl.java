@@ -2,7 +2,6 @@ package com.dev.moyering.user.repository;
 
 import com.dev.moyering.admin.dto.AdminPaymentDto;
 import com.dev.moyering.admin.dto.AdminPaymentSearchCond;
-import com.dev.moyering.user.entity.QUserPayment;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -23,6 +22,7 @@ import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
 import static com.dev.moyering.host.entity.QClassRegist.classRegist;
 import static com.dev.moyering.host.entity.QHostClass.hostClass;
 import static com.dev.moyering.user.entity.QUser.user;
+import static com.dev.moyering.user.entity.QUserPayment.userPayment;
 
 
 @Slf4j
@@ -31,7 +31,7 @@ import static com.dev.moyering.user.entity.QUser.user;
 public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
-    QUserPayment userPayment = QUserPayment.userPayment;
+
 
     /*** 관리자 페이지 > 결제 내역 조회 */
     // JPA는 연관관계를 기준으로 경로를 따라가야 SQL을 제대로 만들 수 있음 => **중간 경로**가 빠져버리면 Hibernate는 무슨 객체인지 몰라서 아예 데이터를 못 가져옴 !
@@ -47,7 +47,7 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
                         adminCoupon.couponType, // 쿠폰 유형 (관리자, 호스트)
                         adminCoupon.discountType, // 쿠폰할인 타입 (금액, 비율)
                         adminCoupon.discount, //할인 금액 / 비율
-                        Expressions.constant(0), // calculatedDiscountAmount 초기값
+                        Expressions.constant(0), // calculatedDiscountAmount 초기값 (금액/비율에 따른 쿠폰 적용금액)
                         userPayment.amount, // 총 결제금액 (totalAmount)
                         userPayment.paidAt, //결제일시 (LocalDateTime)
                         userPayment.paymentType, //결제타입 (카드, 간편결제)
@@ -65,7 +65,6 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-
         Long total = countPaymentList(cond);
         return new PageImpl<>(content, pageable, total);
     }
@@ -145,4 +144,5 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
 
         return null;
     }
+
 }

@@ -10,6 +10,8 @@ import com.dev.moyering.socialing.repository.CommentRepository;
 import com.dev.moyering.socialing.repository.FeedRepository;
 import com.dev.moyering.socialing.repository.LikeListRepository;
 import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.entity.UserBadge;
+import com.dev.moyering.user.repository.UserBadgeRepository;
 import com.dev.moyering.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +43,7 @@ public class FeedServiceImpl implements FeedService {
     private final CommentRepository commentRepository;
     private final LikeListRepository likeListRepository;
     private final UserRepository userRepository;
+    private final UserBadgeRepository userBadgeRepository;
 
     private final EntityManager entityManager;
 
@@ -58,13 +62,9 @@ public class FeedServiceImpl implements FeedService {
             List<Integer> likedFeedIds = likeListRepository.findFeedIdsByUserId(userId);
             Set<Integer> likedFeedIdSet = new HashSet<>(likedFeedIds);
 
-            System.out.println("========== Feed List ==========");
             for (FeedDto feed : feeds) {
                 System.out.println("feedId: " + feed.getFeedId());
             }
-
-            System.out.println("========== Liked Feed Ids ==========");
-            System.out.println("▶▶ likedFeedIdSet = " + likedFeedIdSet);
 
             // DTO에 likedByUser 설정
             for (FeedDto feed : feeds) {
@@ -103,6 +103,9 @@ public class FeedServiceImpl implements FeedService {
         dto.setCreatedAt(feed.getCreateDate());
         dto.setMine(currentUserId != null &&
                 feed.getUser().getUserId().equals(currentUserId));
+
+        UserBadge badge =userBadgeRepository.findById(dto.getWriterBadge()).get();
+        dto.setWriterBadgeImg(badge.getBadge_img());
 
         // 3) 좋아요/댓글 수, likedByUser
         dto.setLikesCount(likeListRepository.countByFeedFeedId(feedId));
@@ -154,6 +157,32 @@ public class FeedServiceImpl implements FeedService {
 
                     dto.setCreatedAt(feed.getCreateDate());
                     dto.setMine(feed.getUser().getUserId().equals(userId));
+//                    UserBadge badge =userBadgeRepository.findById(dto.getWriterBadge()).get();
+//                    dto.setWriterBadgeImg(badge.getBadge_img());
+
+                    Integer badgeId = user.getUserBadgeId();
+                    String badgeImg = (badgeId != null)
+                            ? userBadgeRepository.findById(badgeId)
+                            .map(UserBadge::getBadge_img)
+                            .orElse(null)
+                            : null;
+                    dto.setWriterBadgeImg(badgeImg);
+//                    Integer userIdInFeed = user.getUserId();
+//                    if (userIdInFeed != null) {
+//                        User userInFeed = userRepository.findById(userIdInFeed)
+//                                .orElseThrow(() -> new RuntimeException("User not found"));
+//                        Integer badgeId = userInFeed.getUserBadgeId();
+//
+//                        dto.setWriterBadgeImg(
+//                                badgeId != null
+//                                        ? userBadgeRepository.findById(badgeId)
+//                                        .map(UserBadge::getBadge_img)
+//                                        .orElse(null)
+//                                        : null
+//                        );
+//                    } else {
+//                        dto.setWriterBadgeImg(null);
+//                    }
 
                     List<CommentDto> commentDtos = commentRepository.findByFeed_FeedIdOrderByCreateAtAsc(feed.getFeedId())
                             .stream().map(Comment::toDto)
@@ -178,6 +207,7 @@ public class FeedServiceImpl implements FeedService {
         List<FeedDto> dtoList = new ArrayList<>();
         List<LikeList> likeList = new ArrayList<>();
         List<LikeListDto> likeListDtos = new ArrayList<>();
+
 
         for (Feed feed : feedList) {
             dtoList.add(feed.toDto());
@@ -252,106 +282,106 @@ public class FeedServiceImpl implements FeedService {
     @Transactional
     public void updateFeed(Integer feedId
 //            , FeedDto feedDto
-            , String text, List<String> tags
-            , List<MultipartFile> images
-//            , List<String> removeUrls
+            , String text, String tag1, String tag2, String tag3, String tag4, String tag5
+            , MultipartFile image1, MultipartFile image2, MultipartFile image3, MultipartFile image4, MultipartFile image5
+            , List<String> removeUrls
     ) throws Exception {
         Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new Exception("수정하려고 하는 피드가 없습니다"));
 
-        /*feed.setContent(feedDto.getContent());
-        feed.setTag1(feedDto.getTag1());
-        feed.setTag2(feedDto.getTag2());
-        feed.setTag3(feedDto.getTag3());
-        feed.setTag4(feedDto.getTag4());
-        feed.setTag5(feedDto.getTag5());*/
+        feed.setTag1(tag1);
+        feed.setTag2(tag2);
+        feed.setTag3(tag3);
+        feed.setTag4(tag4);
+        feed.setTag5(tag5);
 
-        if (tags.size() > 0) feed.setTag1(tags.get(0));
-        if (tags.size() > 1 ) feed.setTag2(tags.get(1));
-        if (tags.size() > 2 ) feed.setTag3(tags.get(2));
-        if (tags.size() > 3 ) feed.setTag4(tags.get(3));
-        if (tags.size() > 4 ) feed.setTag5(tags.get(4));
+// 📌 1. 기존 이미지 목록에서 삭제 대상 제거
+        List<String> filenames = new ArrayList<>();
+        if (feed.getImg1() != null && (removeUrls == null || !removeUrls.contains(feed.getImg1())))
+            filenames.add(feed.getImg1());
+        if (feed.getImg2() != null && (removeUrls == null || !removeUrls.contains(feed.getImg2())))
+            filenames.add(feed.getImg2());
+        if (feed.getImg3() != null && (removeUrls == null || !removeUrls.contains(feed.getImg3())))
+            filenames.add(feed.getImg3());
+        if (feed.getImg4() != null && (removeUrls == null || !removeUrls.contains(feed.getImg4())))
+            filenames.add(feed.getImg4());
+        if (feed.getImg5() != null && (removeUrls == null || !removeUrls.contains(feed.getImg5())))
+            filenames.add(feed.getImg5());
+//
+        for (String removeUrl : removeUrls) {
+            try {
+                System.out.println("삭제 시도 파일명: " + removeUrl);
+                Path filePath = Paths.get(iuploadPath, removeUrl);
+                System.out.println("삭제 풀경로: " + filePath);
 
-        /*List<String> currentUrls = new ArrayList<>();
-        if (feed.getImg1() != null) currentUrls.add(feed.getImg1());
-        if (feed.getImg2() != null) currentUrls.add(feed.getImg2());
-        if (feed.getImg3() != null) currentUrls.add(feed.getImg3());
-        if (feed.getImg4() != null) currentUrls.add(feed.getImg4());
-        if (feed.getImg5() != null) currentUrls.add(feed.getImg5());*/
+                boolean deleted = Files.deleteIfExists(filePath);
+                System.out.println("삭제 성공 여부: " + deleted);
+            } catch (Exception e) {
+                System.err.println("파일 삭제 중 오류: " + e.getMessage());
+            }
+        }
+        //
+// 📌 2. 삭제한 파일 시스템에서 삭제
+        if (removeUrls != null) {
+            for (String removeUrl : removeUrls) {
+                Path filePath = Paths.get(iuploadPath, removeUrl);
+                Files.deleteIfExists(filePath);
+            }
+        }
 
-//        if (images.get(0) != null ) feed.setImg1(images.get(0).getOriginalFilename());
-//        if (images.get(1) != null) feed.setImg2(images.get(1).getOriginalFilename());
-//        if (images.get(2) != null ) feed.setImg3(images.get(2).getOriginalFilename());
-//        if (images.get(3) != null && images.get(3).isEmpty()) feed.setImg4(images.get(3).getOriginalFilename());
-//        if (images.get(4) != null && images.get(4).isEmpty()) feed.setImg5(images.get(4).getOriginalFilename());
-//        if (images.size() > 0) feed.setImg1(images.get(0).getOriginalFilename());
-//        if (images.size() > 1) feed.setImg2(images.get(1).getOriginalFilename());
-//        if (images.size() > 2) feed.setImg3(images.get(2).getOriginalFilename());
-//        if (images.size() > 3) feed.setImg4(images.get(3).getOriginalFilename());
-//        if (images.size() > 4) feed.setImg5(images.get(4).getOriginalFilename());
-        feed.setImg1(images.size() > 0 ? images.get(0).getOriginalFilename() : null);
-        feed.setImg2(images.size() > 1 ? images.get(1).getOriginalFilename() : null);
-        feed.setImg3(images.size() > 2 ? images.get(2).getOriginalFilename() : null);
-        feed.setImg4(images.size() > 3 ? images.get(3).getOriginalFilename() : null);
-        feed.setImg5(images.size() > 4 ? images.get(4).getOriginalFilename() : null);
-
-
-        if (text!=null) feed.setContent(text);
-
+        // 📌 3. 새 이미지 뒤에 추가 및 저장
         Path dir = Paths.get(iuploadPath);
         if (!Files.exists(dir)) {
             Files.createDirectories(dir);
         }
 
-        /*// 삭제 요청된 파일 제거
-        if (removeUrls != null && !removeUrls.isEmpty()) {
-            for (String url : removeUrls) {
-                String filename = Paths.get(url).getFileName().toString();
-                try {
-                    Files.deleteIfExists(dir.resolve(filename));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            // currentUrls 에서 제거
-            currentUrls = currentUrls.stream()
-                    .filter(u -> !removeUrls.contains(u))
-                    .collect(Collectors.toList());
+        if (image1 != null && !image1.isEmpty()) {
+            filenames.add(image1.getOriginalFilename());
+            image1.transferTo(new File(iuploadPath, image1.getOriginalFilename()));
         }
-*/
-        /*// 새로운 이미지 저장
-        if (images != null && !images.isEmpty()) {
-            for (MultipartFile img : images) {
-                if (img.isEmpty()) continue;
-                String orig = img.getOriginalFilename();
-                String fname = System.currentTimeMillis() + "_" + orig;
-                Path target = dir.resolve(fname);
-
-                try (InputStream is = img.getInputStream()) {
-                    Files.copy(is, target, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("이미지 저장 실패: " + fname, e);
-                }
-
-                // DB에는 파일명만 넣어둠
-                currentUrls.add(fname);
-            }
+        if (image2 != null && !image2.isEmpty()) {
+            filenames.add(image2.getOriginalFilename());
+            image2.transferTo(new File(iuploadPath, image2.getOriginalFilename()));
+        }
+        if (image3 != null && !image3.isEmpty()) {
+            filenames.add(image3.getOriginalFilename());
+            image3.transferTo(new File(iuploadPath, image3.getOriginalFilename()));
+        }
+        if (image4 != null && !image4.isEmpty()) {
+            filenames.add(image4.getOriginalFilename());
+            image4.transferTo(new File(iuploadPath, image4.getOriginalFilename()));
+        }
+        if (image5 != null && !image5.isEmpty()) {
+            filenames.add(image5.getOriginalFilename());
+            image5.transferTo(new File(iuploadPath, image5.getOriginalFilename()));
         }
 
-        // 엔티티 이미지 필드 초기화
-        feed.setImg1(null);
-        feed.setImg2(null);
-        feed.setImg3(null);
-        feed.setImg4(null);
-        feed.setImg5(null);
+        // 📌 4. 최대 5개 유지 및 Feed에 순서대로 채우기
+        while (filenames.size() < 5) {
+            filenames.add(null);
+        }
+        feed.setImg1(filenames.get(0));
+        feed.setImg2(filenames.get(1));
+        feed.setImg3(filenames.get(2));
+        feed.setImg4(filenames.get(3));
+        feed.setImg5(filenames.get(4));
+//        feed.setImg1(filenames.size() > 0 ? filenames.get(0) : null);
+//        feed.setImg2(filenames.size() > 1 ? filenames.get(1) : null);
+//        feed.setImg3(filenames.size() > 2 ? filenames.get(2) : null);
+//        feed.setImg4(filenames.size() > 3 ? filenames.get(3) : null);
+//        feed.setImg5(filenames.size() > 4 ? filenames.get(4) : null);
 
-        // 최대 5개 까지 세팅
-        if (currentUrls.size() > 0) feed.setImg1(currentUrls.get(0));
-        if (currentUrls.size() > 1) feed.setImg2(currentUrls.get(1));
-        if (currentUrls.size() > 2) feed.setImg3(currentUrls.get(2));
-        if (currentUrls.size() > 3) feed.setImg4(currentUrls.get(3));
-        if (currentUrls.size() > 4) feed.setImg5(currentUrls.get(4));*/
+/*        feed.setImg1(images.size() > 0 ? images.get(0).getOriginalFilename() : feed.getImg1());
+        feed.setImg2(images.size() > 1 ? images.get(1).getOriginalFilename() : feed.getImg2());
+        feed.setImg3(images.size() > 2 ? images.get(2).getOriginalFilename() : feed.getImg3());
+        feed.setImg4(images.size() > 3 ? images.get(3).getOriginalFilename() : feed.getImg4());
+        feed.setImg5(images.size() > 4 ? images.get(4).getOriginalFilename() : feed.getImg5());*/
 
+        if (text != null) feed.setContent(text);
+
+
+        if (!Files.exists(dir)) {
+            Files.createDirectories(dir);
+        }
         feedRepository.save(feed);
     }
 
@@ -367,6 +397,23 @@ public class FeedServiceImpl implements FeedService {
 
         int offset = page * size;
         return feedRepository.findTopLikedFeeds(offset, size);
+    }
+
+    @Override
+    @Transactional
+    public void deleteFeed(Integer feedId, Integer userId) throws Exception {
+        log.info(">> deleteFeed 실행, feedId={}, userId={}", feedId, userId);
+
+        Feed feed = feedRepository.findById(feedId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 피드"));
+        log.info(">> Feed 존재 확인 완료, feed.userId={}", feed.getUser().getUserId());
+
+        if (!feed.getUser().getUserId().equals(userId)) {
+            throw new IllegalArgumentException("본인이 작성한 피드만 삭제할 수 있습니다.");
+        }
+
+        feedRepository.softDeleteById(feedId,userId);
+        log.info(">> softDeleteById 완료");
     }
 
 

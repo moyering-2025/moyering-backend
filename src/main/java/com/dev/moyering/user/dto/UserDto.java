@@ -44,6 +44,7 @@ public class UserDto {
 	private String userBadgeImg;
 	private Boolean emailVerified;
 	private String emialVerificationToken;
+	private String badgeImg;
 
 	public User toEntity() {
 		User entity = User.builder()
@@ -84,5 +85,6 @@ public class UserDto {
 		this.username = username;
 		this.nickName = nickName;
 		this.profile = profile;
+
 	}
 }

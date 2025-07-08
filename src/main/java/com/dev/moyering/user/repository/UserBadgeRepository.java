@@ -14,5 +14,7 @@ public interface UserBadgeRepository extends JpaRepository<UserBadge, Integer> {
 
     // 유저의 대표 배지
     Optional<UserBadge> findByUser_UserIdAndIsRepresentativeTrue(Integer userId);
+    //유저가 뱃지를 가지고 있는지 체크
+	boolean existsByUserUserIdAndBadgeBadgeId(Integer userId, Integer badgeId);
 
 }

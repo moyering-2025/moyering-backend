@@ -1,5 +1,6 @@
 package com.dev.moyering.admin.repository;
 
+import com.dev.moyering.admin.dto.AdminPaymentDto;
 import com.dev.moyering.admin.dto.AdminSettlementDto;
 import com.dev.moyering.admin.dto.PaymentSettlementViewDto;
 import com.dev.moyering.admin.dto.SettlementAggregationDto;
@@ -25,4 +26,9 @@ public interface AdminSettlementRepositoryCustom {
     Long getSettlementListCount(String searchKeyword, LocalDate startDate, LocalDate endDate);
     
     Page<AdminSettlement> getHostSettlementList(SettlementSearchRequestDto dto, Pageable pageable);
+
+    /*** 특정 정산에 대한 수강생 결제 리스트*/
+    List<AdminPaymentDto> getPaymentListBySettlementId(Integer settlementId);
+
+
 }
