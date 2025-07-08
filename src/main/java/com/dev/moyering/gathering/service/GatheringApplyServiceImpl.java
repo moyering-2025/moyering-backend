@@ -17,6 +17,7 @@ import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringApply;
 import com.dev.moyering.gathering.repository.GatheringApplyRepository;
 import com.dev.moyering.gathering.repository.GatheringRepository;
+import com.dev.moyering.gathering.repository.MessageRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
 import com.dev.moyering.util.PageInfo;
@@ -28,6 +29,8 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 	
 	@Autowired
 	private GatheringRepository gatheringRepository;
+	@Autowired
+	private MessageRepository messageRepository;
 	
 	@Autowired
 	private AlarmService alarmService;
@@ -146,5 +149,6 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 		System.out.println("145 알람 보내기 테스트 "+ alarmDto);
 		alarmService.sendAlarm(alarmDto);
        gatheringApplyRepository.deleteById(gatheringApplyId);
+//       messageRepository
 	}
 }

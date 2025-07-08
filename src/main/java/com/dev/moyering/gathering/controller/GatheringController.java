@@ -31,6 +31,7 @@ import com.dev.moyering.gathering.service.GatheringInquiryService;
 import com.dev.moyering.gathering.service.GatheringLikesService;
 import com.dev.moyering.gathering.service.GatheringService;
 import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.entity.UserBadge;
 import com.dev.moyering.user.service.UserService;
 import com.dev.moyering.util.PageInfo;
 
@@ -85,10 +86,18 @@ public class GatheringController {
 			res.put("gathering", nGatheringDto);
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
 			List<GatheringApplyDto> member = gatheringApplyService.findApprovedUserListByGatheringId(gatheringId);
+			for(GatheringApplyDto gaMember : member) {
+				UserBadge b = userService.getUserFirstBadge(gaMember.getUserId());
+				gaMember.setUserBadgeId(b.getUserBadgeId());
+				gaMember.setUserBadgeImg(b.getBadge_img());
+			}
 			List<GatheringDto> recommendations = gatheringService.findGatheringWithCategory(nGatheringDto.getGatheringId(), nGatheringDto.getSubCategoryId(), nGatheringDto.getCategoryId());
 			
 	        Integer acceptedCount = gatheringApplyService.findApprovedUserCountByGatheringId(gatheringId);
 	        nGatheringDto.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);
+			UserBadge badge = userService.getUserFirstBadge(nGatheringDto.getUserId());
+	        userDto.setUserBadgeId(badge.getUserBadgeId());
+	        userDto.setUserBadgeImg(badge.getBadge_img());
 			userDto.setPassword(null);
 			res.put("organizer", userDto);
 			res.put("member", member);

@@ -1,6 +1,6 @@
 package com.dev.moyering.gathering.entity;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.dev.moyering.gathering.dto.GatheringInquiryDto;
 import com.dev.moyering.gathering.dto.MessageDto;
 import com.dev.moyering.user.entity.User;
 
@@ -56,6 +55,13 @@ public class Message {
 	@ColumnDefault("0")
     private Boolean messageHide;
     
+	@Column(columnDefinition = "DATETIME")
+	@CreationTimestamp
+	private Date messageDisableTime;
+	@Column(columnDefinition = "DATETIME")
+	@CreationTimestamp
+	private Date messageAvailableTime;
+	
     public MessageDto toDto() {
     	MessageDto.MessageDtoBuilder builder = MessageDto.builder()
 				.messageId(messageId)
@@ -70,7 +76,9 @@ public class Message {
 				.senderProfile(user.getProfile())
 				.messageContent(messageContent)
 				.writeDate(writeDate)
-				.messageHide(messageHide);
+				.messageHide(messageHide)
+				.messageDisableTime(messageDisableTime)
+				.messageAvailableTime(messageAvailableTime);
 	    	return builder.build();
     }
     
