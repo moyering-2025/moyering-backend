@@ -271,7 +271,7 @@ public class FeedServiceImpl implements FeedService {
         feed.setTag4(tag4);
         feed.setTag5(tag5);
 
-
+// 📌 1. 기존 이미지 목록에서 삭제 대상 제거
         List<String> filenames = new ArrayList<>();
         if (feed.getImg1() != null && (removeUrls == null || !removeUrls.contains(feed.getImg1())))
             filenames.add(feed.getImg1());
@@ -283,15 +283,33 @@ public class FeedServiceImpl implements FeedService {
             filenames.add(feed.getImg4());
         if (feed.getImg5() != null && (removeUrls == null || !removeUrls.contains(feed.getImg5())))
             filenames.add(feed.getImg5());
+//
+        for (String removeUrl : removeUrls) {
+            try {
+                System.out.println("삭제 시도 파일명: " + removeUrl);
+                Path filePath = Paths.get(iuploadPath, removeUrl);
+                System.out.println("삭제 풀경로: " + filePath);
 
-//        for (MultipartFile image : images) {
-//            filenames.add(image.getOriginalFilename());
-//        }
-//        if (image1 != null && !image1.isEmpty()) filenames.add(image1.getOriginalFilename());
-//        if (image2 != null && !image2.isEmpty()) filenames.add(image2.getOriginalFilename());
-//        if (image3 != null && !image3.isEmpty()) filenames.add(image3.getOriginalFilename());
-//        if (image4 != null && !image4.isEmpty()) filenames.add(image4.getOriginalFilename());
-//        if (image5 != null && !image5.isEmpty()) filenames.add(image5.getOriginalFilename());
+                boolean deleted = Files.deleteIfExists(filePath);
+                System.out.println("삭제 성공 여부: " + deleted);
+            } catch (Exception e) {
+                System.err.println("파일 삭제 중 오류: " + e.getMessage());
+            }
+        }
+        //
+// 📌 2. 삭제한 파일 시스템에서 삭제
+        if (removeUrls != null) {
+            for (String removeUrl : removeUrls) {
+                Path filePath = Paths.get(iuploadPath, removeUrl);
+                Files.deleteIfExists(filePath);
+            }
+        }
+
+        // 📌 3. 새 이미지 뒤에 추가 및 저장
+        Path dir = Paths.get(iuploadPath);
+        if (!Files.exists(dir)) {
+            Files.createDirectories(dir);
+        }
 
         if (image1 != null && !image1.isEmpty()) {
             filenames.add(image1.getOriginalFilename());
@@ -314,11 +332,20 @@ public class FeedServiceImpl implements FeedService {
             image5.transferTo(new File(iuploadPath, image5.getOriginalFilename()));
         }
 
-        feed.setImg1(filenames.size() > 0 ? filenames.get(0) : null);
-        feed.setImg2(filenames.size() > 1 ? filenames.get(1) : null);
-        feed.setImg3(filenames.size() > 2 ? filenames.get(2) : null);
-        feed.setImg4(filenames.size() > 3 ? filenames.get(3) : null);
-        feed.setImg5(filenames.size() > 4 ? filenames.get(4) : null);
+        // 📌 4. 최대 5개 유지 및 Feed에 순서대로 채우기
+        while (filenames.size() < 5) {
+            filenames.add(null);
+        }
+        feed.setImg1(filenames.get(0));
+        feed.setImg2(filenames.get(1));
+        feed.setImg3(filenames.get(2));
+        feed.setImg4(filenames.get(3));
+        feed.setImg5(filenames.get(4));
+//        feed.setImg1(filenames.size() > 0 ? filenames.get(0) : null);
+//        feed.setImg2(filenames.size() > 1 ? filenames.get(1) : null);
+//        feed.setImg3(filenames.size() > 2 ? filenames.get(2) : null);
+//        feed.setImg4(filenames.size() > 3 ? filenames.get(3) : null);
+//        feed.setImg5(filenames.size() > 4 ? filenames.get(4) : null);
 
 /*        feed.setImg1(images.size() > 0 ? images.get(0).getOriginalFilename() : feed.getImg1());
         feed.setImg2(images.size() > 1 ? images.get(1).getOriginalFilename() : feed.getImg2());
@@ -328,13 +355,11 @@ public class FeedServiceImpl implements FeedService {
 
         if (text != null) feed.setContent(text);
 
-        Path dir = Paths.get(iuploadPath);
+
         if (!Files.exists(dir)) {
             Files.createDirectories(dir);
         }
-
         feedRepository.save(feed);
-
     }
 
     @Override

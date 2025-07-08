@@ -117,7 +117,7 @@ public class FeedController {
             @RequestPart(value = "img3", required = false) MultipartFile image3,
             @RequestPart(value = "img4", required = false) MultipartFile image4,
             @RequestPart(value = "img5", required = false) MultipartFile image5,
-            @RequestPart(value = "removeUrls", required = false) String[] removeUrls,
+            @RequestParam(value = "removeUrls", required = false) String[] removeUrls,
             @AuthenticationPrincipal PrincipalDetails principal
             , HttpServletRequest request
     ) throws Exception {
@@ -128,8 +128,13 @@ public class FeedController {
         if (image4 != null && !image4.isEmpty()) images.add(image4);
         if (image5 != null && !image5.isEmpty()) images.add(image5);
         List<String> removeList = removeUrls != null ? Arrays.asList(removeUrls) : Collections.emptyList();
-
+        System.out.println("img1 = " + image1);
+        System.out.println("img2 = " + image2);
+        System.out.println("img2 = " + image3);
+        System.out.println("img2 = " + image4);
+        System.out.println("img2 = " + image5);
 //        System.out.println("==========================================" + removeUrls);
+        System.out.println("백엔드에서 받은 removeUrls = " + removeUrls);
         FeedDto existing = feedService.getFeedDetail(feedId, principal.getUser().getUserId());
         if (!existing.getWriterUserId().equals(principal.getUser().getUserId())) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
