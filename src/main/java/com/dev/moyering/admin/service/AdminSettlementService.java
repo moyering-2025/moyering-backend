@@ -1,5 +1,6 @@
 package com.dev.moyering.admin.service;
 
+import com.dev.moyering.admin.dto.AdminPaymentDto;
 import com.dev.moyering.admin.dto.AdminSettlementDto;
 import com.dev.moyering.admin.dto.PaymentSettlementViewDto;
 import com.dev.moyering.admin.dto.SettlementAggregationDto;
@@ -26,6 +27,9 @@ public interface AdminSettlementService {
     
     /*** 특정강사 정산 리스트 조회 */
     Page<AdminSettlementDto> getHostSettlementList(SettlementSearchRequestDto dto);
+
+    /*** 특정 정산의 수강생 목록 조회 */
+    List <AdminPaymentDto> getPaymentListBySettlementId(Integer settlementId);
 
 }
 
