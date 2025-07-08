@@ -7,7 +7,7 @@ import java.util.List;
 public interface FeedRepositoryCustom {
 
     // 댓글, 조회수 함께 조회
-    List<FeedDto> findAllWithCounts();
+//    List<FeedDto> findAllWithCounts();
 
     // 전체피드 조회
     List<FeedDto> findFeeds(String sortType, Integer userId); //userid는 팔로우용

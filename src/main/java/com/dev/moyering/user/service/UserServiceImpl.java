@@ -299,6 +299,10 @@ public class UserServiceImpl implements UserService {
 
         // 새로운 대표 배지로
         targetBadge.setIsRepresentative(true);
+
+        // User 테이블의 userBadgeId 필드도 갱신
+        User user = targetBadge.getUser();
+        user.setUserBadgeId(targetBadge.getUserBadgeId());
     }
 
 	@Override

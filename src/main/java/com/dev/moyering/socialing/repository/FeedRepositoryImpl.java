@@ -6,6 +6,7 @@ import com.dev.moyering.socialing.entity.QFeed;
 import com.dev.moyering.socialing.entity.QFollow;
 import com.dev.moyering.socialing.entity.QLikeList;
 import com.dev.moyering.user.entity.QUser;
+import com.dev.moyering.user.entity.QUserBadge;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -26,41 +27,41 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    @Override
-    public List<FeedDto> findAllWithCounts() {
-        QFeed feed = QFeed.feed;
-        QComment comment = QComment.comment;
-        QLikeList feedLike = QLikeList.likeList;
-        QUser user = QUser.user;
-
-        return jpaQueryFactory
-                .select(Projections.fields(FeedDto.class,
-                        feed.feedId.as("feedId"),
-                        feed.content,
-                        feed.img1, feed.img2, feed.img3, feed.img4, feed.img5,
-                        feed.tag1, feed.tag2, feed.tag3, feed.tag4, feed.tag5,
-                        feed.isDeleted,
-                        user.username.as("writerId"),
-                        user.profile.as("writerProfile"),
-                        user.userBadgeId.as("writerBadge"),
-                        ExpressionUtils.as(
-                                JPAExpressions.select(comment.count())
-                                        .from(comment)
-                                        .where(comment.feed.feedId.eq(feed.feedId)),
-                                "commentsCount"
-                        ),
-                        ExpressionUtils.as(
-                                JPAExpressions.select(feedLike.count())
-                                        .from(feedLike)
-                                        .where(feedLike.feed.feedId.eq(feed.feedId)),
-                                "likesCount"
-                        )
-                ))
-                .from(feed)
-                .leftJoin(feed.user, user)
-                .where(feed.isDeleted.eq(false))
-                .fetch();
-    }
+//    @Override
+//    public List<FeedDto> findAllWithCounts() {
+//        QFeed feed = QFeed.feed;
+//        QComment comment = QComment.comment;
+//        QLikeList feedLike = QLikeList.likeList;
+//        QUser user = QUser.user;
+//
+//        return jpaQueryFactory
+//                .select(Projections.fields(FeedDto.class,
+//                        feed.feedId.as("feedId"),
+//                        feed.content,
+//                        feed.img1, feed.img2, feed.img3, feed.img4, feed.img5,
+//                        feed.tag1, feed.tag2, feed.tag3, feed.tag4, feed.tag5,
+//                        feed.isDeleted,
+//                        user.username.as("writerId"),
+//                        user.profile.as("writerProfile"),
+//                        user.userBadgeId.as("writerBadge"),
+//                        ExpressionUtils.as(
+//                                JPAExpressions.select(comment.count())
+//                                        .from(comment)
+//                                        .where(comment.feed.feedId.eq(feed.feedId)),
+//                                "commentsCount"
+//                        ),
+//                        ExpressionUtils.as(
+//                                JPAExpressions.select(feedLike.count())
+//                                        .from(feedLike)
+//                                        .where(feedLike.feed.feedId.eq(feed.feedId)),
+//                                "likesCount"
+//                        )
+//                ))
+//                .from(feed)
+//                .leftJoin(feed.user, user)
+//                .where(feed.isDeleted.eq(false))
+//                .fetch();
+//    }
 
     @Override
     public List<FeedDto> findFeeds(String sortType, Integer userId) {
@@ -209,6 +210,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
         QComment comment = QComment.comment;
         QLikeList likeList = QLikeList.likeList;
         QUser user = QUser.user;
+        QUserBadge badge = QUserBadge.userBadge;
 
         return jpaQueryFactory
                 .select(Projections.fields(FeedDto.class,
@@ -221,11 +223,15 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                         user.nickName.as("writerId"),
                         user.profile.as("writerProfile"),
                         user.userBadgeId.as("writerBadge"),
+                        badge.badge_img.as("writerBadgeImg"),
                         comment.countDistinct().as("commentsCount"),
                         likeList.countDistinct().as("likesCount")
                 ))
                 .from(feed)
                 .leftJoin(feed.user, user)
+                .leftJoin(badge)
+                .on(badge.user.eq(user)
+                        .and(badge.isRepresentative.eq(true)))
                 .leftJoin(comment).on(comment.feed.feedId.eq(feed.feedId))
                 .leftJoin(likeList).on(likeList.feed.feedId.eq(feed.feedId))
                 .where(feed.isDeleted.eq(false))

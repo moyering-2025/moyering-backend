@@ -10,6 +10,8 @@ import com.dev.moyering.socialing.repository.CommentRepository;
 import com.dev.moyering.socialing.repository.FeedRepository;
 import com.dev.moyering.socialing.repository.LikeListRepository;
 import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.entity.UserBadge;
+import com.dev.moyering.user.repository.UserBadgeRepository;
 import com.dev.moyering.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,7 @@ public class FeedServiceImpl implements FeedService {
     private final CommentRepository commentRepository;
     private final LikeListRepository likeListRepository;
     private final UserRepository userRepository;
+    private final UserBadgeRepository userBadgeRepository;
 
     private final EntityManager entityManager;
 
@@ -104,6 +107,9 @@ public class FeedServiceImpl implements FeedService {
         dto.setCreatedAt(feed.getCreateDate());
         dto.setMine(currentUserId != null &&
                 feed.getUser().getUserId().equals(currentUserId));
+
+        UserBadge badge =userBadgeRepository.findById(dto.getWriterBadge()).get();
+        dto.setWriterBadgeImg(badge.getBadge_img());
 
         // 3) 좋아요/댓글 수, likedByUser
         dto.setLikesCount(likeListRepository.countByFeedFeedId(feedId));
@@ -256,7 +262,7 @@ public class FeedServiceImpl implements FeedService {
             , String text, String tag1, String tag2, String tag3, String tag4, String tag5
             , MultipartFile image1, MultipartFile image2, MultipartFile image3, MultipartFile image4, MultipartFile image5
             , List<String> removeUrls
-                           ) throws Exception {
+    ) throws Exception {
         Feed feed = feedRepository.findById(feedId).orElseThrow(() -> new Exception("수정하려고 하는 피드가 없습니다"));
 
         feed.setTag1(tag1);
@@ -320,7 +326,7 @@ public class FeedServiceImpl implements FeedService {
         feed.setImg4(images.size() > 3 ? images.get(3).getOriginalFilename() : feed.getImg4());
         feed.setImg5(images.size() > 4 ? images.get(4).getOriginalFilename() : feed.getImg5());*/
 
-        if (text!=null) feed.setContent(text);
+        if (text != null) feed.setContent(text);
 
         Path dir = Paths.get(iuploadPath);
         if (!Files.exists(dir)) {

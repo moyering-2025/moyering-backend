@@ -44,33 +44,15 @@ public class FeedController {
 //            @RequestParam(required = false) String userId
             @RequestHeader(value = "Authorization", required = false) String header
     ) {
-        System.out.println("==== CONTROLLER /socialing/feeds ====");
-        System.out.println("▶▶▶ Authorization header = " + header);
-
-//        try {
-//            Integer userId = principal != null ?
-//                    principal.getUser().getUserId() : null;
-//            List<FeedDto> feeds = feedService.getFeeds(sort, userId);
-//            return new ResponseEntity<>(feeds, HttpStatus.OK);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        try {
-//            Integer userId = jwtUtil.extractUserIdFromHeader(header); // ✅ 로그인한 경우만 값 나옴
-//            System.out.println("▶▶▶ extracted userId = " + userId);
-//            List<FeedDto> feeds = feedService.getFeeds(sort, userId);
-//            return new ResponseEntity<>(feeds, HttpStatus.OK);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
+//        System.out.println("==== CONTROLLER /socialing/feeds ====");
+//        System.out.println("▶▶▶ Authorization header = " + header);
         Integer userId = jwtUtil.extractUserIdFromHeader(header);
-        System.out.println("userId = " + userId);
+//        System.out.println("userId = " + userId);
 
         List<FeedDto> feeds = null;
         try {
             feeds = feedService.getFeeds(sort, userId);
+            System.out.println("********************************************************"+feeds);
             System.out.println("feeds.size = " + feeds.size());
             return new ResponseEntity<>(feeds, HttpStatus.OK);
         } catch (Exception e) {
@@ -79,36 +61,6 @@ public class FeedController {
         }
     }
 
-
-//    // ✔ 피드 상세 조회
-//    @GetMapping("/feeds/{feedId}")
-//    public ResponseEntity<Map<String, Object>> getFeedDetail(@PathVariable Integer feedId,
-//                                                             @AuthenticationPrincipal PrincipalDetails principalDetails) {
-//        Map<String, Object> response = new HashMap<>();
-//
-//        // 1. 피드 본문
-//        FeedDto feedDto = feedService.getFeedById(feedId);
-//        response.put("feed", feedDto);
-//
-//        // 2. 댓글 목록
-//        List<CommentDto> comments = feedService.getCommentsByFeedId(feedId);
-//        response.put("comments", comments);
-//
-//        // 3. 좋아요 수
-//        Long likeCount = feedService.getLikeCount(feedId);
-//        response.put("likeCount", likeCount);
-//
-//        // 4. 로그인한 사용자의 좋아요 여부
-//        String loginUserId = principalDetails != null ? principalDetails.getUsername() : null;
-//        boolean isLiked = feedService.checkUserLikedFeed(feedId, loginUserId);
-//        response.put("isLiked", isLiked);
-//
-//        // 5. 기타 (예: 뱃지 정보, 작성자 프로필 등 추가 가능)
-//        response.put("writerBadge", feedDto.getWriterBadge());
-//        response.put("writerProfile", feedDto.getWriterProfile());
-//
-//        return ResponseEntity.ok(response);
-//    }
 
     @GetMapping("/socialing/feed")
     public ResponseEntity<FeedDto> getFeedDetail(
@@ -143,16 +95,6 @@ public class FeedController {
         }
     }
 
-    /*@GetMapping("/socialing/userFeed/{nickName}")
-    public ResponseEntity<List<FeedDto>> getUserByNickName(@PathVariable String nickName) {
-        try {
-            User user = userRepository.findByNickName(nickName).orElseThrow(() -> new Exception("유저를 찾을 수 없습니다"));
-
-        }catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }*/
     @GetMapping("/socialing/memberFeed/{nickName}")
     public ResponseEntity<List<FeedDto>> getFeedsByNickName(
             @PathVariable("nickName") String nickName,
