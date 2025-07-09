@@ -1,11 +1,15 @@
 package com.dev.moyering.host.service;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.dev.moyering.classring.service.ClassPaymentService;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.entity.ClassCalendar;
@@ -22,6 +26,7 @@ public class ClassCalendarServiceImpl implements ClassCalendarService {
 	private final ClassCalendarRepository classCalendarRepository;
 	private final UserRepository userRepository;
 	private final ScheduleDetailRepository scheduleDetailRepository;
+	private final ClassPaymentService classPaymentService;
 
 	@Override
 	public List<HostClassDto> getHotHostClasses() throws Exception {
@@ -82,6 +87,42 @@ public class ClassCalendarServiceImpl implements ClassCalendarService {
 				});
 		}
 		return classList;
+	}
+
+	@Transactional
+	@Override
+	public void checkHostClassStatus() throws Exception {
+        LocalDate localDate = LocalDate.now().plusDays(2);
+        Date classDate = java.sql.Date.valueOf(localDate);
+        List<ClassCalendar> list = classCalendarRepository.findByStartDateLessThanEqualAndStatus(classDate, "모집중");
+
+        for (ClassCalendar cal : list) {
+        	System.out.println("스케줄러 테스트"+cal.getHostClass().getName());
+            int registered = cal.getRegisteredCount();
+            int min = cal.getHostClass().getRecruitMin();
+
+            if (registered >= min) {
+                cal.changeStatus("모집마감");
+            } else {
+                cal.changeStatus("폐강");
+                //classPaymentService.refundAllForCalendar(cal.getCalendarId());
+            }
+        }
+        classCalendarRepository.saveAll(list);
+	}
+
+	@Transactional
+	@Override
+	public void changeStatusToFinished() throws Exception {
+        LocalDate localDate = LocalDate.now().minusDays(1);
+        Date classDate = java.sql.Date.valueOf(localDate);
+        List<ClassCalendar> list = classCalendarRepository.findByStartDateLessThanEqualAndStatus(classDate, "모집마감");
+        
+        for (ClassCalendar cal : list) {
+        	cal.changeStatus("종료");
+        }
+        
+        classCalendarRepository.saveAll(list);
 	}
 
 }

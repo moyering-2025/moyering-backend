@@ -123,7 +123,7 @@ public class HostClassServiceImpl implements HostClassService {
 		hostClassRepository.save(hostClass);
 
 		dates.forEach(date -> {
-			ClassCalendar cc = ClassCalendar.builder().startDate(date).endDate(date).status("검수중")
+			ClassCalendar cc = ClassCalendar.builder().startDate(date).endDate(date).status("승인대기")
 					.hostClass(HostClass.builder().classId(hostClass.getClassId()).build()).build();
 			
 			classCalendarRepository.save(cc);

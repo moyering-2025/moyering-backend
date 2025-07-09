@@ -55,4 +55,7 @@ public interface UserService {
     void sendEamilVerifiedTokenForPassword(String email,String username,String name)throws Exception;
     
     void changePassword(String password,String username) throws Exception;
+    
+    //유저의 활동 점수 추가
+    void addScore(Integer userId, Integer score) throws Exception;
 }

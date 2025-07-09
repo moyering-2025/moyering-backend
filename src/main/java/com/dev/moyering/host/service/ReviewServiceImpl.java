@@ -13,8 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dev.moyering.admin.service.AdminBadgeScoreService;
 import com.dev.moyering.classring.dto.UserReviewResponseDto;
 import com.dev.moyering.classring.dto.UtilSearchDto;
 import com.dev.moyering.classring.dto.WritableReviewResponseDto;
@@ -28,6 +30,8 @@ import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.HostClassRepository;
 import com.dev.moyering.host.repository.ReviewRepository;
 import com.dev.moyering.user.repository.UserRepository;
+import com.dev.moyering.user.service.UserBadgeService;
+import com.dev.moyering.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +42,9 @@ public class ReviewServiceImpl implements ReviewService {
 	private final HostClassRepository classRepository;
 	private final ClassCalendarRepository calendarRepository;
 	private final UserRepository userRepository;
+	private final UserService userService;
+	private final AdminBadgeScoreService adminBadgeScoreService;
+	private final UserBadgeService userBadgeService;
     @Value("${iupload.path}")
     private String uploadPath;
 
@@ -151,7 +158,8 @@ public class ReviewServiceImpl implements ReviewService {
 	            .totalElements(pageResult.getTotalElements())
 	            .build();
 	}
-
+	
+	@Transactional
 	@Override
 	public Integer writeReview(ReviewDto reviewDto) throws Exception {
 		//이미지가 있을 때
@@ -172,6 +180,14 @@ public class ReviewServiceImpl implements ReviewService {
 		
 		Review entity = reviewDto.toEntity();
         Review saved = reviewRepository.save(entity);
+        
+        //리뷰 작성 시 포인트 획득
+        //증가시킬 포인트 찾기
+        Integer score = adminBadgeScoreService.getScoreByTitle("클래스 후기 작성");
+        //유저의 활동점수 증가
+        userService.addScore(reviewDto.getUserId(), score);
+        //뱃지 획득 가능 여부 확인
+        userBadgeService.giveBadgeWithScore(reviewDto.getUserId());
         return saved.getReviewId();
     }
 
