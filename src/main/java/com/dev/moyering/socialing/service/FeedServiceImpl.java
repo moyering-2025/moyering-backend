@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dev.moyering.admin.service.AdminBadgeScoreService;
+
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.dto.LikeListDto;
@@ -31,7 +32,9 @@ import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.socialing.entity.LikeList;
 import com.dev.moyering.socialing.repository.CommentRepository;
 import com.dev.moyering.socialing.repository.FeedRepository;
+import com.dev.moyering.socialing.repository.FollowRepository;
 import com.dev.moyering.socialing.repository.LikeListRepository;
+import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.entity.UserBadge;
 import com.dev.moyering.user.repository.UserBadgeRepository;
@@ -57,6 +60,8 @@ public class FeedServiceImpl implements FeedService {
 	private final AdminBadgeScoreService adminBadgeScoreService;
 	private final UserBadgeService userBadgeService;
 	
+    private final FollowRepository followRepository;
+    
     private final EntityManager entityManager;
 
     @Value("${iupload.path}")
@@ -449,6 +454,22 @@ public class FeedServiceImpl implements FeedService {
 		    }
 
 		    return likeCountMap;
+	}
+
+	@Override
+	public Map<String, Object> userSubCount(Integer userId) throws Exception {
+		User user = userRepository.findById(userId).get(); 
+		
+		Integer feedCount = feedRepository.findByUserUserId(userId).size();
+		Integer followCount = followRepository.countByFollower(user);
+		Integer followingCount = followRepository.countByFollowing(user);
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("feedCount", feedCount);
+		map.put("followCount", followCount);
+		map.put("followingCount",followingCount);
+		
+		return map;
 	}
 
 
