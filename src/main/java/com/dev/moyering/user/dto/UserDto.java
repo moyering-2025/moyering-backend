@@ -41,6 +41,7 @@ public class UserDto {
 	private String providerId;
 	private Integer activeScore;
 	private Integer userBadgeId;
+	private String userBadgeImg;
 	private Boolean emailVerified;
 	private String emialVerificationToken;
 	private String badgeImg;
