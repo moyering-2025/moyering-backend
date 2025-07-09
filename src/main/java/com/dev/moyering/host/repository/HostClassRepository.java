@@ -13,4 +13,6 @@ public interface HostClassRepository extends JpaRepository<HostClass, Integer>, 
 	HostClass findByClassId(Integer classId) throws Exception;
 	Optional<HostClass> findByClassIdAndHost_HostId(Integer classId, Integer hostId);
 
+
+
 }

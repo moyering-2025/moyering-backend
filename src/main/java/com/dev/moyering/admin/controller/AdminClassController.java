@@ -23,7 +23,7 @@ public class AdminClassController {
     /*** 클래스 리스트 조회*/
     @GetMapping
     public ResponseEntity<Page<AdminClassDto>> getClassList(
-            @ModelAttribute AdminClassSearchCond cond, // 쿼리 파라미터나 폼데이터에서 데이터 가져오기
+            @ModelAttribute AdminClassSearchCond cond,// 쿼리 파라미터나 폼데이터에서 데이터 가져오기
             @PageableDefault(size = 20, sort = "regDate", direction = Sort.Direction.DESC) Pageable pageable // 등록일 내림차순
     ) {
         try {
@@ -34,4 +34,18 @@ public class AdminClassController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    /*** 관리자가 강사 클래스를 승인 */
+    @PatchMapping("/{classId}/approve")
+    public ResponseEntity <?> approveClass(@PathVariable Integer classId){
+        try {
+            hostClassService.approveClass(classId);
+            return ResponseEntity.ok().build();
+        } catch(Exception e) {
+            log.error("<UNK> <UNK> <UNK> <UNK> <UNK> <UNK>", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
 }

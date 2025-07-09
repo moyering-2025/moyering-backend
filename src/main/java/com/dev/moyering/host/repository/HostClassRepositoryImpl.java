@@ -107,48 +107,47 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 
 	// 관리자 페이지 > 클래스 관리 검색
 	@Override
-	public List<AdminClassDto> searchClassForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
-		return jpaQueryFactory
-				// 클래스 관리에서 카테고리를 수정 + 삭제할 일은 없으므로, subcategoryId, categoryId 제외하기
+	public Page<AdminClassDto> searchClassForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
+		List<AdminClassDto> content = jpaQueryFactory
 				.select(Projections.constructor(AdminClassDto.class,
-						hostClass.classId,                           // 클래스 아이디 (클래스 상세정보 볼 때 활용)
-						hostClass.subCategory.firstCategory.categoryName,    // 1차 카테고리명
-						hostClass.subCategory.subCategoryName,      // 2차 카테고리명
-						hostClass.host.userId,                      // 강사 id (강사 로그인 아이디 클릭해서 상세정보 볼 때 필요)
-						user.username,     							// 강사 로그인 아이디
-						hostClass.host.name,                        // 강사명
-						hostClass.name,                             // 클래스명
-						hostClass.price,                            // 가격
-						hostClass.recruitMin,                       // 최소인원
-						hostClass.recruitMax,                       // 최대인원
-						hostClass.regDate,                          // 클래스 개설 요청일자
-						classCalendar.status                        // 상태
-								 ))
-				.from(hostClass)
-//				.leftJoin(hostClass.subCategory, subCategory)
-//				.leftJoin(subCategory.firstCategory, subCategory.firstCategory)
-				.leftJoin(classCalendar).on(hostClass.classId.eq(classCalendar.hostClass.classId))
+						hostClass.classId,
+						hostClass.subCategory.firstCategory.categoryName,
+						hostClass.subCategory.subCategoryName,
+						hostClass.host.userId,
+						user.username,
+						hostClass.host.name,
+						hostClass.name,
+						hostClass.price,
+						hostClass.recruitMin,
+						hostClass.recruitMax,
+						hostClass.regDate,
+						classCalendar.status
+				))
+				.from(classCalendar)  // classCalendar를 메인으로
+				.join(classCalendar.hostClass, hostClass)
 				.leftJoin(user).on(hostClass.host.userId.eq(user.userId))
 				.where(
 						likeHostUserNameOrNameOrClassname(cond.getKeyword()),
 						eqClassStatus(cond.getStatusFilter()),
 						betweenDate(cond.getFromDate(), cond.getToDate())
 				)
+//				.orderBy(
+//						hostClass.regDate.desc()  // 개설일 기준 내림차순
+
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.fetch();
+
+		Long total = countClasses(cond);
+		return new PageImpl<>(content, pageable, total);
 	}
 
-
-	// 관리자 페이지 > 클래스 관리 > 개수 조회
 	@Override
 	public Long countClasses(AdminClassSearchCond cond) throws Exception {
 		return jpaQueryFactory
-				.select(hostClass.count())
-				.from(hostClass)
-//				.leftJoin(hostClass.subCategory, subCategory)
-//				.leftJoin(subCategory.firstCategory, subCategory.firstCategory)
-				.leftJoin(classCalendar).on(hostClass.classId.eq(classCalendar.hostClass.classId))
+				.select(classCalendar.count())
+				.from(classCalendar)  // classCalendar를 메인으로
+				.join(classCalendar.hostClass, hostClass)  // INNER JOIN
 				.leftJoin(user).on(hostClass.host.userId.eq(user.userId))
 				.where(
 						likeHostUserNameOrNameOrClassname(cond.getKeyword()),
@@ -157,7 +156,6 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 				)
 				.fetchOne();
 	}
-
 	// 클래스 검색
 	private BooleanExpression likeHostUserNameOrNameOrClassname(String keyword) {
 		if (keyword == null || keyword.isEmpty()) return null; // 검색어 없으면 전체 조회
@@ -169,8 +167,9 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 	}
 
 	// 클래스 상태
-	private BooleanExpression eqClassStatus(String status) {
-		return (status == null || status.isEmpty()) ? null : classCalendar.status.eq(status);
+	private BooleanExpression eqClassStatus(List<String> statusFilter) {
+		if (statusFilter == null || statusFilter.isEmpty()) return null;
+		return classCalendar.status.in(statusFilter);
 	}
 
 	// 개설일자
@@ -186,93 +185,108 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		QClassCalendar calendar = QClassCalendar.classCalendar;
 		QHost host = QHost.host;
 		QClassRegist regist = QClassRegist.classRegist;
-		
+
 		BooleanBuilder builder = new BooleanBuilder();
-		
+
 		builder.and(host.hostId.eq(dto.getHostId()));
-		
-		if(dto.getKeyword() != null && !dto.getKeyword().isBlank()) {
+
+		if (dto.getKeyword() != null && !dto.getKeyword().isBlank()) {
 			builder.and(user.name.containsIgnoreCase(dto.getKeyword()));
 		}
-		
+
 		List<User> content = jpaQueryFactory
 				.select(user)
 				.from(regist)
-				.leftJoin(regist.user,user)
-				.leftJoin(regist.classCalendar,calendar)
-				.leftJoin(calendar.hostClass,hostClass)
-				.leftJoin(hostClass.host,host)
+				.leftJoin(regist.user, user)
+				.leftJoin(regist.classCalendar, calendar)
+				.leftJoin(calendar.hostClass, hostClass)
+				.leftJoin(hostClass.host, host)
 				.where(builder)
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.fetch();
-		
-		long totla =jpaQueryFactory.select(user).from(regist)
-				.leftJoin(regist.user,user)
-				.leftJoin(regist.classCalendar,calendar)
-				.leftJoin(calendar.hostClass,hostClass)
-				.leftJoin(hostClass.host,host)
+
+		long totla = jpaQueryFactory.select(user).from(regist)
+				.leftJoin(regist.user, user)
+				.leftJoin(regist.classCalendar, calendar)
+				.leftJoin(calendar.hostClass, hostClass)
+				.leftJoin(hostClass.host, host)
 				.where(builder)
 				.fetchCount();
-		return new PageImpl<>(content,pageable,totla);
+		return new PageImpl<>(content, pageable, totla);
 	}
 
 	@Override
 	public List<HostClass> findSearchClass(MainSearchRequestDto dto) throws Exception {
-		QHostClass hostClass= QHostClass.hostClass;
-		
+		QHostClass hostClass = QHostClass.hostClass;
+
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.or(hostClass.name.containsIgnoreCase(dto.getSearchQuery()));
 		builder.or(hostClass.detailDescription.containsIgnoreCase(dto.getSearchQuery()));
-		
+
 		List<HostClass> content = jpaQueryFactory.selectFrom(hostClass).where(builder).fetch();
-		
+
 		long total = jpaQueryFactory.selectFrom(hostClass).where(builder).fetchCount();
-		
+
 		return content;
 	}
-	public List<HostClassDto> findRecommendClassesInDetail(Integer subCategoryId,Integer categoryId,Integer classId) throws Exception {
+
+	public List<HostClassDto> findRecommendClassesInDetail(Integer subCategoryId, Integer categoryId, Integer classId) throws Exception {
 		QHostClass hc = QHostClass.hostClass;
 		QClassCalendar cc = QClassCalendar.classCalendar;
 		QSubCategory sc = QSubCategory.subCategory;
 		List<HostClass> firstList = jpaQueryFactory
 				.selectFrom(hc)
 				.where(
-					hc.subCategory.subCategoryId.eq(subCategoryId),
-					hc.classId.ne(classId),
-			        JPAExpressions.selectOne()
-		            .from(cc)
-		            .where(cc.hostClass.classId.eq(hc.classId)
-		                  .and(cc.status.eq("모집중")))
-		            .exists()
-	            ).limit(3)
+						hc.subCategory.subCategoryId.eq(subCategoryId),
+						hc.classId.ne(classId),
+						JPAExpressions.selectOne()
+								.from(cc)
+								.where(cc.hostClass.classId.eq(hc.classId)
+										.and(cc.status.eq("모집중")))
+								.exists()
+				).limit(3)
 				.fetch();
-		
-		if (firstList.size()<3) {
+
+		if (firstList.size() < 3) {
 			int remain = 3 - firstList.size();
-	        List<Integer> excludeIds = firstList.stream()
-	                .map(HostClass::getClassId)
-	                .collect(Collectors.toList());
+			List<Integer> excludeIds = firstList.stream()
+					.map(HostClass::getClassId)
+					.collect(Collectors.toList());
 
-	        List<HostClass> secondList = jpaQueryFactory
-	            .selectFrom(hc)
-	            .where(
-	                hc.subCategory.firstCategory.categoryId.eq(categoryId),
-	                hc.subCategory.subCategoryId.ne(subCategoryId),
-	                hc.classId.notIn(excludeIds),
-	                JPAExpressions.selectOne()
-	                    .from(cc)
-	                    .where(cc.hostClass.classId.eq(hc.classId)
-	                          .and(cc.status.eq("모집중")))
-	                    .exists()
-	            )
-	            .limit(remain)
-	            .fetch();
+			List<HostClass> secondList = jpaQueryFactory
+					.selectFrom(hc)
+					.where(
+							hc.subCategory.firstCategory.categoryId.eq(categoryId),
+							hc.subCategory.subCategoryId.ne(subCategoryId),
+							hc.classId.notIn(excludeIds),
+							JPAExpressions.selectOne()
+									.from(cc)
+									.where(cc.hostClass.classId.eq(hc.classId)
+											.and(cc.status.eq("모집중")))
+									.exists()
+					)
+					.limit(remain)
+					.fetch();
 
-	        firstList.addAll(secondList);
+			firstList.addAll(secondList);
 		}
-		return firstList.stream().map(h->h.toDto()).collect(Collectors.toList());
+		return firstList.stream().map(h -> h.toDto()).collect(Collectors.toList());
 	}
 
-	
+	@Override
+	public int updateClassStatus(Integer classId) throws Exception {
+		ClassCalendar calendar = jpaQueryFactory
+				.selectFrom(classCalendar)
+				.where( // classId가 맞고, 승인대기인 항목
+						classCalendar.hostClass.classId.eq(classId)
+								.and (classCalendar.status.eq("승인대기"))
+				)
+				.fetchOne();
+		if (calendar == null) {
+			return 0;
+		}
+		calendar.changeStatus("모집중");
+				return 1;
+	}
 }

@@ -280,5 +280,4 @@ public class HostClassController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 		}
 	}
-
 }

@@ -19,7 +19,6 @@ import javax.validation.Valid;
 @Slf4j // 로깅
 @CrossOrigin(origins = "*")
 public class AdminNoticeController {
-
     private final AdminNoticeServiceImpl noticeService;
 
     /*** 공지사항 등록*/

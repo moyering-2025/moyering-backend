@@ -4,10 +4,8 @@ import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -390,19 +389,30 @@ public class HostClassServiceImpl implements HostClassService {
 	public Page<AdminClassDto> getHostClassListForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
 		log.info("클래스 목록 관리 조회 - cond : {}, pageable : {}", cond, pageable);
 		try {
-			List<AdminClassDto> content = hostClassRepository.searchClassForAdmin(cond, pageable);
-			log.info("조회된 content 개수 : {}", content.size());
+			Page<AdminClassDto> content = hostClassRepository.searchClassForAdmin(cond, pageable);
 
 			Long total = hostClassRepository.countClasses(cond); // 검색 조건에 따른 페이지 계산
-			log.info("전체 개수 : {}", total);
-
-			return new PageImpl<>(content, pageable, total);
+			return content;
 		} catch (Exception e) {
 			log.error("getClassList 에러 상새 : ", e);
 			throw e;
 		}
 	}
 
+	/*** 관리자가 강사 클래스를 승인 */
+	@Override
+	@Transactional
+	public void approveClass(Integer classId) throws Exception {
+		try {
+			int updatedStatus = hostClassRepository.updateClassStatus(classId);
+			if (updatedStatus == 0) {
+				throw new RuntimeException("업데이트 할 상태가 없습니다.");
+			}
+		} catch (Exception e) {
+			log.error("we");
+			throw e;
+		}
+	}
 	@Override
 	public Integer updateClass(HostClassDto hostClassDto) throws Exception {
 		HostClassDto classDto = hostClassRepository.findByClassId(hostClassDto.getClassId()).toDto();

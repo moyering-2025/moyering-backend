@@ -56,7 +56,7 @@ public class SettlementSchedulerService {
                 )
                 .where(
                         classCalendar.endDate.eq(sevenDaysAgo) // 7일 전 종료
-                                .and(classCalendar.status.eq("종료됨")) // 클래스 완료 상태
+                                .and(classCalendar.status.eq("종료")) // 클래스 완료 상태
                                 .and(adminSettlement.settlementId.isNull()) // 정산 테이블에 없는 것만
                 )
                 .groupBy(
