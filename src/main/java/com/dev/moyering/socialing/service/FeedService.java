@@ -3,6 +3,8 @@ package com.dev.moyering.socialing.service;
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.entity.Feed;
+import com.dev.moyering.user.dto.UserDto;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -46,4 +48,8 @@ public interface FeedService {
     void deleteFeed(Integer feedId,Integer userId) throws Exception;
     
     Map<Integer,Integer> myFeedsLikeCount(Integer userId) throws Exception;
+    
+    //게시물,팔로워,팔로잉 수 
+    Map<String,Object> userSubCount(Integer userId)throws Exception;
+
 }

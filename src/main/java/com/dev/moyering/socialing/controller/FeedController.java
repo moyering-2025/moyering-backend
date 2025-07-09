@@ -15,6 +15,7 @@ import com.dev.moyering.config.jwt.JwtUtil;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.repository.LikeListRepository;
 import com.dev.moyering.socialing.service.FeedService;
+import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -219,8 +220,20 @@ public class FeedController {
     		e.printStackTrace();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     	}
-    	
     }
+    
+    @GetMapping("/socialing/subCount")
+    public ResponseEntity<Map<String,Object>>subCount(@RequestParam Integer userId){
+    	try {
+    		Map<String,Object> map = feedService.userSubCount(userId);
+    		return new ResponseEntity<>(map,HttpStatus.OK);
+    	}catch (Exception e) {
+    		e.printStackTrace();
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    }
+    
+    
     
     
 }

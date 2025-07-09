@@ -1,5 +1,27 @@
 package com.dev.moyering.socialing.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.dto.LikeListDto;
@@ -8,31 +30,16 @@ import com.dev.moyering.socialing.entity.Feed;
 import com.dev.moyering.socialing.entity.LikeList;
 import com.dev.moyering.socialing.repository.CommentRepository;
 import com.dev.moyering.socialing.repository.FeedRepository;
+import com.dev.moyering.socialing.repository.FollowRepository;
 import com.dev.moyering.socialing.repository.LikeListRepository;
+import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.entity.UserBadge;
 import com.dev.moyering.user.repository.UserBadgeRepository;
 import com.dev.moyering.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +51,8 @@ public class FeedServiceImpl implements FeedService {
     private final LikeListRepository likeListRepository;
     private final UserRepository userRepository;
     private final UserBadgeRepository userBadgeRepository;
-
+    private final FollowRepository followRepository;
+    
     private final EntityManager entityManager;
 
     @Value("${iupload.path}")
@@ -428,6 +436,22 @@ public class FeedServiceImpl implements FeedService {
 		    }
 
 		    return likeCountMap;
+	}
+
+	@Override
+	public Map<String, Object> userSubCount(Integer userId) throws Exception {
+		User user = userRepository.findById(userId).get(); 
+		
+		Integer feedCount = feedRepository.findByUserUserId(userId).size();
+		Integer followCount = followRepository.countByFollower(user);
+		Integer followingCount = followRepository.countByFollowing(user);
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("feedCount", feedCount);
+		map.put("followCount", followCount);
+		map.put("followingCount",followingCount);
+		
+		return map;
 	}
 
 
