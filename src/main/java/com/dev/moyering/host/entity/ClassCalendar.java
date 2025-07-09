@@ -67,6 +67,9 @@ public class ClassCalendar {
 	}
 	//강의의 상태 변경
 	public void changeStatus(String status) {
+//	    if (!ALLOWED_STATUSES.contains(status)) {
+//	        throw new IllegalArgumentException("허용되지 않은 상태값입니다.");
+//	    }
 		this.status=status;
 	}
 	

@@ -87,6 +87,14 @@ public class User {
 	@Column
 	private String emailVerificationToken;
 	
+	//활동점수 증가
+	public void addScore(Integer score) {
+	    if (score == null || score <= 0) {
+	        throw new IllegalArgumentException("점수는 1 이상이어야 합니다.");
+	    }
+	    this.activeScore += score;
+	}
+	
 	public UserDto toDto() {
 		UserDto dto = UserDto.builder()
 				.userId(userId)

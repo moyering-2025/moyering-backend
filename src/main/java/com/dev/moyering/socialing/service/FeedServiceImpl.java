@@ -1,5 +1,28 @@
 package com.dev.moyering.socialing.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.dev.moyering.admin.service.AdminBadgeScoreService;
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.dto.LikeListDto;
@@ -13,26 +36,11 @@ import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.entity.UserBadge;
 import com.dev.moyering.user.repository.UserBadgeRepository;
 import com.dev.moyering.user.repository.UserRepository;
+import com.dev.moyering.user.service.UserBadgeService;
+import com.dev.moyering.user.service.UserService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
-import org.springframework.util.FileSystemUtils;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +53,10 @@ public class FeedServiceImpl implements FeedService {
     private final UserRepository userRepository;
     private final UserBadgeRepository userBadgeRepository;
 
+	private final UserService userService;
+	private final AdminBadgeScoreService adminBadgeScoreService;
+	private final UserBadgeService userBadgeService;
+	
     private final EntityManager entityManager;
 
     @Value("${iupload.path}")
@@ -275,6 +287,15 @@ public class FeedServiceImpl implements FeedService {
         feedRepository.save(feed);
         Integer feedNum = feed.getFeedId();
         entityManager.clear();
+        
+        //소셜링 글 작성 시 포인트 획득
+        //증가시킬 포인트 찾기
+        Integer score = adminBadgeScoreService.getScoreByTitle("소셜링 게시글 작성");
+        //유저의 활동점수 증가
+        userService.addScore(feed.getUser().getUserId(), score);
+        //뱃지 획득 가능 여부 확인
+        userBadgeService.giveBadgeWithScore(feed.getUser().getUserId());
+        
         return feedNum;
     }
 

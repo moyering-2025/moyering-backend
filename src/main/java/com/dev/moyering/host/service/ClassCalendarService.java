@@ -11,4 +11,7 @@ public interface ClassCalendarService {
 	List<ClassCalendarDto> selectCalednarByClassId(Integer classId)throws Exception;
 	List<ClassCalendarDto> getClassCalendarByHostClassId(Integer classId) throws Exception;
 	List<ClassCalendarDto> getMyClassSchedule(Integer userId) throws Exception;
+	//스케줄러로 모집마감, 폐강 처리
+	void checkHostClassStatus() throws Exception;
+	void changeStatusToFinished() throws Exception;
 }
