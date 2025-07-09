@@ -1,5 +1,6 @@
 package com.dev.moyering.socialing.service;
 
+import com.dev.moyering.admin.service.AdminBadgeScoreService;
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.entity.Comment;
 import com.dev.moyering.socialing.entity.Feed;
@@ -7,10 +8,13 @@ import com.dev.moyering.socialing.repository.CommentRepository;
 import com.dev.moyering.socialing.repository.FeedRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
+import com.dev.moyering.user.service.UserBadgeService;
+import com.dev.moyering.user.service.UserService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -23,7 +27,10 @@ public class CommentServiceImpl implements CommentService {
     private final FeedRepository feedRepository;
     private final UserRepository userRepository;
 
-
+	private final UserService userService;
+	private final AdminBadgeScoreService adminBadgeScoreService;
+	private final UserBadgeService userBadgeService;
+	
     @Override
     public List<CommentDto> getComments(Integer feedId) {
     return null;
@@ -45,6 +52,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setDeleted(true);
     }
 
+    @Transactional
     @Override
     public CommentDto addComment(Integer feedId, Integer userId, String content, Integer parentId) throws Exception {
         Feed feed = feedRepository.findById(feedId)
@@ -63,6 +71,15 @@ public class CommentServiceImpl implements CommentService {
                 .build();
 
         Comment saved = commentRepository.save(comment);
+        
+        //소셜링 댓글 작성 시 포인트 획득
+        //증가시킬 포인트 찾기
+        Integer score = adminBadgeScoreService.getScoreByTitle("소셜링 댓글 작성");
+        //유저의 활동점수 증가
+        userService.addScore(comment.getUser().getUserId(), score);
+        //뱃지 획득 가능 여부 확인
+        userBadgeService.giveBadgeWithScore(comment.getUser().getUserId());
+        
         return saved.toDto();
     }
 }

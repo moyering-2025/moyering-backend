@@ -78,9 +78,7 @@ public class UserReviewController {
     public ResponseEntity<Integer> uploadReview(
 		@ModelAttribute ReviewDto reviewDto,
         @AuthenticationPrincipal PrincipalDetails principal
-    ) {
-    	
-        System.out.println("sdflijasljflwsaef");
+    ) {    	
         reviewDto.setUserId(principal.getUser().getUserId());
         try {
         	Integer reviewId = reviewService.writeReview(reviewDto); // ↓서비스 분리
