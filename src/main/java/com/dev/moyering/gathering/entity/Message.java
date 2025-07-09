@@ -56,10 +56,8 @@ public class Message {
     private Boolean messageHide;
     
 	@Column(columnDefinition = "DATETIME")
-	@CreationTimestamp
 	private Date messageDisableTime;
 	@Column(columnDefinition = "DATETIME")
-	@CreationTimestamp
 	private Date messageAvailableTime;
 	
     public MessageDto toDto() {

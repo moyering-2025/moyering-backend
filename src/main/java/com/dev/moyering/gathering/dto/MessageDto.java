@@ -51,16 +51,9 @@ public class MessageDto {
 				.messageAvailableTime(messageAvailableTime);
 		return builder.build();
 	}
-
-	public MessageDto(Integer gatheringId, Integer senderId, String messageContent) {
-		super();
-		this.gatheringId = gatheringId;
-		this.senderId = senderId;
-		this.messageContent = messageContent;
-	}
-
-	public MessageDto(Integer gatheringId, String gatheringTitle, String thumbnailFileName, Integer organizerUserId,
-			Date meetingDate, Boolean messageRoomState) {
+	public MessageDto(Integer gatheringId, String gatheringTitle, String thumbnailFileName, 
+            Integer organizerUserId, Date meetingDate, 
+            Boolean messageRoomState) {
 		super();
 		this.gatheringId = gatheringId;
 		this.gatheringTitle = gatheringTitle;
@@ -68,7 +61,22 @@ public class MessageDto {
 		this.organizerUserId = organizerUserId;
 		this.meetingDate = meetingDate;
 		this.messageRoomState = messageRoomState;
-	}
+		}
+	public MessageDto(Integer gatheringId, String gatheringTitle, String thumbnailFileName, 
+            Integer organizerUserId, Date meetingDate, Date messageAvailableTime, 
+            Boolean messageRoomState) {
+this.gatheringId = gatheringId;
+this.gatheringTitle = gatheringTitle;
+this.thumbnailFileName = thumbnailFileName;
+this.organizerUserId = organizerUserId;
+this.meetingDate = meetingDate;
+this.messageAvailableTime = messageAvailableTime;
+this.messageRoomState = messageRoomState;
+
+// 기본값 설정
+this.gatheringState = false;
+this.messageHide = false;
+}
 	public MessageDto(Integer messageId, Integer gatheringId, Integer senderId, 
             String senderNickname, String senderProfile, String messageContent, 
             Boolean messageHide, Date writeDate) {

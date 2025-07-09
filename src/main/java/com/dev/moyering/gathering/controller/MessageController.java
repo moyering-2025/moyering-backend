@@ -51,17 +51,12 @@ public class MessageController {
 	public ResponseEntity<Boolean> sendMessage(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestBody Map<String, Object> param){
 		try {
-//			send = MessageService.confirmAlarmAll(param.get("alarmList"));
+			System.out.println(param);
 			Boolean sendSuccess = null;
 			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
 			Integer gatheringId = (Integer) param.get("gatheringId");
 			String messageContent = (String) param.get("content");
-			MessageDto messageDto = new MessageDto();
-			messageDto.setGatheringId(gatheringId);
-			messageDto.setSenderId(principal.getUser().getUserId());
-			messageDto.setMessageContent(messageContent);
-			
-			System.out.println("messageDto : "+messageDto);
+			sendSuccess = messageService.sendMessage(gatheringId, principal.getUser().getUserId(), messageContent);
 			return new ResponseEntity<Boolean>(sendSuccess, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();

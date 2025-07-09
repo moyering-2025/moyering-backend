@@ -13,6 +13,6 @@ import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringApply;
 
 public interface GatheringApplyRepository extends JpaRepository<GatheringApply, Integer>, GatheringApplyRepositoryCustom {
-	
+    Optional<GatheringApply> findByGatheringGatheringIdAndUserUserId(Integer gatheringId, Integer userId);
 
 }
