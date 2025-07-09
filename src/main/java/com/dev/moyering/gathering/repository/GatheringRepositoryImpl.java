@@ -279,16 +279,22 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 				.map(g -> g.toDto()).collect(Collectors.toList());
 	}
 	@Override
-	public List<Gathering> findSearchGathering(MainSearchRequestDto dto) {
+	public Page<Gathering> findSearchGathering(MainSearchRequestDto dto,Pageable pageable) {
 		QGathering gathering = QGathering.gathering;
 		
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.or(gathering.title.containsIgnoreCase(dto.getSearchQuery()));
 		builder.or(gathering.intrOnln.containsIgnoreCase(dto.getSearchQuery()));
 		
-		List<Gathering> content = jpaQueryFactory.selectFrom(gathering).where(builder).fetch();
+		List<Gathering> content = jpaQueryFactory
+		        .selectFrom(gathering)
+		        .where(builder)
+		        .offset(pageable.getOffset())
+		        .limit(pageable.getPageSize())
+		        .fetch();
+		
 		long total = jpaQueryFactory.selectFrom(gathering).where(builder).fetchCount();
 		
-		return content;
+		return new PageImpl<>(content,pageable,total);
 	}
 }

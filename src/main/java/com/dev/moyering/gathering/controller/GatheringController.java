@@ -31,6 +31,7 @@ import com.dev.moyering.gathering.service.GatheringInquiryService;
 import com.dev.moyering.gathering.service.GatheringLikesService;
 import com.dev.moyering.gathering.service.GatheringService;
 import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.entity.UserBadge;
 import com.dev.moyering.user.service.UserService;
 import com.dev.moyering.util.PageInfo;
 
@@ -52,9 +53,9 @@ public class GatheringController {
 		try {
 			gatheringDto.setUserId(principal.getUser().getUserId());
 			gatheringDto.setThumbnailFileName(thumbnail.getOriginalFilename());
-			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
+//			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
 			Integer gatheringId = gatheringService.writeGathering(gatheringDto, thumbnail);
-			System.out.println("게더링 등록 성공 새 게더링 아이디 : " + gatheringId);
+//			System.out.println("게더링 등록 성공 새 게더링 아이디 : " + gatheringId);
 			return new ResponseEntity<>(gatheringId, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -66,7 +67,7 @@ public class GatheringController {
 			@ModelAttribute GatheringDto gatheringDto, 
 			@RequestParam(name="thumbnail", required = false) MultipartFile thumbnail) {
 		try {
-			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
+//			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
 			gatheringService.modifyGathering(gatheringDto, thumbnail);
 			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringDto.getGatheringId());
 			return new ResponseEntity<>(nGatheringDto, HttpStatus.OK);
@@ -80,15 +81,23 @@ public class GatheringController {
 		try {
 			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
 			//호스트,신청 멤버 정보 추가
-			System.out.println("조회된 게더링 : " + nGatheringDto);
+//			System.out.println("조회된 게더링 : " + nGatheringDto);
 			Map<String,Object> res = new HashMap<>();
 			res.put("gathering", nGatheringDto);
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());
 			List<GatheringApplyDto> member = gatheringApplyService.findApprovedUserListByGatheringId(gatheringId);
+			for(GatheringApplyDto gaMember : member) {
+				UserBadge b = userService.getUserFirstBadge(gaMember.getUserId());
+				gaMember.setUserBadgeId(b.getUserBadgeId());
+				gaMember.setUserBadgeImg(b.getBadge_img());
+			}
 			List<GatheringDto> recommendations = gatheringService.findGatheringWithCategory(nGatheringDto.getGatheringId(), nGatheringDto.getSubCategoryId(), nGatheringDto.getCategoryId());
 			
 	        Integer acceptedCount = gatheringApplyService.findApprovedUserCountByGatheringId(gatheringId);
 	        nGatheringDto.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);
+			UserBadge badge = userService.getUserFirstBadge(nGatheringDto.getUserId());
+	        userDto.setUserBadgeId(badge.getUserBadgeId());
+	        userDto.setUserBadgeImg(badge.getBadge_img());
 			userDto.setPassword(null);
 			res.put("organizer", userDto);
 			res.put("member", member);
@@ -106,9 +115,9 @@ public class GatheringController {
 		try {
 			//찜 여부, 신청여부
 			Map<String,Object> res = new HashMap<>();
-			System.out.println("로그인 정보 : "+principal.getUser().getUserId());
+//			System.out.println("로그인 정보 : "+principal.getUser().getUserId());
 			Integer cntApply = gatheringApplyService.findByGatheringIdAndUserId(gatheringId, principal.getUser().getUserId());
-			System.out.println("cnt :" + cntApply);
+//			System.out.println("cnt :" + cntApply);
 			if(cntApply !=null && cntApply != 0) {
 				res.put("canApply", false);
 			} else {
@@ -130,7 +139,7 @@ public class GatheringController {
 	public String toggleGatheringLike(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestParam("gatheringId") Integer gatheringId) {
 		try {
-			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
+//			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
 			Boolean isLike = gatheringLikesService.toggleGatheringLike(principal.getUser().getUserId(), gatheringId);
 			return String.valueOf(isLike);
 		} catch(Exception e) {
@@ -142,7 +151,7 @@ public class GatheringController {
 	public ResponseEntity<GatheringDto> detailForModifyGathering(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestParam("gatheringId") Integer gatheringId) {
 		try {
-	        System.out.println("gatheringId: " + gatheringId);
+//	        System.out.println("gatheringId: " + gatheringId);
 //	        System.out.println("로그인 정보 : "+principal.getUser().getUserId());
 			GatheringDto gatheringDto = gatheringService.detailGathering(gatheringId);
 //			System.out.println("조회된 게더링 : " + gatheringDto);
@@ -167,8 +176,8 @@ public class GatheringController {
 			@PathVariable Integer gatheringId){
 		try {
 			Integer userId = principal.getUser().getUserId();
-			System.out.println("로그인 유저 : "+ userId);
-			System.out.println("gatheringId : "+gatheringId);
+//			System.out.println("로그인 유저 : "+ userId);
+//			System.out.println("gatheringId : "+gatheringId);
 			gatheringService.updateGatheringStatus(gatheringId, true);
             return new ResponseEntity<>(HttpStatus.OK);
 		} catch(Exception e) {

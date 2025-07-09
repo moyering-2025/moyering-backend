@@ -118,12 +118,13 @@ public class HostClassServiceImpl implements HostClassService {
 		if (files[6] != null && !files[6].isEmpty())
 			hostClassDto.setPortfolioName(files[6].getOriginalFilename());
 		HostClass hostClass = hostClassDto.toEntity();
+		hostClass.setRegDate(Date.valueOf(LocalDate.now()));
 		hostClassRepository.save(hostClass);
 
 		dates.forEach(date -> {
-			ClassCalendar cc = ClassCalendar.builder().startDate(date).endDate(date).status("검수중")
+			ClassCalendar cc = ClassCalendar.builder().startDate(date).endDate(date).status("승인대기")
 					.hostClass(HostClass.builder().classId(hostClass.getClassId()).build()).build();
-
+			
 			classCalendarRepository.save(cc);
 		});
 

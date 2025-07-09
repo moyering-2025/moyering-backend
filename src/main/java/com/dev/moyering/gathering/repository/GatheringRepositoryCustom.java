@@ -31,5 +31,5 @@ public interface GatheringRepositoryCustom {
 	List<GatheringDto> findMyApplyGatheringSchedule(Integer userId) throws Exception;
 	List<GatheringDto> findMyGatheringSchedule(Integer userId) throws Exception;
 	
-	List<Gathering> findSearchGathering(MainSearchRequestDto dto);
+	Page<Gathering> findSearchGathering(MainSearchRequestDto dto,Pageable pageable);
 }

@@ -25,7 +25,7 @@ public interface HostClassRepositoryCustom {
 //    AdminClassDto findClassByClassId(Integer classId) throws Exception;
     Page<User> searchClassStudent(StudentSearchRequestDto dto, Pageable pageable) throws Exception;
     
-    List<HostClass> findSearchClass(MainSearchRequestDto dto)throws Exception;
+    Page<HostClass> findSearchClass(MainSearchRequestDto dto,Pageable pageable)throws Exception;
     
     //클래스 상세 3개 추천해주기
     List<HostClassDto> findRecommendClassesInDetail(Integer subCategoryId, Integer categoryId,Integer classId) throws Exception;

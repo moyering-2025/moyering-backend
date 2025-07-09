@@ -72,9 +72,9 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 			builder.and(calendar.calendarId.eq(requestDto.getCalendarId()));
 		}
 		// 답변 상태 필터
-		if ("답변완료".equals(requestDto.getReplyStatus())) {
+		if ("1".equals(requestDto.getReplyStatus())) {
 			builder.and(review.state.eq(1));
-		} else if ("답변대기".equals(requestDto.getReplyStatus())) {
+		} else if ("0".equals(requestDto.getReplyStatus())) {
 			builder.and(review.state.eq(0));
 		}
 		

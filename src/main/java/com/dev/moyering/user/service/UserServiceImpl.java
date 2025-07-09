@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new Exception("이메일 인증이 완료되지 않았습니다.");
         }
-        
+        user.setActiveScore(0);
         user.setUserBadgeId(1);
         userRepository.save(user);
         userBadgeService.giveBadge(user.getUserId(), 1);
@@ -307,6 +307,10 @@ public class UserServiceImpl implements UserService {
 
         // 새로운 대표 배지로
         targetBadge.setIsRepresentative(true);
+
+        // User 테이블의 userBadgeId 필드도 갱신
+        User user = targetBadge.getUser();
+        user.setUserBadgeId(targetBadge.getUserBadgeId());
     }
 
 	@Override
@@ -339,6 +343,12 @@ public class UserServiceImpl implements UserService {
 		User user = userRepository.findByUsername(username).get();
 		user.setPassword(bCryptPasswordEncoder.encode(password));
 		userRepository.save(user);
+	}
+	
+	@Override
+	public void addScore(Integer userId, Integer score) throws Exception {
+		User user = userRepository.findById(userId).orElseThrow(()-> new Exception("해당 회원이 존재하지 않습니다."));
+		user.addScore(score);
 	}
 	
 	

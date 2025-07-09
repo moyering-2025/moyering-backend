@@ -79,9 +79,9 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 		}
 
 		// 답변 상태 필터
-		if ("답변완료".equals(dto.getReplyStatus())) {
+		if ("1".equals(dto.getReplyStatus())) {
 			builder.and(inquiry.state.eq(1));
-		} else if ("답변대기".equals(dto.getReplyStatus())) {
+		} else if ("0".equals(dto.getReplyStatus())) {
 			builder.and(inquiry.state.eq(0));
 		}
 

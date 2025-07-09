@@ -76,7 +76,7 @@ public class HostServiceImpl implements HostService {
 			String fileName = profile.getOriginalFilename();
 			Path savePath = Paths.get(iuploadPath, fileName); // ✅ 폴더 + 파일명
 			Files.write(savePath, profile.getBytes());
-			host.setIdCard(fileName); // DB에는 파일명만 저장
+			host.setProfile(fileName); // DB에는 파일명만 저장
 		}
 		hostRepository.save(host);
 		Host sHost = hostRepository.findById(hostId).get();
@@ -87,9 +87,9 @@ public class HostServiceImpl implements HostService {
 	public Host updateHostSettlement(Integer hostId, String bankName, String accName, String accNum,
 			MultipartFile idCard)
 			throws Exception {
-		System.out.println(hostId);
+//		System.out.println(hostId);
 		Host host = hostRepository.findById(hostId).get();
-		System.out.println(host);
+//		System.out.println(host);
 		if (host != null) {
 			if (bankName != null)
 				host.setBankName(bankName);
