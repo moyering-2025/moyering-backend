@@ -44,7 +44,7 @@ public class MessageController {
 	@Autowired
 	private GatheringApplyService gatheringApplyService;
 	@Autowired
-	private MessageService MessageService;
+	private MessageService messageService;
 	
 	@PostMapping("/user/sendMessage")
 	@ResponseBody
@@ -64,18 +64,29 @@ public class MessageController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	@PostMapping("/user/messageRoomList")
+	@GetMapping("/user/messageRoomList")
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> messageRoomList(@AuthenticationPrincipal PrincipalDetails principal, 
-			@RequestBody Map<String, Object> param){
+	public ResponseEntity<Map<String, Object>> messageRoomList(@AuthenticationPrincipal PrincipalDetails principal){
 		try {
 			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
-			Integer gatheringId = (Integer) param.get("gatheringId");
-			String messageContent = (String) param.get("content");
-			MessageDto messageDto = new MessageDto(gatheringId, principal.getUser().getUserId(), messageContent);
-			System.out.println("messageDto : "+messageDto);
-
+			List<MessageDto> getMessageRoomList = messageService.getMessageRoomListUserId(principal.getUser().getUserId());
 	        Map<String, Object> res = new HashMap<>();
+	        res.put("myMessageRoomList", getMessageRoomList);
+	        return new ResponseEntity<>(res, HttpStatus.OK);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	@GetMapping("/user/messageRoom/{roomId}")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> messageRoomByGatheringId(@AuthenticationPrincipal PrincipalDetails principal,
+			@PathVariable(value = "roomId") int roomId){
+		try {
+			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
+			List<MessageDto> getMessageRoomByGatheringId = messageService.getMessageListByGatheringIdAndUserId(roomId, principal.getUser().getUserId());
+	        Map<String, Object> res = new HashMap<>();
+	        res.put("myMessageRoomList", getMessageRoomByGatheringId);
 	        return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();

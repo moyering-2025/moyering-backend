@@ -1,6 +1,8 @@
 package com.dev.moyering.gathering.repository;
 
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -227,9 +229,10 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 	@Transactional
 	public void responseToGatheringInquiry(GatheringInquiryDto gatheringInquiryDto) throws Exception {
 		QGatheringInquiry gatheringInquiry = QGatheringInquiry.gatheringInquiry;
+	    Date today = Date.valueOf(LocalDate.now());   
 		JPAUpdateClause clause = jpaQueryFactory.update(gatheringInquiry)
 				.set(gatheringInquiry.responseContent, gatheringInquiryDto.getResponseContent())
-				.set(gatheringInquiry.responseDate, gatheringInquiryDto.getResponseDate())
+				.set(gatheringInquiry.responseDate, today)
 				.where(gatheringInquiry.inquiryId.eq(gatheringInquiryDto.getInquiryId()));
 		clause.execute();
 	}

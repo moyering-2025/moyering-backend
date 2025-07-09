@@ -49,11 +49,6 @@ public class GatheringApply {
     @Column()
 	@CreationTimestamp
     private Date applyDate;
-    
-    @Column()
-    private Date approvalDate;
-    @Column()
-    private Date rejectionDate;
 
     @Column(columnDefinition = "TINYINT")
     private Boolean isApproved;
@@ -83,8 +78,6 @@ public class GatheringApply {
 	    		.aspiration(aspiration)
 	    		.applyDate(applyDate)
 	    		.isApprove(isApproved)
-    			.approvalDate(approvalDate)
-    			.rejectionDate(rejectionDate)
 	    		.build();
     }
 }
