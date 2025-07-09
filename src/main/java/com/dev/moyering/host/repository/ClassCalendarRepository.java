@@ -1,5 +1,6 @@
 package com.dev.moyering.host.repository;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -13,4 +14,5 @@ public interface ClassCalendarRepository extends JpaRepository<ClassCalendar, In
 	Optional<ClassCalendar> findByCalendarIdAndHostClass_ClassId(Integer calendarId, Integer classId);
 	List<ClassCalendar> findAllByHostClass_ClassIdAndStatus(Integer classId,String status);
 	List<ClassCalendar> findByHostClassClassId(Integer classId)throws Exception;
+	List<ClassCalendar> findByStartDateLessThanEqualAndStatus(Date classDate, String string)throws Exception;
 }
