@@ -250,6 +250,7 @@ public class FeedServiceImpl implements FeedService {
 
         Feed feed = feedDto.toEntity();
         feed.setUser(writer);
+
         if (images != null) {                                                          // 나중에 이미지 중복체크 넣기
             for (int i = 0; i < images.size() && i < 5; i++) {
                 MultipartFile img = images.get(i);
@@ -282,6 +283,13 @@ public class FeedServiceImpl implements FeedService {
 
         feedRepository.save(feed);
         Integer feedNum = feed.getFeedId();
+
+
+        UserBadge badge = userBadgeRepository.findById(writer.getUserId()).get();
+        if (badge != null) {
+            feedDto.setWriterBadgeImg(badge.getBadge_img());
+        }
+
         entityManager.clear();
         return feedNum;
     }
