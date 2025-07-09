@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dev.moyering.admin.service.AdminBadgeScoreService;
+
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.dto.FeedDto;
 import com.dev.moyering.socialing.dto.LikeListDto;
@@ -37,6 +39,8 @@ import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.entity.UserBadge;
 import com.dev.moyering.user.repository.UserBadgeRepository;
 import com.dev.moyering.user.repository.UserRepository;
+import com.dev.moyering.user.service.UserBadgeService;
+import com.dev.moyering.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +55,11 @@ public class FeedServiceImpl implements FeedService {
     private final LikeListRepository likeListRepository;
     private final UserRepository userRepository;
     private final UserBadgeRepository userBadgeRepository;
+
+	private final UserService userService;
+	private final AdminBadgeScoreService adminBadgeScoreService;
+	private final UserBadgeService userBadgeService;
+	
     private final FollowRepository followRepository;
     
     private final EntityManager entityManager;
@@ -291,6 +300,15 @@ public class FeedServiceImpl implements FeedService {
         }
 
         entityManager.clear();
+        
+        //소셜링 글 작성 시 포인트 획득
+        //증가시킬 포인트 찾기
+        Integer score = adminBadgeScoreService.getScoreByTitle("소셜링 게시글 작성");
+        //유저의 활동점수 증가
+        userService.addScore(feed.getUser().getUserId(), score);
+        //뱃지 획득 가능 여부 확인
+        userBadgeService.giveBadgeWithScore(feed.getUser().getUserId());
+        
         return feedNum;
     }
 

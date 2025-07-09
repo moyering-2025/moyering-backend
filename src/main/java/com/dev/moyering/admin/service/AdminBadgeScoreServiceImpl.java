@@ -71,4 +71,11 @@ public class AdminBadgeScoreServiceImpl implements AdminBadgeScoreService {
                 savedScore.getActiveScoreId(), savedScore.getTitle(), savedScore.getScore());
         return savedScore.toDto();
     }
+
+	@Override
+	public Integer getScoreByTitle(String title) throws Exception {
+		Integer score = adminBadgeScoreRepository.findByTitle(title).orElseThrow(()-> new Exception("해당 제목을 가진 데이터가 없습니다."))
+				.getScore();
+		return score;
+	}
 }
