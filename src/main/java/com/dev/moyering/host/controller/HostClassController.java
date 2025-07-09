@@ -162,6 +162,7 @@ public class HostClassController {
 	public ResponseEntity<Object> inquiryReply(@RequestParam Integer inquiryId, @RequestParam Integer hostId,
 			@RequestParam String iqResContent) {
 		try {
+			System.out.println("iq:"+iqResContent);
 			inquiryService.replyInquiry(inquiryId, hostId, iqResContent);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (Exception e) {

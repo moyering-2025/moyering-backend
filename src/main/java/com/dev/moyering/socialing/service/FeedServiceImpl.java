@@ -416,6 +416,20 @@ public class FeedServiceImpl implements FeedService {
         log.info(">> softDeleteById 완료");
     }
 
+	@Override
+	public Map<Integer,Integer> myFeedsLikeCount(Integer userId) throws Exception {
+		 List<Feed> feedList = feedRepository.findByUserUserId(userId);
+		    Map<Integer, Integer> likeCountMap = new HashMap<>();
+
+		    for (Feed feed : feedList) {
+		        Integer feedId = feed.getFeedId();
+		        int count = likeListRepository.findByFeedFeedId(feedId).size();
+		        likeCountMap.put(feedId, count);
+		    }
+
+		    return likeCountMap;
+	}
+
 
 }
 

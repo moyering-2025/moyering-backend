@@ -34,9 +34,10 @@ public class MainController {
 	private final ClassCalendarService classCalendarService;
 	private final GatheringService gatheringService;
 	private final BannerService bannerService;
-    private final HostClassService hostClassService;
-    private final MainService mainService;
+	private final HostClassService hostClassService;
+	private final MainService mainService;
 
+	
 	//메인페이지
     @GetMapping("/main")
     public ResponseEntity<Map<String, Object>> getMainClasses(@AuthenticationPrincipal PrincipalDetails principal) {
@@ -48,71 +49,70 @@ public class MainController {
 //        System.out.println(principal+"sdflsjflskjflaeh;glrikn");
 		try {
 			if (principal != null) {
-				 userId = principal.getUser().getUserId();
+				userId = principal.getUser().getUserId();
 			}
-			
+
 			classes = classCalendarService.getRecommendHostClassesForUser2(userId);
 			gathers = gatheringService.getMainGathersForUser(userId);
-			
+
 			hotClasses = classCalendarService.getHotHostClasses();
 			banners = bannerService.getMainBnanerList(1);
+			System.out.println(gathers + "sss");
 //			System.out.println(gathers+"sss");
 			Map<String, Object> result = new HashMap<>();
 			result.put("classes", classes);
 			result.put("hotClasses", hotClasses);
 			result.put("gathers", gathers);
 			result.put("banners", banners);
-	        return ResponseEntity.ok(result);
+			return ResponseEntity.ok(result);
 		} catch (Exception e) {
 			e.printStackTrace();
-	        return ResponseEntity.internalServerError().build(); // 500 에러 응답
+			return ResponseEntity.internalServerError().build(); // 500 에러 응답
 		}
 
-    }
-    
-    //게더링 리스트
-    @PostMapping("/gatheringList")
-    public ResponseEntity<PageResponseDto<GatheringDto>> searchClasses(
-            @RequestBody GatheringSearchRequestDto dto) {
-    	PageResponseDto<GatheringDto> response;
+	}
+
+	// 게더링 리스트
+	@PostMapping("/gatheringList")
+	public ResponseEntity<PageResponseDto<GatheringDto>> searchClasses(@RequestBody GatheringSearchRequestDto dto) {
+		PageResponseDto<GatheringDto> response;
 
 		try {
 			response = gatheringService.searchGathers(dto);
-	        return ResponseEntity.ok(response);
+			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			e.printStackTrace();
-	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-    }
-    
-    @PostMapping("/classList")
-    public ResponseEntity<PageResponseDto<HostClassDto>> searchClasses(
-            @RequestBody ClassSearchRequestDto dto) {
-    	PageResponseDto<HostClassDto> response;
-    	dto.setSize(16);
+	}
+
+	@PostMapping("/classList")
+	public ResponseEntity<PageResponseDto<HostClassDto>> searchClasses(@RequestBody ClassSearchRequestDto dto) {
+		PageResponseDto<HostClassDto> response;
+		dto.setSize(16);
 
 		try {
 			response = hostClassService.searchClasses(dto);
-	        return ResponseEntity.ok(response);
+			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			e.printStackTrace();
-	        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);			
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-    }
-    
-    @PostMapping("/searchAll")
-    public ResponseEntity<Map<String,Object>> searchAll(
-    		@RequestBody MainSearchRequestDto dto){
-    	try {
-    		Map<String,Object> list = mainService.searchAllBySearchQuery(dto); 
-    		System.out.println(list);
-    		
-    		return new ResponseEntity<>(list,HttpStatus.OK);
-    	}catch (Exception e) {
-    		e.printStackTrace();
-    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    	}
-    	
-    }
-    
+	}
+
+	@PostMapping("/searchAll")
+	public ResponseEntity<Map<String, Object>> searchAll(@RequestBody MainSearchRequestDto dto) {
+		try {
+			Map<String, Object> list = mainService.searchAllBySearchQuery(dto);
+			System.out.println("Feed List Size: " + ((List<?>) list.get("feedList")).size());
+			System.out.println("Gathering List Size: " + ((List<?>) list.get("gatheringList")).size());
+			System.out.println("Host Class List Size: " + ((List<?>) list.get("hostClassList")).size());
+			return new ResponseEntity<>(list, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+	}
+
 }

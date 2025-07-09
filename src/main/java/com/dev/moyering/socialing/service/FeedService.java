@@ -44,4 +44,6 @@ public interface FeedService {
     List<FeedDto> getPopularFeeds(Integer page, Integer size) throws Exception;
 
     void deleteFeed(Integer feedId,Integer userId) throws Exception;
+    
+    Map<Integer,Integer> myFeedsLikeCount(Integer userId) throws Exception;
 }

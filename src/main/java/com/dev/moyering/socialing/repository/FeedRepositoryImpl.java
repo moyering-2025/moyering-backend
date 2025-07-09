@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -274,15 +275,18 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     }
 
 	@Override
-	public List<Feed> findSearchFeed(MainSearchRequestDto dto) {
+	public Page<Feed> findSearchFeed(MainSearchRequestDto dto,Pageable pageable) {
 		QFeed feed = QFeed.feed;
 		
 		BooleanBuilder builder = new BooleanBuilder();
 		builder.or(feed.content.containsIgnoreCase(dto.getSearchQuery()));
 		
-		List<Feed> content = jpaQueryFactory.selectFrom(feed).where(builder).fetch();
+		List<Feed> content = jpaQueryFactory.selectFrom(feed)
+				.where(builder)
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize()).fetch();
 		long total = jpaQueryFactory.selectFrom(feed).where(builder).fetchCount();
 		
-		return content;
+		return new PageImpl<>(content,pageable,total);
 	}
 }
