@@ -17,13 +17,13 @@ import com.dev.moyering.gathering.repository.MessageRepository;
 @Service
 public class MessageServiceImpl implements MessageService {
 	@Autowired
-	GatheringInquiryRepository gatheringInquiryRepository;
+	private GatheringInquiryRepository gatheringInquiryRepository;
 	@Autowired
-	GatheringRepository gatheringRepository;
+	private GatheringRepository gatheringRepository;
 	@Autowired
-	GatheringApplyRepository gatheringApplyRepository;
+	private GatheringApplyRepository gatheringApplyRepository;
 	@Autowired
-	MessageRepository messageRepository;
+	private MessageRepository messageRepository;
 	@Override
 	public Boolean sendMessage(Integer gatheringId, Integer senderId, String messageContent) throws Exception {
 		//MessageDto messageDto = new MessageDto(gatheringId, senderId, messageContent);
@@ -65,9 +65,19 @@ public class MessageServiceImpl implements MessageService {
 		 return messageList;
 	}
 	@Override
-	public List<MessageDto> getMessageRoomListUserId(Integer userId) throws Exception {
-		 List<MessageDto> messageRoomList = messageRepository.getMessageRoomListUserId(userId);
+	public List<MessageDto> getAvailableMessageRoomList(Integer userId) throws Exception {
+//		public List<MessageDto> getMessageRoomListUserId(Integer userId) throws Exception {
+		 List<MessageDto> messageRoomList = messageRepository.getAvailableMessageRoomListUserId(userId);
+//		 List<MessageDto> messageRoomList = messageRepository.getMessageRoomListUserId(userId);
 			
 		 return messageRoomList;
+	}
+	@Override
+	public List<MessageDto> getDisableMessageRoomList(Integer userId) throws Exception {
+//		public List<MessageDto> getMessageRoomListUserId(Integer userId) throws Exception {
+		List<MessageDto> messageRoomList = messageRepository.getDisableMessageRoomListUserId(userId);
+//		 List<MessageDto> messageRoomList = messageRepository.getMessageRoomListUserId(userId);
+		
+		return messageRoomList;
 	}
 }

@@ -1,5 +1,6 @@
 package com.dev.moyering.gathering.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import com.dev.moyering.common.dto.AlarmDto;
 import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.GatheringDto;
+import com.dev.moyering.gathering.dto.MessageDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringApply;
 import com.dev.moyering.gathering.repository.GatheringApplyRepository;
@@ -87,6 +89,7 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 		//주최자 시점 수락여부 결정
 		gatheringApplyRepository.updateGatheringApplyApproval(gatheringApplyId, isApproved);
 		Optional<GatheringApply> oGatheringApply = gatheringApplyRepository.findById(gatheringApplyId);
+	
 		AlarmDto.AlarmDtoBuilder builder = AlarmDto.builder()
 				.alarmType(3)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
 				.title("참여 신청 상태 변경") 
@@ -97,6 +100,20 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 			builder.content(oGatheringApply.get().getGathering().getUser().getNickName()+"님께서는 "+oGatheringApply.get().getGathering().getTitle()+"에 수락되셨습니다.");
 		}else {
 			builder.content(oGatheringApply.get().getGathering().getUser().getNickName()+"님께서는 "+oGatheringApply.get().getGathering().getTitle()+"에 거절되셨습니다.");
+			Integer rejectedUserId = oGatheringApply.get().getUser().getUserId();
+	        Integer gatheringId = oGatheringApply.get().getGathering().getGatheringId();
+	        Date today = new Date();
+	        try {
+	            int updatedCount =  messageRepository.updateMessageDisableTimeIfExists(rejectedUserId, gatheringId, today);
+	            if (updatedCount > 0) {
+	                System.out.println("메시지 비활성화 완료: " + updatedCount + "개의 메시지 업데이트");
+	            } else {
+	                System.out.println("비활성화할 메시지가 없습니다.");
+	            }
+	        } catch (Exception e) {
+	            System.err.println("메시지 비활성화 중 오류: " + e.getMessage());
+	            // 오류가 발생해도 알람은 정상적으로 보내도록 처리
+	        }
 		}
 		System.out.println("98 알람 보내기 테스트 "+ builder.build());
 		alarmService.sendAlarm(builder.build());
@@ -126,7 +143,6 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 	}
 	@Override
 	public Integer selectMyApplyListCount(Integer userId, String word, String status) throws Exception {
-		// TODO Auto-generated method stub
 		return gatheringApplyRepository.findMyApplyListCount(userId, word, status).intValue();
 	}
 	@Override
@@ -151,4 +167,5 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
        gatheringApplyRepository.deleteById(gatheringApplyId);
 //       messageRepository
 	}
+	
 }

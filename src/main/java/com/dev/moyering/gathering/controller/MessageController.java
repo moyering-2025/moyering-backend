@@ -56,7 +56,11 @@ public class MessageController {
 			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
 			Integer gatheringId = (Integer) param.get("gatheringId");
 			String messageContent = (String) param.get("content");
-			MessageDto messageDto = new MessageDto(gatheringId, principal.getUser().getUserId(), messageContent);
+			MessageDto messageDto = new MessageDto();
+			messageDto.setGatheringId(gatheringId);
+			messageDto.setSenderId(principal.getUser().getUserId());
+			messageDto.setMessageContent(messageContent);
+			
 			System.out.println("messageDto : "+messageDto);
 			return new ResponseEntity<Boolean>(sendSuccess, HttpStatus.OK);
 		} catch(Exception e) {
@@ -69,9 +73,12 @@ public class MessageController {
 	public ResponseEntity<Map<String, Object>> messageRoomList(@AuthenticationPrincipal PrincipalDetails principal){
 		try {
 			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
-			List<MessageDto> getMessageRoomList = messageService.getMessageRoomListUserId(principal.getUser().getUserId());
+			List<MessageDto> availableMessageRoomList = messageService.getAvailableMessageRoomList(principal.getUser().getUserId());
+			List<MessageDto> disableMessageRoomList = messageService.getDisableMessageRoomList(principal.getUser().getUserId());
 	        Map<String, Object> res = new HashMap<>();
-	        res.put("myMessageRoomList", getMessageRoomList);
+	        System.out.println("disableMessageRoomList: "+disableMessageRoomList);
+	        res.put("availableMessageRoomList", availableMessageRoomList);
+	        res.put("disableMessageRoomList", disableMessageRoomList);
 	        return new ResponseEntity<>(res, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();

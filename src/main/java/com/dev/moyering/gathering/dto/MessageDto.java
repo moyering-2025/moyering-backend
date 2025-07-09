@@ -58,60 +58,27 @@ public class MessageDto {
 		this.senderId = senderId;
 		this.messageContent = messageContent;
 	}
-	// 쿼리에서 사용하는 생성자
-	public MessageDto(Integer gatheringId, String gatheringTitle, String thumbnailFileName, 
-	                  Boolean gatheringState, Integer organizerUserId, Date meetingDate, 
-	                  Date writeDate, Date messageDisableTime, Date messageAvailableTime, 
-	                  Boolean messageRoomState) {
-	    this.gatheringId = gatheringId;
-	    this.gatheringTitle = gatheringTitle;
-	    this.thumbnailFileName = thumbnailFileName;
-	    this.gatheringState = gatheringState;
-	    this.organizerUserId = organizerUserId;
-	    this.meetingDate = meetingDate;
-	    this.writeDate = writeDate; // latestMessageDate
-	    this.messageDisableTime = messageDisableTime;
-	    this.messageAvailableTime = messageAvailableTime;
-	    this.messageRoomState = messageRoomState;
-	    
-	    // 쿼리에서 제공되지 않는 필드들은 기본값 설정
-	    this.messageId = null;
-	    this.senderId = null;
-	    this.senderNickname = null;
-	    this.senderProfile = null;
-	    this.messageContent = null;
-	    this.messageHide = null;
-	}
-	 public MessageDto(Integer gatheringId, Integer messageId, Integer senderId, 
-             String senderNickname, String senderProfile, String messageContent, 
-             Boolean messageHide, Date writeDate) {
-				this.gatheringId = gatheringId;
-				this.messageId = messageId;
-				this.senderId = senderId;
-				this.senderNickname = senderNickname;
-				this.senderProfile = senderProfile;
-				this.messageContent = messageContent;
-				this.messageHide = messageHide;
-				this.writeDate = writeDate;
-	 	}
 
-	public MessageDto(Integer messageId, Integer gatheringId, String gatheringTitle, String thumbnailFileName,
-			Boolean gatheringState, Integer organizerUserId, Date meetingDate, Integer senderId, String senderNickname,
-			String senderProfile, String messageContent, Date writeDate, Boolean messageHide,
-			Boolean messageRoomState) {
-		this.messageId = messageId;
+	public MessageDto(Integer gatheringId, String gatheringTitle, String thumbnailFileName, Integer organizerUserId,
+			Date meetingDate, Boolean messageRoomState) {
+		super();
 		this.gatheringId = gatheringId;
 		this.gatheringTitle = gatheringTitle;
 		this.thumbnailFileName = thumbnailFileName;
-		this.gatheringState = gatheringState != null ? gatheringState : false;
 		this.organizerUserId = organizerUserId;
 		this.meetingDate = meetingDate;
+		this.messageRoomState = messageRoomState;
+	}
+	public MessageDto(Integer messageId, Integer gatheringId, Integer senderId, 
+            String senderNickname, String senderProfile, String messageContent, 
+            Boolean messageHide, Date writeDate) {
+		this.messageId = messageId;
+		this.gatheringId = gatheringId;
 		this.senderId = senderId;
 		this.senderNickname = senderNickname;
 		this.senderProfile = senderProfile;
 		this.messageContent = messageContent;
-		this.writeDate = writeDate;
 		this.messageHide = messageHide;
-		this.messageRoomState = messageRoomState != null ? messageRoomState : false;
+		this.writeDate = writeDate;
 	}
 }

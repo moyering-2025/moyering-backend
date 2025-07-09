@@ -2,6 +2,7 @@ package com.dev.moyering.gathering.repository;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -119,17 +120,13 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	@Override
 	@Transactional
 	public void updateGatheringApplyApproval(Integer gatheringApplyId, boolean isApproved) throws Exception {
+		  LocalDateTime now = LocalDateTime.now();
+		
 	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
 	    JPAUpdateClause clause = jpaQueryFactory.update(gatheringApply)
 	            .set(gatheringApply.isApproved, isApproved)
+	            .set(gatheringApply.approvedUpdate, now)
 	            .where(gatheringApply.gatheringApplyId.eq(gatheringApplyId));
-//	    java.sql.Date today = java.sql.Date.valueOf(LocalDate.now());
-//	    if(isApproved) {
-//	        clause.set(gatheringApply.rejectionDate,(Date) null)
-//            .set(gatheringApply.approvalDate, today);
-//	    } else {
-//	        clause.set(gatheringApply.rejectionDate, today);
-//	    }
 	    clause.execute();
 	}
 
@@ -261,7 +258,7 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
             .where(gatheringApply.gatheringApplyId.eq(gatheringApplyId))
             .execute();
 		 if (deletedCount == 0) {
-			 throw new Exception("비상~~~!");
+			 throw new Exception();
 		 }
     }
 }
