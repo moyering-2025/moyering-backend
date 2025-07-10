@@ -45,6 +45,7 @@ public class UserDto {
 	private Boolean emailVerified;
 	private String emialVerificationToken;
 	private String badgeImg;
+	private Integer follower;
 
 	public User toEntity() {
 		User entity = User.builder()

@@ -3,7 +3,7 @@ package com.dev.moyering.user.service;
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
 import com.dev.moyering.common.service.EmailService;
-
+import com.dev.moyering.socialing.repository.FollowRepository;
 import com.dev.moyering.user.dto.UserBadgeDto;
 import com.dev.moyering.user.dto.UserProfileDto;
 import com.dev.moyering.user.dto.UserProfileUpdateDto;
@@ -39,6 +39,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+	@Autowired
+	private FollowRepository followRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -117,7 +119,10 @@ public class UserServiceImpl implements UserService {
 
     public UserDto findUserByUserId(Integer userId) throws Exception {
         User user = userRepository.findById(userId).orElseThrow(() -> new Exception("멤버 조회 오류"));
-        return user.toDto();
+        Integer myFollowerCnt =  followRepository.countByFollowing(user);
+        UserDto userDto = user.toDto();
+        userDto.setFollower(myFollowerCnt);
+        return userDto;
     }
 
     @Override

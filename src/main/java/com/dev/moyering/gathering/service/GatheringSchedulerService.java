@@ -83,8 +83,7 @@ public class GatheringSchedulerService {
             Integer minAttendees = gathering.getMinAttendees();
             
             // 승인된 참여자 수 조회
-            Integer approvedCount = gatheringApplyRepository.findApprovedUserCountByGatheringId(gatheringId);
-            
+            Integer approvedCount = gatheringApplyRepository.countByGatheringGatheringIdAndIsApprovedTrue(gatheringId).intValue();            
             logger.info("모임 ID: {}, 최소 참여 인원: {}, 승인된 참여자 수: {}", 
                        gatheringId, minAttendees, approvedCount);
             

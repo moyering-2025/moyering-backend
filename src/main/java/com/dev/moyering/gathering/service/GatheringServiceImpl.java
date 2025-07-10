@@ -96,9 +96,9 @@ public class GatheringServiceImpl implements GatheringService {
 	        Integer gatheringId = gathering.getGatheringId();
 	        
 	        // 참여 수락된 인원수 조회
-	        Integer acceptedCount = gatheringApplyRepository.findApprovedUserCountByGatheringId(gatheringId);
+	        Integer acceptedCount = gatheringApplyRepository.countByGatheringGatheringIdAndIsApprovedTrue(gatheringId).intValue();
 	        // 전체 참여신청 인원수 조회  
-	        Integer appliedCount = gatheringApplyRepository.findApplyUserCountByGatheringId(gatheringId);
+	        Integer appliedCount = gatheringApplyRepository.countByGatheringGatheringId(gatheringId).intValue();
 	        
 	        // DTO에 값 설정
 	        gathering.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);

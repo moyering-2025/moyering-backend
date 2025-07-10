@@ -206,7 +206,7 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 		QGatheringInquiry gatheringInquiry = QGatheringInquiry.gatheringInquiry;
 
 		List<GatheringInquiry> inquiryList = jpaQueryFactory.selectFrom(gatheringInquiry)
-				.leftJoin(gatheringInquiry.user).fetchJoin() // User 정보를 함께 조회
+				.leftJoin(gatheringInquiry.user).fetchJoin() 
 				.leftJoin(gatheringInquiry.gathering).fetchJoin() // Gathering 정보를 함께 조회
 				.where(gatheringInquiry.gathering.gatheringId.eq(gatheringId))
 				.orderBy(gatheringInquiry.inquiryId.desc()).fetch();

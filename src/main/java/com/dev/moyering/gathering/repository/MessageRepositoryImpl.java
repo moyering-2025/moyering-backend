@@ -207,7 +207,7 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
 	            u.profile,
 	            new CaseBuilder()
 	                .when(m.messageHide.eq(true))
-	                .then("주최자가 가린 메시지 입니다")
+	                .then("모임장이 가린 메시지 입니다")
 	                .otherwise(m.messageContent),
 	            m.messageHide,
 	            m.writeDate

@@ -42,7 +42,8 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 
 	@Override
 	public Integer findApprovedUserCountByGatheringId(Integer gatheringId) throws Exception {
-		return gatheringApplyRepository.findApprovedUserCountByGatheringId(gatheringId);
+//		return gatheringApplyRepository.findApprovedUserCountByGatheringId(gatheringId);
+        return gatheringApplyRepository.countByGatheringGatheringIdAndIsApprovedTrue(gatheringId).intValue();
 	}
 	@Override
 	public List<GatheringApplyDto> findApprovedUserListByGatheringId(Integer gatheringId) throws Exception {
@@ -58,7 +59,8 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 	@Override
 	public Integer findByGatheringIdAndUserId(Integer gatheringId, Integer userId) throws Exception {
 		//상세보기용, 신청여부 조회 
-		return gatheringApplyRepository.findByGatheringIdAndUserId(gatheringId, userId);
+//		return gatheringApplyRepository.findByGatheringIdAndUserId(gatheringId, userId);
+		 return gatheringApplyRepository.countByGatheringGatheringIdAndUserUserId(gatheringId, userId).intValue();
 	} 
 	@Override
 	public Integer applyToGathering(GatheringApplyDto gatheringApplyDto) throws Exception {
@@ -136,7 +138,7 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 	    // 2. 각 게더링별 참여 중인 인원수 정보 추가
 	    for (GatheringApplyDto gatheringApplyDto : gatheringApplyList) {
 	        Integer gatheringId = gatheringApplyDto.getGatheringId();
-	        Integer acceptedCount = gatheringApplyRepository.findApprovedUserCountByGatheringId(gatheringId);
+	        Integer acceptedCount = gatheringApplyRepository.countByGatheringGatheringIdAndIsApprovedTrue(gatheringId).intValue();
 	        gatheringApplyDto.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);
 	    }
 	    return gatheringApplyList;
