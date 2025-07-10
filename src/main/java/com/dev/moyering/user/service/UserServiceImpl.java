@@ -10,6 +10,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.dev.moyering.admin.dto.AdminMemberDto;
+import com.dev.moyering.admin.dto.AdminMemberSearchCond;
+import com.dev.moyering.common.service.EmailService;
+import com.dev.moyering.socialing.repository.FollowRepository;
+import com.dev.moyering.user.dto.UserBadgeDto;
+import com.dev.moyering.user.dto.UserProfileDto;
+import com.dev.moyering.user.dto.UserProfileUpdateDto;
+import com.dev.moyering.user.entity.UserBadge;
+import com.dev.moyering.user.repository.UserBadgeRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -40,6 +52,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+	@Autowired
+	private FollowRepository followRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -119,7 +133,10 @@ public class UserServiceImpl implements UserService {
 
     public UserDto findUserByUserId(Integer userId) throws Exception {
         User user = userRepository.findById(userId).orElseThrow(() -> new Exception("멤버 조회 오류"));
-        return user.toDto();
+        Integer myFollowerCnt =  followRepository.countByFollowing(user);
+        UserDto userDto = user.toDto();
+        userDto.setFollower(myFollowerCnt);
+        return userDto;
     }
 
     @Override
@@ -212,6 +229,7 @@ public class UserServiceImpl implements UserService {
             user.setProfile(fileName);
         }
 
+        user.setUsername(dto.getUsername());
         user.setName(dto.getName());
         user.setTel(dto.getTel());
         user.setEmail(dto.getEmail());
@@ -240,6 +258,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
 
         UserProfileDto dto = new UserProfileDto();
+        dto.setUsername(user.getUsername());
         dto.setName(user.getName());
         dto.setTel(user.getTel());
         dto.setEmail(user.getEmail());

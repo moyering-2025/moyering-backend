@@ -13,6 +13,15 @@ import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringApply;
 
 public interface GatheringApplyRepository extends JpaRepository<GatheringApply, Integer>, GatheringApplyRepositoryCustom {
-	
+    Optional<GatheringApply> findByGatheringGatheringIdAndUserUserId(Integer gatheringId, Integer userId);
+ 
+    Long countByGatheringGatheringIdAndUserUserId(Integer gatheringId, Integer userId);
+    Long countByGatheringGatheringId(Integer gatheringId);
+    Long countByGatheringGatheringIdAndIsApprovedTrue(Integer gatheringId);
+    
+    Boolean existsByGatheringGatheringIdAndUserUserId(Integer gatheringId, Integer userId);
+    Boolean existsByGatheringGatheringIdAndUserUserIdAndIsApprovedTrue(Integer gatheringId, Integer userId);
+    
+    void deleteByGatheringApplyId(Integer gatheringApplyId);
 
 }

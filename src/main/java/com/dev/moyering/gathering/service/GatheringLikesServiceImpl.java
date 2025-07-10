@@ -1,7 +1,10 @@
 package com.dev.moyering.gathering.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +23,7 @@ public class GatheringLikesServiceImpl implements GatheringLikesService {
 	@Override
 	public Integer getTotalLikesOfGatheringByGatheringId(Integer gatheringId) throws Exception {
 
-		Integer totalLikes = gatheringLikesRepository.countByGatheringId(gatheringId);
+		Integer totalLikes = gatheringLikesRepository.countByGatheringGatheringId(gatheringId).intValue();
 		System.out.println("totalLikes : "+totalLikes);
 		return totalLikes;
 	}
@@ -29,15 +32,13 @@ public class GatheringLikesServiceImpl implements GatheringLikesService {
 	public Boolean getGatheringLike(Integer userId, Integer gatheringId) throws Exception {
 		//좋아요 여부 조회
 		return gatheringLikesRepository.selectGatheringLikes(userId, gatheringId)!=null;
-	
+//		return gatheringLikesRepository.findGatheringLikeIdByGatheringGatheringIdAndUserUserId(gatheringId, userId).isPresent();
 	}
 
 	@Override
+	@Transactional
 	public Boolean toggleGatheringLike(Integer userId, Integer gatheringId) throws Exception {
-		// 좋아요 상태 변경
-		
 		Integer gatheringLikeNum = gatheringLikesRepository.selectGatheringLikes(userId, gatheringId); 
-		System.out.println("gatheringLikeNum : "+gatheringLikeNum);
 		if(gatheringLikeNum==null) {
 			gatheringLikesRepository.save(
 					GatheringLikes.builder()
