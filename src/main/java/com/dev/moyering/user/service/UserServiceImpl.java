@@ -126,6 +126,11 @@ public class UserServiceImpl implements UserService {
         user.setRegDate(Date.valueOf(LocalDate.now()));
         user.setActiveScore(0);
         user.setUserBadgeId(1);
+        user.setBirthday(userDto.getBirthday());
+        user.setAddr(userDto.getAddr());
+        user.setDetailAddr(userDto.getDetailAddr());
+        user.setLatitude(userDto.getLatitude());
+        user.setLongitude(userDto.getLongitude());
         userRepository.save(user);
         userBadgeService.giveBadge(user.getUserId(), 1);
     }
