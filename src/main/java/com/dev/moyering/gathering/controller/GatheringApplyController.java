@@ -47,7 +47,6 @@ public class GatheringApplyController {
 	public String applyGathering(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestBody Map<String, Object> param){
 		try {
-			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
 			Integer gatheringId = (Integer) param.get("gatheringId");
 			String aspiration = (String) param.get("aspiration");
 			String title = (String) param.get("title");

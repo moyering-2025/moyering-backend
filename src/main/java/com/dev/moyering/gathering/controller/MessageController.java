@@ -51,9 +51,7 @@ public class MessageController {
 	public ResponseEntity<Boolean> sendMessage(@AuthenticationPrincipal PrincipalDetails principal, 
 			@RequestBody Map<String, Object> param){
 		try {
-			System.out.println(param);
 			Boolean sendSuccess = null;
-			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
 			Integer gatheringId = (Integer) param.get("gatheringId");
 			String messageContent = (String) param.get("content");
 			sendSuccess = messageService.sendMessage(gatheringId, principal.getUser().getUserId(), messageContent);
@@ -67,11 +65,9 @@ public class MessageController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> messageRoomList(@AuthenticationPrincipal PrincipalDetails principal){
 		try {
-			System.out.println("로그인된 아이디 : "+principal.getUser().getUserId());
 			List<MessageDto> availableMessageRoomList = messageService.getAvailableMessageRoomList(principal.getUser().getUserId());
 			List<MessageDto> disableMessageRoomList = messageService.getDisableMessageRoomList(principal.getUser().getUserId());
 	        Map<String, Object> res = new HashMap<>();
-	        System.out.println("disableMessageRoomList: "+disableMessageRoomList);
 	        res.put("availableMessageRoomList", availableMessageRoomList);
 	        res.put("disableMessageRoomList", disableMessageRoomList);
 	        return new ResponseEntity<>(res, HttpStatus.OK);

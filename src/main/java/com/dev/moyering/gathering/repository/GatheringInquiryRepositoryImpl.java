@@ -50,7 +50,6 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 	    if (optionalConditions.hasValue()) {
 	        whereCondition.and(optionalConditions);
 	    }
-	    System.out.println("최종 WHERE 조건: " + whereCondition);
 	    
 	    List<GatheringInquiry> entities = jpaQueryFactory
 	        .selectFrom(inquiry)
@@ -62,9 +61,6 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 	        .offset(pageRequest.getOffset())
 	        .limit(pageRequest.getPageSize())
 	        .fetch();
-	    
-	    System.out.println("조회된 결과 수: " + entities.size());
-	    
 	    return entities.stream()
 	        .map(GatheringInquiry::toDto)
 	        .collect(Collectors.toList());
@@ -128,9 +124,6 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 	    
 	    if (optionalConditions.hasValue()) {
 	        whereCondition.and(optionalConditions);
-	        System.out.println("선택적 조건이 적용됨");
-	    } else {
-	        System.out.println("선택적 조건이 없음");
 	    }
 	    
 	    List<GatheringInquiry> entities = jpaQueryFactory
@@ -143,8 +136,6 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 	        .offset(pageRequest.getOffset())
 	        .limit(pageRequest.getPageSize())
 	        .fetch();
-	    
-	    System.out.println("조회된 결과 수: " + entities.size());
 	    
 	    return entities.stream()
 	        .map(GatheringInquiry::toDto)
@@ -178,7 +169,6 @@ public class GatheringInquiryRepositoryImpl implements GatheringInquiryRepositor
 	        .where(whereCondition)
 	        .fetchOne();
 	    
-	    System.out.println("Count 결과: " + count);
 	    return count;
 	}
 
