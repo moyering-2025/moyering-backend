@@ -9,16 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class HostFeedResponseDto {
-    private Integer feedId;
-    private Integer writerUserId;
-    private String hostName;
+public class HostFeedUpdateDto {
     private String content;
-    private String img1;
-    private String img2;
-    private String img3;
-    private String img4;
-    private String img5;
     private String tag1;
     private String tag2;
     private String tag3;

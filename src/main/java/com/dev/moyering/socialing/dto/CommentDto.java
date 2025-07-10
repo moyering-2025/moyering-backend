@@ -31,6 +31,8 @@ public class CommentDto {
     private String writerId;
     private Integer userBadge;
 
+    private String parentWriterId;
+
     private List<CommentDto> replies;
 
     public Comment toEntity() {

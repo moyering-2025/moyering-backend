@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class UserProfileUpdateDto {
+    private String username;
     private String name;
     private String tel;
     private String email;

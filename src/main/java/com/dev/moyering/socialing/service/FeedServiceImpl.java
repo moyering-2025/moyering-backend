@@ -259,6 +259,7 @@ public class FeedServiceImpl implements FeedService {
 
         Feed feed = feedDto.toEntity();
         feed.setUser(writer);
+
         if (images != null) {                                                          // 나중에 이미지 중복체크 넣기
             for (int i = 0; i < images.size() && i < 5; i++) {
                 MultipartFile img = images.get(i);
@@ -291,6 +292,14 @@ public class FeedServiceImpl implements FeedService {
 
         feedRepository.save(feed);
         Integer feedNum = feed.getFeedId();
+
+
+//        UserBadge badge = userBadgeRepository.findById(writer.getUserId()).get();
+        UserBadge badge = userBadgeRepository.findById(writer.getUserId()).orElseThrow(() -> new Exception("배지를 찾을 수 없습니다."));
+        if (badge != null) {
+            feedDto.setWriterBadgeImg(badge.getBadge_img());
+        }
+
         entityManager.clear();
         
         //소셜링 글 작성 시 포인트 획득

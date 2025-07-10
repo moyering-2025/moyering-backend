@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class UserProfileDto {
+    private String username;
     private String name;
     private String tel;
     private String email;
