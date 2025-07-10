@@ -210,6 +210,7 @@ public class UserServiceImpl implements UserService {
             user.setProfile(fileName);
         }
 
+        user.setUsername(dto.getUsername());
         user.setName(dto.getName());
         user.setTel(dto.getTel());
         user.setEmail(dto.getEmail());
@@ -238,6 +239,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("유저 없음"));
 
         UserProfileDto dto = new UserProfileDto();
+        dto.setUsername(user.getUsername());
         dto.setName(user.getName());
         dto.setTel(user.getTel());
         dto.setEmail(user.getEmail());
