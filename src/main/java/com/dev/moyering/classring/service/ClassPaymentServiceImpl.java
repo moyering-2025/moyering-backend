@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,8 +16,12 @@ import com.dev.moyering.classring.dto.ClassPaymentResponseDto;
 import com.dev.moyering.classring.dto.PaymentApproveRequestDto;
 import com.dev.moyering.classring.dto.PaymentInitRequestDto;
 import com.dev.moyering.classring.dto.UserCouponDto;
+import com.dev.moyering.classring.dto.UserPaymentHistoryDto;
+import com.dev.moyering.classring.dto.UtilSearchDto;
+import com.dev.moyering.classring.dto.WishlistItemDto;
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.classring.repository.UserCouponRepository;
+import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.entity.ClassCalendar;
@@ -169,5 +176,18 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
 	            .build();
 
 	    userPaymentRepository.save(payment);		
-	}	
+	}
+
+	@Override
+	public PageResponseDto<UserPaymentHistoryDto> getUserPaymentHistory(UtilSearchDto dto) throws Exception {
+	    Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
+	    Page<UserPaymentHistoryDto> pageResult = userPaymentRepository.findUserPaymentHistory(dto, pageable);
+        
+	    return PageResponseDto.<UserPaymentHistoryDto>builder()
+	            .content(pageResult.getContent())
+	            .currentPage(pageResult.getNumber() + 1)
+	            .totalPages(pageResult.getTotalPages())
+	            .totalElements(pageResult.getTotalElements())
+	            .build();
+	    }	
 }
