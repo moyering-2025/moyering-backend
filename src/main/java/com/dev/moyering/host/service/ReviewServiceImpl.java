@@ -20,7 +20,9 @@ import com.dev.moyering.admin.service.AdminBadgeScoreService;
 import com.dev.moyering.classring.dto.UserReviewResponseDto;
 import com.dev.moyering.classring.dto.UtilSearchDto;
 import com.dev.moyering.classring.dto.WritableReviewResponseDto;
+import com.dev.moyering.common.dto.AlarmDto;
 import com.dev.moyering.common.dto.PageResponseDto;
+import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.dto.ReviewSearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
@@ -45,6 +47,8 @@ public class ReviewServiceImpl implements ReviewService {
 	private final UserService userService;
 	private final AdminBadgeScoreService adminBadgeScoreService;
 	private final UserBadgeService userBadgeService;
+	private final AlarmService alarmService;
+
     @Value("${iupload.path}")
     private String uploadPath;
 
@@ -188,6 +192,21 @@ public class ReviewServiceImpl implements ReviewService {
         userService.addScore(reviewDto.getUserId(), score);
         //뱃지 획득 가능 여부 확인
         userBadgeService.giveBadgeWithScore(reviewDto.getUserId());
+        
+        System.out.println(saved);
+	    ClassCalendar calendar = calendarRepository.findById(reviewDto.getCalendarId())
+	            .orElseThrow(() -> new Exception("캘린더를 찾을 수 없습니다."));
+	    
+	    AlarmDto alarm =  AlarmDto.builder()
+	    		.alarmType(2)
+	    		.title("클래스 리뷰 등록")
+	    		.content(calendar.getHostClass().getName() +"에 대한 리뷰가 등록되었습니다.")
+	    		.receiverId(calendar.getHostClass().getHost().getUserId())
+	    		.senderId(reviewDto.getUserId())
+	    		.senderNickname(reviewDto.getStudentName())
+	    		.build();
+	    
+        alarmService.sendAlarm(alarm);
         return saved.getReviewId();
     }
 

@@ -11,10 +11,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dev.moyering.classring.dto.InquiryResponseDto;
 import com.dev.moyering.classring.dto.UtilSearchDto;
+import com.dev.moyering.common.dto.AlarmDto;
 import com.dev.moyering.common.dto.PageResponseDto;
+import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.dto.InquirySearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
@@ -35,6 +38,7 @@ public class InquiryServiceImpl implements InquiryService {
 	private final UserRepository userRepository;
 	private final ClassCalendarRepository calendarRepository;
 	private final HostClassRepository hostClassRepository;
+	private final AlarmService alarmService;
 	
 	@Override
 	public PageResponseDto<InquiryDto> getInquiryListByClassId(Integer classId, int page, int size) throws Exception {
@@ -52,6 +56,8 @@ public class InquiryServiceImpl implements InquiryService {
 				.totalElements(inquiryPage.getTotalElements())
 				.build();
 	}
+	
+	@Transactional
 	@Override
 	public Integer writeInquriy(InquiryDto dto) throws Exception {
 		User user = userRepository.findById(dto.getUserId())
@@ -68,6 +74,16 @@ public class InquiryServiceImpl implements InquiryService {
 	    		.build();
 	    inquiryRepository.save(inquiry);
 	    
+	    AlarmDto alarm =  AlarmDto.builder()
+	    		.alarmType(2)
+	    		.title("클래스 문의 등록")
+	    		.content(calendar.getHostClass().getName()+"에 대한 문의가 등록되었습니다.")
+	    		.receiverId(calendar.getHostClass().getHost().getUserId())
+	    		.senderId(dto.getUserId())
+	    		.senderNickname(dto.getStudentName())
+	    		.build();
+
+	    alarmService.sendAlarm(alarm);
 		return inquiry.getInquiryId();
 	}
 	@Override
