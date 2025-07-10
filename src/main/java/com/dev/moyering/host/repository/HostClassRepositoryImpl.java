@@ -279,5 +279,22 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		return firstList.stream().map(h->h.toDto()).collect(Collectors.toList());
 	}
 
+	@Override
+	public List<ClassCalendar> findByHostId(Integer hostId) {
+		QHost host = QHost.host;
+		QHostClass hostClass = QHostClass.hostClass;
+		QClassCalendar calendar = QClassCalendar.classCalendar;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(host.hostId.eq(hostId));
+		
+		List<ClassCalendar> list = jpaQueryFactory.selectFrom(calendar)
+				.leftJoin(calendar.hostClass,hostClass)
+				.leftJoin(hostClass.host,host)
+				.where(builder).fetch();
+		
+		return list;
+	}
+
 	
 }

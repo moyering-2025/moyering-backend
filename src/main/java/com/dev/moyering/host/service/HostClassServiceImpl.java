@@ -3,11 +3,11 @@ package com.dev.moyering.host.service;
 import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,6 +25,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
+import com.dev.moyering.admin.entity.AdminSettlement;
+import com.dev.moyering.admin.repository.AdminSettlementRepository;
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.common.entity.SubCategory;
@@ -38,12 +40,16 @@ import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.ClassRegist;
 import com.dev.moyering.host.entity.HostClass;
+import com.dev.moyering.host.entity.Inquiry;
 import com.dev.moyering.host.entity.QClassCalendar;
 import com.dev.moyering.host.entity.QHostClass;
+import com.dev.moyering.host.entity.Review;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.ClassRegistRepository;
 import com.dev.moyering.host.repository.HostClassRepository;
 import com.dev.moyering.host.repository.HostRepository;
+import com.dev.moyering.host.repository.InquiryRepository;
+import com.dev.moyering.host.repository.ReviewRepository;
 import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
@@ -64,6 +70,9 @@ public class HostClassServiceImpl implements HostClassService {
 	private final HostRepository hostRepository;
 	private final SubCategoryRepository subCategoryRepository;
 	private final ClassRegistRepository classRegistRepository;
+	private final InquiryRepository inquiryRepository;
+	private final ReviewRepository reviewRepository;
+	private final AdminSettlementRepository settlementRepository;
 
 	@Value("${iupload.path}")
 	private String iuploadPath;
@@ -125,15 +134,12 @@ public class HostClassServiceImpl implements HostClassService {
 		dates.forEach(date -> {
 			ClassCalendar cc = ClassCalendar.builder().startDate(date).endDate(date).status("승인대기")
 					.hostClass(HostClass.builder().classId(hostClass.getClassId()).build()).build();
-			
+
 			classCalendarRepository.save(cc);
 		});
 
 		return hostClass.getClassId();
 	}
-	
-	
-	
 
 	@Override
 	public PageResponseDto<HostClassDto> searchClasses(ClassSearchRequestDto dto) throws Exception {
@@ -427,11 +433,11 @@ public class HostClassServiceImpl implements HostClassService {
 		} else {
 			hostClassDto.setImgName2(classDto.getImgName2());
 		}
-			
+
 		if (files[2] != null && !files[2].isEmpty()) {
 			hostClassDto.setImgName3(files[2].getOriginalFilename());
 		} else {
-			hostClassDto.setImgName3(classDto.getImgName3());	
+			hostClassDto.setImgName3(classDto.getImgName3());
 		}
 		if (files[3] != null && !files[3].isEmpty()) {
 			hostClassDto.setImgName4(files[3].getOriginalFilename());
@@ -450,7 +456,7 @@ public class HostClassServiceImpl implements HostClassService {
 		}
 
 		hostClassRepository.save(hostClassDto.toEntity());
-		
+
 		return hostClassDto.getClassId();
 
 	}
@@ -459,7 +465,7 @@ public class HostClassServiceImpl implements HostClassService {
 	public List<UserDto> selectClassStudentList(Integer calendarId) throws Exception {
 		List<ClassRegist> classRegistList = classRegistRepository.findByClassCalendarCalendarId(calendarId);
 		List<User> studnetList = new ArrayList<>();
-		for(ClassRegist regist : classRegistList) {
+		for (ClassRegist regist : classRegistList) {
 			studnetList.add(userRepository.findById(regist.getUser().getUserId()).get());
 		}
 		List<UserDto> dtoList = studnetList.stream().map(User::toDto).collect(Collectors.toList());
@@ -470,34 +476,127 @@ public class HostClassServiceImpl implements HostClassService {
 	public List<UserDto> selectStudentList(Integer hostId) throws Exception {
 		List<ClassRegist> regList = classRegistRepository.findByCalendar_HostClass_Host_HostId(hostId);
 		List<UserDto> userDtoList = new ArrayList<>();
-		for(ClassRegist reg : regList) {
+		for (ClassRegist reg : regList) {
 			User user = userRepository.findById(reg.getUser().getUserId()).get();
 			userDtoList.add(user.toDto());
 		}
-		
+
 		return userDtoList;
 	}
 
 	@Override
 	public Page<UserDto> searchStudents(StudentSearchRequestDto dto) throws Exception {
-		PageRequest pageable = PageRequest.of(dto.getPage(),dto.getSize());
+		PageRequest pageable = PageRequest.of(dto.getPage(), dto.getSize());
 		Page<User> resultPage = hostClassRepository.searchClassStudent(dto, pageable);
 		return resultPage.map(User::toDto);
 	}
 
 	@Override
 	public List<CalendarUserDto> searchStudentClass(Integer hostId, Integer userId) throws Exception {
-		List<CalendarUserDto> dtoList=classRegistRepository.findByStudentClass(hostId, userId);
+		List<CalendarUserDto> dtoList = classRegistRepository.findByStudentClass(hostId, userId);
 		return dtoList;
 	}
 
 	@Override
-	public List<HostClassDto> getRecommendClassesInDetail(Integer subCategoryId,Integer classId) throws Exception {
-		SubCategory subCategory = subCategoryRepository.findById(subCategoryId).orElseThrow(()-> new Exception("해당 카테고리가 존재하지 않습니다.ㄴ"));
-		List<HostClassDto> result =hostClassRepository.findRecommendClassesInDetail(subCategoryId, subCategory.getFirstCategory().getCategoryId(), classId);
-		return 	result;
+	public List<HostClassDto> getRecommendClassesInDetail(Integer subCategoryId, Integer classId) throws Exception {
+		SubCategory subCategory = subCategoryRepository.findById(subCategoryId)
+				.orElseThrow(() -> new Exception("해당 카테고리가 존재하지 않습니다.ㄴ"));
+		List<HostClassDto> result = hostClassRepository.findRecommendClassesInDetail(subCategoryId,
+				subCategory.getFirstCategory().getCategoryId(), classId);
+		return result;
 	}
 
-	
+	@Override
+	public Map<String, Object> hostRateCount(Integer hostId) throws Exception {
+		Map<String, Object> map = new HashMap<>();
+		// 문의 응답률
+		List<Inquiry> inquiryList = inquiryRepository.hostInquiryCount(hostId);
+		int size = inquiryList.size();
+		int count = 0;
+		for (Inquiry iq : inquiryList) {
+			if (iq.getState() == 1) {
+				count++;
+			}
+		}
+		if (size == 0) {
+			map.put("inquiryRate", 0.0);
+		} else {
+			Double result = (count / (double) size) * 100;
+			result = Math.round(result * 100.0) / 100.0;
+			map.put("inquiryRate", result);
+
+		}
+
+		// 리뷰 총 갯수
+		List<Review> reviewList = reviewRepository.findByHostHostId(hostId);
+		map.put("reviewRate", reviewList.size());
+
+		// 평점
+		int star = 0;
+		for (Review review : reviewList) {
+			star += review.getStar();
+		}
+
+		double starRate = ((double) star / reviewList.size()) * 100;
+		starRate = Math.round(starRate * 100.0) / 100.0;
+		map.put("starRate", starRate);
+
+		// 이번달 진행한 클래스갯수
+		List<ClassCalendar> calendarList = hostClassRepository.findByHostId(hostId);
+		int calendarCount = 0;
+		for (ClassCalendar cal : calendarList) {
+			LocalDate currentDate = LocalDate.now();
+			LocalDate firstDayOfThisMonth = currentDate.withDayOfMonth(1);
+			LocalDate lastDayOfThisMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+			if (cal.getStatus().equals("종료") && !cal.getStartDate().before(Date.valueOf(firstDayOfThisMonth))
+					&& !cal.getStartDate().after(Date.valueOf(lastDayOfThisMonth))) {
+				calendarCount++;
+			}
+		}
+		map.put("calendarCount", calendarCount);
+
+		// 이번달 취소 건수
+		int cancleCount = 0;
+		for (ClassCalendar cal : calendarList) {
+			LocalDate currentDate = LocalDate.now();
+			LocalDate firstDayOfThisMonth = currentDate.withDayOfMonth(1);
+			LocalDate lastDayOfThisMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+			if (cal.getStatus().equals("폐강")
+					|| cal.getStatus().equals("반려") && !cal.getStartDate().before(Date.valueOf(firstDayOfThisMonth))
+							&& !cal.getStartDate().after(Date.valueOf(lastDayOfThisMonth))) {
+				cancleCount++;
+			}
+		}
+		map.put("cancleCount", cancleCount);
+
+		// 전체정상금액
+		List<AdminSettlement> settlementList = settlementRepository.findByHostIdsettlementList(hostId);
+		int settleCount = 0;
+		int allSettleCount = 0;
+		for (AdminSettlement settle : settlementList) {
+			if(settle.getSettlementStatus().equals("CP")) {
+				settleCount += settle.getSettlementAmount();	
+				allSettleCount++;
+			}
+		}
+		map.put("settleCount", settleCount);
+
+		//전체 결제 건수
+		map.put("payCount", allSettleCount);
+		
+		//이번달 판매금액
+		int thisMonthSettleCount = 0;
+		for(AdminSettlement settle : settlementList) {
+			LocalDate currentDate = LocalDate.now();
+			LocalDate firstDayOfThisMonth = currentDate.withDayOfMonth(1);
+			LocalDate lastDayOfThisMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+			if(settle.getSettlementStatus().equals("CP") && !settle.getSettlementDate().isBefore(firstDayOfThisMonth) && !settle.getSettlementDate().isAfter(lastDayOfThisMonth)) {
+				thisMonthSettleCount += settle.getSettlementAmount();
+			}
+		}
+		map.put("thisMonthSettle",thisMonthSettleCount);
+		
+		return map;
+	}
 
 }

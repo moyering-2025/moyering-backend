@@ -17,4 +17,5 @@ public interface InquiryService {
 	void replyInquiry(Integer inquiryId,Integer hostId,String iqResContent)throws Exception;
 	Page<InquiryDto> searchInquiries(InquirySearchRequestDto dto) throws Exception;
 	PageResponseDto<InquiryResponseDto> getMyInquiries(UtilSearchDto dto) throws Exception;
+	
 }

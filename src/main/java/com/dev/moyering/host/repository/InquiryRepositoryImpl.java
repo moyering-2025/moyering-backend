@@ -160,4 +160,24 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 		return new PageImpl<InquiryResponseDto>(content,pageable,total);
 	}
 
+
+	@Override
+	public List<Inquiry> hostInquiryCount(Integer hostId) {
+		QClassCalendar calendar = QClassCalendar.classCalendar;
+		QHostClass hostClass = QHostClass.hostClass;
+		QHost host = QHost.host;
+		QInquiry inquiry = QInquiry.inquiry;
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(host.hostId.eq(hostId));
+		
+		List<Inquiry> list = jpaQueryFactory.selectFrom(inquiry)
+				.leftJoin(inquiry.classCalendar,calendar)
+				.leftJoin(calendar.hostClass,hostClass)
+				.leftJoin(hostClass.host,host)
+				.where(builder).fetch();
+		
+		return list;
+	}
+
 }

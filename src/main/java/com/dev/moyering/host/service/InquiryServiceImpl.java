@@ -122,5 +122,6 @@ public class InquiryServiceImpl implements InquiryService {
 				.totalElements(pageResult.getTotalElements())
 				.build();
 	}
+	
 
 }
