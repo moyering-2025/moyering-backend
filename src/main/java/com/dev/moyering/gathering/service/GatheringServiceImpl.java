@@ -77,12 +77,12 @@ public class GatheringServiceImpl implements GatheringService {
 	@Override
 	public List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception {
 	    // 내가 등록한 게더링 목록 + 페이지네이션, 제목으로 검색 
-	    PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+	    PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 5);
 	    Long cnt = gatheringRepository.selectMyGatheringListCount(userId, word, status);
 	    
 	    Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
-	    Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
-	    Integer endPage = Math.min(startPage+10-1, allPage);
+	    Integer startPage = (pageInfo.getCurPage()-1)/5*5+1;
+	    Integer endPage = Math.min(startPage+5-1, allPage);
 	    
 	    pageInfo.setAllPage(allPage);
 	    pageInfo.setStartPage(startPage);

@@ -18,6 +18,7 @@ import com.dev.moyering.classring.dto.WritableReviewResponseDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.service.ReviewService;
+import com.dev.moyering.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -79,7 +80,9 @@ public class UserReviewController {
 		@ModelAttribute ReviewDto reviewDto,
         @AuthenticationPrincipal PrincipalDetails principal
     ) {    	
-        reviewDto.setUserId(principal.getUser().getUserId());
+    	User user = principal.getUser(); 
+        reviewDto.setUserId(user.getUserId());
+        reviewDto.setStudentName(user.getNickName());
         try {
         	Integer reviewId = reviewService.writeReview(reviewDto); // ↓서비스 분리
             return ResponseEntity.ok(reviewId);

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dev.moyering.classring.dto.InquiryResponseDto;
 import com.dev.moyering.classring.dto.UtilSearchDto;
@@ -58,6 +59,8 @@ public class InquiryServiceImpl implements InquiryService {
 				.totalElements(inquiryPage.getTotalElements())
 				.build();
 	}
+	
+	@Transactional
 	@Override
 	public Integer writeInquriy(InquiryDto dto) throws Exception {
 		User user = userRepository.findById(dto.getUserId())
@@ -74,6 +77,16 @@ public class InquiryServiceImpl implements InquiryService {
 	    		.build();
 	    inquiryRepository.save(inquiry);
 	    
+	    AlarmDto alarm =  AlarmDto.builder()
+	    		.alarmType(2)
+	    		.title("클래스 문의 등록")
+	    		.content(calendar.getHostClass().getName()+"에 대한 문의가 등록되었습니다.")
+	    		.receiverId(calendar.getHostClass().getHost().getUserId())
+	    		.senderId(dto.getUserId())
+	    		.senderNickname(dto.getStudentName())
+	    		.build();
+
+	    alarmService.sendAlarm(alarm);
 		return inquiry.getInquiryId();
 	}
 	@Override

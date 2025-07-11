@@ -16,6 +16,7 @@ import com.dev.moyering.classring.dto.UtilSearchDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.InquiryDto;
 import com.dev.moyering.host.service.InquiryService;
+import com.dev.moyering.user.entity.User;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +31,11 @@ public class UserInquiryController {
 	@PostMapping("/user/writeClassInquiry")
 	public ResponseEntity<Integer> writeClassInquiry(
 			@RequestBody InquiryDto dto,@AuthenticationPrincipal PrincipalDetails principal) {
-		Integer userId = principal.getUser().getUserId();
-		dto.setUserId(userId);
+		User user = principal.getUser();
+		dto.setUserId(user.getUserId());
+		dto.setStudentName(user.getNickName());
 		try {
+			System.out.println("sjdflajsbnteg"+dto.getUserId());
 			Integer inquiryId = inquiryService.writeInquriy(dto);
 	        return ResponseEntity.ok(inquiryId); // 성공 시 생성된 ID 반환
 		} catch (Exception e) {

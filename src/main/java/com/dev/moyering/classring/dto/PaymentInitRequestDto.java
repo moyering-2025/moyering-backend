@@ -17,4 +17,5 @@ public class PaymentInitRequestDto {
     private Integer userCouponId;
     private Integer amount;
     private String paymentType;
+    private Integer classPrice;
 }
