@@ -123,12 +123,12 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 	@Override
 	public List<GatheringApplyDto> findApplyListByApplyUserId(Integer userId, PageInfo pageInfo, String word, String status) throws Exception {
 	    // 내가 지원한 게더링 목록 + 페이지네이션, 제목으로 검색 
-	    PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+	    PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 5);
 	    Long cnt = gatheringApplyRepository.findMyApplyListCount(userId, word, status);
 	    
 	    Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
-	    Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
-	    Integer endPage = Math.min(startPage+10-1, allPage);
+	    Integer startPage = (pageInfo.getCurPage()-1)/5*5+1;
+	    Integer endPage = Math.min(startPage+5-1, allPage);
 	    
 	    pageInfo.setAllPage(allPage);
 	    pageInfo.setStartPage(startPage);
@@ -164,7 +164,6 @@ public class GatheringApplyServiceImpl implements GatheringApplyService {
 				//발신자 닉네임 => 시스템/관리자가 발송하는 알람이면 메니저 혹은 관리자, 강사가 발송하는 알람이면 강사테이블의 닉네임, 그 외에는 유저 테이블의 닉네임(마이페이지 알림 내역에서 보낸 사람으로 보여질 이름)
 				.content(oGatheringApply.get().getUser().getNickName()+"님께서 "+oGatheringApply.get().getGathering().getTitle() +"을 탈퇴하였습니다")//알림 내용
 				.build();
-		System.out.println("145 알람 보내기 테스트 "+ alarmDto);
 		alarmService.sendAlarm(alarmDto);
        gatheringApplyRepository.deleteById(gatheringApplyId);
 //       messageRepository
