@@ -181,6 +181,8 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                 .from(adminSettlement)
                 .leftJoin(adminSettlement.classCalendar, classCalendar)
                 .leftJoin(host).on(host.hostId.eq(adminSettlement.hostId))
+                .leftJoin(hostClass).on(host.hostId.eq(hostClass.host.hostId))
+                .leftJoin(user).on(host.userId.eq(user.userId))
                 .where(
                         searchSettlement(searchKeyword),
                         settlementDateBetween(startDate, endDate)
@@ -195,8 +197,12 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
         if (!StringUtils.hasText(searchKeyword)) {
             return null;
         }
-        return adminSettlement.hostId.stringValue().contains(searchKeyword)
-                .or(adminSettlement.classCalendar.hostClass.name.containsIgnoreCase(searchKeyword));
+
+        String trimmedKeyword = searchKeyword.trim();
+        return adminSettlement.hostId.stringValue().contains(trimmedKeyword)
+                .or(adminSettlement.classCalendar.hostClass.name.containsIgnoreCase(trimmedKeyword))
+                .or(user.username.containsIgnoreCase(trimmedKeyword))  // 강사 아이디 검색 추가
+                .or(user.name.containsIgnoreCase(trimmedKeyword));     // 강사 이름 검색도 추가
     }
 
     private BooleanExpression settlementDateBetween(LocalDate startDate, LocalDate endDate) {

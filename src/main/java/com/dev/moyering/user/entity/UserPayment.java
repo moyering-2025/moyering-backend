@@ -36,7 +36,7 @@ public class UserPayment {
     private LocalDateTime paidAt; // 결제일
 
     @Column
-    private String status; // 상태 (주문, 취소, 환불)
+    private String status; // 상태 (주문, 취소)
     
     @Column
     private LocalDateTime canceledAt; //취소시간
@@ -64,9 +64,11 @@ public class UserPayment {
     private String discountType; //쿠폰 할인 유형
 
     @Column
+    // 관리자 쿠폰(MG) 사용하면 => 결제금액의 10%, // 강사쿠폰이면 => 클래스 원가의 10%
+    // 관리자 쿠폰 사용하면, 정산할 때 (클래스 강의 당 원가 합) - 수수료 합, 강사쿠폰일 시 정산할 때 결제금액 합 - 수수료 합
     private BigDecimal platformFee;
 
-    // 관리자 쿠폰 사용하면 => 클래스 원가의 10%, // 강사쿠폰이면 => 결제금액의 10%%
+
 
 @Builder
     public UserPayment(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, LocalDateTime canceledAt, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer classPrice, String couponType, String discountType, BigDecimal platformFee) {

@@ -10,6 +10,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.dev.moyering.common.dto.AlarmDto;
+import com.dev.moyering.common.service.AlarmService;
+import com.dev.moyering.host.entity.Host;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -63,7 +66,8 @@ public class HostClassServiceImpl implements HostClassService {
 	private final HostRepository hostRepository;
 	private final SubCategoryRepository subCategoryRepository;
 	private final ClassRegistRepository classRegistRepository;
-
+// 알람서비스 선언
+	private final AlarmService alarmService;
 	@Value("${iupload.path}")
 	private String iuploadPath;
 
@@ -405,12 +409,41 @@ public class HostClassServiceImpl implements HostClassService {
 	@Transactional
 	public void approveClass(Integer classId) throws Exception {
 		try {
+			// 1. 클래스 상태 업데이트
 			int updatedStatus = hostClassRepository.updateClassStatus(classId);
 			if (updatedStatus == 0) {
 				throw new RuntimeException("업데이트 할 상태가 없습니다.");
 			}
+
+			// 2. 클래스 정보 조회 및 userId 추출
+			HostClass hostClass = hostClassRepository.findById(classId)
+					.orElseThrow(() -> new RuntimeException("클래스를 찾을 수 없습니다."));
+
+			Host host = hostClass.getHost();
+			if (host == null) {
+				throw new RuntimeException("호스트 정보를 찾을 수 없습니다.");
+			}
+
+			Integer userId = host.getUserId(); // 이미 userId를 올바르게 가져오고 있음
+			if (userId == null) {
+				throw new RuntimeException("사용자 ID를 찾을 수 없습니다.");
+			}
+
+			// 3. 알람 생성 및 발송
+			AlarmDto alarmDto = AlarmDto.builder()
+					.alarmType(2) // 클래스링 알람
+					.title("클래스 승인 안내")
+					.receiverId(userId) // userId 사용
+					.senderId(1) // 관리자 ID
+					.senderNickname("관리자")
+					.content("클래스가 승인 되었습니다")
+					.build();
+
+			log.info("클래스 승인 알람 발송 - 클래스ID: {}, 수신자 userId: {}", classId, userId);
+			alarmService.sendAlarm(alarmDto);
+
 		} catch (Exception e) {
-			log.error("we");
+			log.error("클래스 승인 처리 중 오류 발생 - 클래스ID: {}, 오류: {}", classId, e.getMessage(), e);
 			throw e;
 		}
 	}

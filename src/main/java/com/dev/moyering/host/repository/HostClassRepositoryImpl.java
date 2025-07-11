@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.querydsl.core.types.dsl.Expressions;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -132,8 +133,13 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 						eqClassStatus(cond.getStatusFilter()),
 						betweenDate(cond.getFromDate(), cond.getToDate())
 				)
-//				.orderBy(
-//						hostClass.regDate.desc()  // 개설일 기준 내림차순
+						.orderBy(
+
+		Expressions.cases()
+				.when(classCalendar.status.eq("승인대기")).then(0)  // 승인대기가 먼저
+				.when(classCalendar.status.eq("모집중")).then(1)
+				.otherwise(3).asc(),                              // 나머지는 마지막
+				hostClass.regDate.desc())
 
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
@@ -281,17 +287,23 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 
 	@Override
 	public int updateClassStatus(Integer classId) throws Exception {
-		ClassCalendar calendar = jpaQueryFactory
+		List<ClassCalendar> calendars = jpaQueryFactory
 				.selectFrom(classCalendar)
-				.where( // classId가 맞고, 승인대기인 항목
+				.where(
 						classCalendar.hostClass.classId.eq(classId)
-								.and (classCalendar.status.eq("승인대기"))
+								.and(classCalendar.status.eq("승인대기"))
 				)
-				.fetchOne();
-		if (calendar == null) {
+				.fetch();
+
+		if (calendars.isEmpty()) {
 			return 0;
 		}
-		calendar.changeStatus("모집중");
-				return 1;
+
+		// 모든 캘린더 상태를 "모집중"으로 변경
+		for (ClassCalendar calendar : calendars) {
+			calendar.changeStatus("모집중");
+		}
+
+		return calendars.size();
 	}
 }

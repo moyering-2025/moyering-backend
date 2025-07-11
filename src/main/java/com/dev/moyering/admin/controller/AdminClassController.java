@@ -46,6 +46,4 @@ public class AdminClassController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-
 }
