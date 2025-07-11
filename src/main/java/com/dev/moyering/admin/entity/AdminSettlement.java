@@ -27,9 +27,11 @@ public class AdminSettlement {
     @Column(nullable = false)
     private LocalDate settlementDate; // 정산 예정일
 
+    @Setter
     @Column
     private LocalDateTime settledAt; // 실제 지급일
 
+    @Setter
     @Column(nullable = false)
     private String settlementStatus; // 정산 상태 (WT/CP/RQ)
 
@@ -43,6 +45,7 @@ public class AdminSettlement {
     private Integer settleAmountToDo; // 정산예정금액
 
 
+    @Setter
     @Column
     private Integer settlementAmount; // 실제 지급액
 
@@ -60,7 +63,6 @@ public class AdminSettlement {
         this.settleAmountToDo = settleAmountToDo;
         this.settlementAmount = settlementAmount;
     }
-
 
     /*** 엔티티 → DTO 변환*/
     public AdminSettlementDto toDto() {
@@ -93,5 +95,10 @@ public class AdminSettlement {
                 .settleAmountToDo(this.settlementAmount)
                 .build();
     }
+
        }
+
+
+
+
 
