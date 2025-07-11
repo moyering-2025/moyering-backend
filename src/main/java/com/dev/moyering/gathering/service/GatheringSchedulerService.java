@@ -109,9 +109,6 @@ public class GatheringSchedulerService {
         }
     }
 
-    /**
-     * 모임 주최자에게 취소 알림 전송
-     */
     private void sendCancellationAlarmToOrganizer(Gathering gathering, Integer approvedCount, Integer minAttendees) {
         try {
             AlarmDto alarmDto = AlarmDto.builder()

@@ -71,23 +71,12 @@ public class AdminSettlementController {
 
             Map<String, Object> response = new HashMap<>();
             if (settlement.isPresent()) {
-                response.put("success", true);
-                response.put("message", "정산 내역 조회 성공");
-                response.put("data", settlement.get());
                 return ResponseEntity.ok(response);
             } else {
-                response.put("success", false);
-                response.put("message", "정산 내역을 찾을 수 없습니다");
-                response.put("data", null);
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            log.error("정산 단건 조회 실패: {}", e.getMessage(), e);
-
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("message", "정산 내역 조회 중 오류가 발생했습니다");
-            errorResponse.put("data", null);
             return ResponseEntity.internalServerError().body(errorResponse);
         }
     }
@@ -95,61 +84,37 @@ public class AdminSettlementController {
     /*** 정산처리*/
     @PutMapping("/{settlementId}/complete")
     public ResponseEntity<Map<String, Object>> completeSettlementSimple(
-            @PathVariable Integer settlementId) {
-
-        log.info("정산 완료 처리 요청 - settlementId: {}", settlementId);
+            @PathVariable Integer settlementId,
+            @RequestBody Map<String, Object> requestData) {
         Map<String, Object> response = new HashMap<>();
         try {
-            boolean result = adminSettlementService.completeSettlement(settlementId);
-
+            // 프론트에서 보낸 계산된 금액 추출
+            Integer totalSettlementAmount = (Integer) requestData.get("totalSettlementAmount");
+            // 서비스에서 계산된 금액 전달
+            boolean result = adminSettlementService.completeSettlement(settlementId, totalSettlementAmount);
             if (result) {
-                response.put("success", true);
-                response.put("message", "정산이 완료되었습니다.");
-                response.put("settlementId", settlementId);
                 return ResponseEntity.ok(response);
             } else {
-                response.put("success", false);
-                response.put("message", "정산 처리에 실패했습니다.");
                 return ResponseEntity.badRequest().body(response);
             }
-
         } catch (Exception e) {
-            log.error("정산 완료 처리 실패 - settlementId: {}, error: {}", settlementId, e.getMessage(), e);
-            response.put("success", false);
-            response.put("message", "정산 처리 중 오류가 발생했습니다: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }
-
 
         /*** 스케줄러 수동 실행(테스트용) */
         @PostMapping("/process-manual")
         public ResponseEntity<Map<String, Object>> processManual() { // 수정됨
             Map<String, Object> result = new HashMap<>();
-
             try {
-                log.info("수동 정산 처리 시작");
                 settlementSchedulerService.processAutoSettlement();
-
-                result.put("success", true);
-                result.put("message", "정산처리 완료");
-                result.put("executedAt", LocalDateTime.now()); // LocalDateTime으로 변경
-
                 return ResponseEntity.ok(result);
             } catch (Exception e) { // catch 블록 추가
-                log.error("수동 정산 처리 중 오류 발생", e);
-
-                result.put("success", false);
-                result.put("message", "정산 처리 실패: " + e.getMessage());
-                result.put("executedAt", LocalDateTime.now());
-
                 return ResponseEntity.status(500).body(result);
             }
         }
 
-        /**
-         * 스케줄러 상태 확인 (정산 대상 클래스 수등)
-         */
+        /*** 스케줄러 상태 확인 (정산 대상 클래스 수등)*/
         @GetMapping("/test-status")
         public ResponseEntity<Map<String, Object>> getSchedulerStatus() {
             Map<String, Object> status = new HashMap<>();
@@ -177,16 +142,10 @@ public class AdminSettlementController {
 
         try {
             List<AdminPaymentDto> payments = adminSettlementService.getPaymentListBySettlementId(settlementId);
-
-            log.info("정산 결제 내역 조회 성공 - settlementId: {}, 건수: {}", settlementId, payments.size());
             return ResponseEntity.ok(payments);
-
         } catch (IllegalArgumentException e) {
-            log.warn("잘못된 정산 ID - settlementId: {}, error: {}", settlementId, e.getMessage());
             return ResponseEntity.badRequest().build();
-
         } catch (Exception e) {
-            log.error("정산 결제 내역 조회 실패 - settlementId: {}, error: {}", settlementId, e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }

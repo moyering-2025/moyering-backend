@@ -17,10 +17,10 @@ public class AdminSettlementDetailDto {
     private Integer settlementId; // 정산 ID
     private String className; // 클래스명
     private String hostName; // 강사명
-    private Integer settleAmountToDo; // 정산 예정 금액 (카멜케이스 수정)
+    private Integer settleAmountToDo; // 정산 예정 금액
 
     // 정산 통계 정보
-    private Integer totalPaymentCount; // 총 결제 건수 (더 명확한 이름)
+    private Integer totalPaymentCount; // 총 결제 건수
     private Integer totalClassAmount; // 총 클래스 금액
     private Integer totalDiscountAmount; // 총 할인 금액
     private Integer totalSettlementAmount; // 실제 정산 금액

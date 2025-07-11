@@ -71,7 +71,7 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
 //                    private Integer totalPlatformFee; // 총 플랫폼 수수료
                         adminSettlement.settlementDate,
                         adminSettlement.settledAt,
-                        adminSettlement.settlementStatus, // WP, CP, RQ
+                        adminSettlement.settlementStatus, // WT, CP, RQ
                         host.bankName,
                         host.accNum,
                         userPayment.amount.sum()
@@ -104,6 +104,14 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                         adminSettlement.settlementAmount
                 )
                 .fetchOne();
+
+
+        // 디버깅 로그 추가
+        if (content != null) {
+            log.info("정산 상세 조회 결과 - settlementId: {}, 계산된예정금액: {}, 기존정산금액: {}",
+                    settlementId, content.getSettleAmountToDo(), content.getSettlementAmount());
+        }
+
         return Optional.ofNullable(content);
     }
 
@@ -181,6 +189,8 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                 .from(adminSettlement)
                 .leftJoin(adminSettlement.classCalendar, classCalendar)
                 .leftJoin(host).on(host.hostId.eq(adminSettlement.hostId))
+                .leftJoin(hostClass).on(host.hostId.eq(hostClass.host.hostId))
+                .leftJoin(user).on(host.userId.eq(user.userId))
                 .where(
                         searchSettlement(searchKeyword),
                         settlementDateBetween(startDate, endDate)
@@ -195,8 +205,12 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
         if (!StringUtils.hasText(searchKeyword)) {
             return null;
         }
-        return adminSettlement.hostId.stringValue().contains(searchKeyword)
-                .or(adminSettlement.classCalendar.hostClass.name.containsIgnoreCase(searchKeyword));
+
+        String trimmedKeyword = searchKeyword.trim();
+        return adminSettlement.hostId.stringValue().contains(trimmedKeyword)
+                .or(adminSettlement.classCalendar.hostClass.name.containsIgnoreCase(trimmedKeyword))
+                .or(user.username.containsIgnoreCase(trimmedKeyword))  // 강사 아이디 검색 추가
+                .or(user.name.containsIgnoreCase(trimmedKeyword));     // 강사 이름 검색도 추가
     }
 
     private BooleanExpression settlementDateBetween(LocalDate startDate, LocalDate endDate) {

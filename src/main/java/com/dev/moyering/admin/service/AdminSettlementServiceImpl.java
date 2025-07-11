@@ -1,5 +1,6 @@
 package com.dev.moyering.admin.service;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -58,9 +59,9 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
 
     @Transactional
     @Override
-    public boolean completeSettlement(Integer settlementId) {
+    public boolean completeSettlement(Integer settlementId, Integer totalSettlementAmount) {
         try {
-            log.info("정산 완료 처리 시작 - settlementId: {}", settlementId);
+            log.info("정산 완료 처리 시작 - settlementId: {}, 받은금액: {}", settlementId, totalSettlementAmount);
 
             // 1. 정산 데이터 조회 (Entity 전체 조회)
             AdminSettlement originalSettlement = adminSettlementRepository.findById(settlementId)
@@ -71,37 +72,36 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
                     originalSettlement.getSettleAmountToDo(),
                     originalSettlement.getSettlementStatus());
 
-            // 2. 도메인 메서드로 정산 완료 처리 (예정금액을 정산금액에 복사)
-            AdminSettlement completedSettlement = originalSettlement.completeSettlement();
+            // 2. 프론트에서 받은 금액으로 직접 설정
+            originalSettlement.setSettlementAmount(totalSettlementAmount != null ? totalSettlementAmount : 0);
+            originalSettlement.setSettlementStatus("CP");
+            originalSettlement.setSettledAt(LocalDateTime.now());
 
             // 3. 저장 (JPA가 ID를 기준으로 UPDATE 수행)
-            AdminSettlement savedSettlement = adminSettlementRepository.save(completedSettlement);
+            AdminSettlement savedSettlement = adminSettlementRepository.save(originalSettlement);
 
-            log.info("정산 완료 처리 성공 - settlementId: {}, 예정금액: {}, 정산금액: {}, 상태: {}, 정산일: {}",
+            log.info("정산 완료 처리 성공 - settlementId: {}, 받은금액: {}, 저장된정산금액: {}, 상태: {}, 정산일: {}",
                     savedSettlement.getSettlementId(),
-                    savedSettlement.getSettleAmountToDo(),
+                    totalSettlementAmount,
                     savedSettlement.getSettlementAmount(),
                     savedSettlement.getSettlementStatus(),
                     savedSettlement.getSettledAt());
-            
-            Integer hostId = adminSettlementRepository.findById(settlementId).get().getHostId();
-            Host host = hostRepository.findById(hostId).get();
-            Integer userId = host.getUserId();
-            
+
+            // 4. 알림 발송 (savedSettlement 사용하여 중복 조회 방지)
+            Host host = hostRepository.findById(savedSettlement.getHostId())
+                    .orElseThrow(() -> new IllegalArgumentException("강사 정보 없음: " + savedSettlement.getHostId()));
+
             AlarmDto alarmDto = AlarmDto.builder()
-    				.alarmType(2)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
-    				.title("정산 완료 안내") // 필수 사항
-    				.receiverId(userId)
-    				//수신자 유저 아이디
-    				.senderId(4)
-    				//발신자 유저 아이디 
-    				.senderNickname("admin")
-    				//발신자 닉네임 => 시스템/관리자가 발송하는 알람이면 메니저 혹은 관리자, 강사가 발송하는 알람이면 강사테이블의 닉네임, 그 외에는 유저 테이블의 닉네임(마이페이지 알림 내역에서 보낸 사람으로 보여질 이름)
-    				.content(host.getName()+"님의 정산처리가 완료되었습니다.")//알림 내용
-    				.build();
-            
+                    .alarmType(2) // '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람'
+                    .title("정산 완료 안내") // 필수 사항
+                    .receiverId(host.getUserId()) // 수신자 유저 아이디
+                    .senderId(4) // 발신자 유저 아이디
+                    .senderNickname("admin") // 발신자 닉네임
+                    .content(host.getName() + "님의 정산처리가 완료되었습니다.") // 알림 내용
+                    .build();
+
             alarmService.sendAlarm(alarmDto);
-            
+
             return true;
 
         } catch (IllegalArgumentException | IllegalStateException e) {

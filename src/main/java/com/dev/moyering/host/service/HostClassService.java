@@ -33,7 +33,10 @@ public interface HostClassService {
 
 	// 관리자 > 클래스 관리 (검색 조회 + 페이징)
 	Page<AdminClassDto> getHostClassListForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception;
-	
+
+	// 관리자 > 클래스 승인
+	void approveClass(Integer classId) throws Exception;
+
 	List<UserDto> selectClassStudentList(Integer calendarId) throws Exception;
 	List<UserDto> selectStudentList(Integer hostId)throws Exception;
 	

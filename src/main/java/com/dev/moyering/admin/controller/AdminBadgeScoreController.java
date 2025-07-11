@@ -24,7 +24,6 @@ public class AdminBadgeScoreController {
     // 배지 관리 페이지 조회
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllBadges(AdminBadgeDto adminBadgeDto) {
-        log.info("controller enter! ");
         try {
             // 서비스에서 dto변환 리스트 가져오기
             List<AdminBadgeDto> badges = adminBadgeScoreService.getAllBadges();
@@ -36,7 +35,6 @@ public class AdminBadgeScoreController {
             response.put("badgeScores", badgeScores);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
             return ResponseEntity.badRequest().build();
         }
     }
@@ -46,14 +44,10 @@ public class AdminBadgeScoreController {
     public ResponseEntity<AdminBadgeScoreDto> updateBadgeScore(
             @PathVariable("activeScoreId") Integer activeScoreId,
             @Valid @RequestBody AdminBadgeScoreDto badgeScoreDto) {
-        log.info("활동점수 수정 요청 : activeScoreId = {}, dto = {}", activeScoreId, badgeScoreDto);
         try {
-            // url id와 body id 일치 확인
             if (!activeScoreId.equals(badgeScoreDto.getActiveScoreId())) {
-                log.warn("ID 불일치: URL={}, Body={}", activeScoreId, badgeScoreDto.getActiveScoreId());
                 return ResponseEntity.badRequest().build();
             }
-
             AdminBadgeScoreDto updatedScore = adminBadgeScoreService.updateBadgeScores(badgeScoreDto);
             return ResponseEntity.ok(updatedScore);
         } catch (Exception e) {

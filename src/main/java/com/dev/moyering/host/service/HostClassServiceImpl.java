@@ -12,6 +12,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.dev.moyering.common.dto.AlarmDto;
+import com.dev.moyering.common.service.AlarmService;
+import com.dev.moyering.host.entity.Host;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -20,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -74,6 +78,8 @@ public class HostClassServiceImpl implements HostClassService {
 	private final ReviewRepository reviewRepository;
 	private final AdminSettlementRepository settlementRepository;
 
+	// 알람서비스 선언
+	private final AlarmService alarmService;
 	@Value("${iupload.path}")
 	private String iuploadPath;
 
@@ -397,19 +403,59 @@ public class HostClassServiceImpl implements HostClassService {
 	public Page<AdminClassDto> getHostClassListForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
 		log.info("클래스 목록 관리 조회 - cond : {}, pageable : {}", cond, pageable);
 		try {
-			List<AdminClassDto> content = hostClassRepository.searchClassForAdmin(cond, pageable);
-			log.info("조회된 content 개수 : {}", content.size());
+			Page<AdminClassDto> content = hostClassRepository.searchClassForAdmin(cond, pageable);
 
 			Long total = hostClassRepository.countClasses(cond); // 검색 조건에 따른 페이지 계산
-			log.info("전체 개수 : {}", total);
-
-			return new PageImpl<>(content, pageable, total);
+			return content;
 		} catch (Exception e) {
 			log.error("getClassList 에러 상새 : ", e);
 			throw e;
 		}
 	}
 
+	/*** 관리자가 강사 클래스를 승인 */
+	@Override
+	@Transactional
+	public void approveClass(Integer classId) throws Exception {
+		try {
+			// 1. 클래스 상태 업데이트
+			int updatedStatus = hostClassRepository.updateClassStatus(classId);
+			if (updatedStatus == 0) {
+				throw new RuntimeException("업데이트 할 상태가 없습니다.");
+			}
+
+			// 2. 클래스 정보 조회 및 userId 추출
+			HostClass hostClass = hostClassRepository.findById(classId)
+					.orElseThrow(() -> new RuntimeException("클래스를 찾을 수 없습니다."));
+
+			Host host = hostClass.getHost();
+			if (host == null) {
+				throw new RuntimeException("호스트 정보를 찾을 수 없습니다.");
+			}
+
+			Integer userId = host.getUserId(); // 이미 userId를 올바르게 가져오고 있음
+			if (userId == null) {
+				throw new RuntimeException("사용자 ID를 찾을 수 없습니다.");
+			}
+
+			// 3. 알람 생성 및 발송
+			AlarmDto alarmDto = AlarmDto.builder()
+					.alarmType(2) // 클래스링 알람
+					.title("클래스 승인 안내")
+					.receiverId(userId) // userId 사용
+					.senderId(1) // 관리자 ID
+					.senderNickname("관리자")
+					.content("클래스가 승인 되었습니다")
+					.build();
+
+			log.info("클래스 승인 알람 발송 - 클래스ID: {}, 수신자 userId: {}", classId, userId);
+			alarmService.sendAlarm(alarmDto);
+
+		} catch (Exception e) {
+			log.error("클래스 승인 처리 중 오류 발생 - 클래스ID: {}, 오류: {}", classId, e.getMessage(), e);
+			throw e;
+		}
+	}
 	@Override
 	public Integer updateClass(HostClassDto hostClassDto) throws Exception {
 		HostClassDto classDto = hostClassRepository.findByClassId(hostClassDto.getClassId()).toDto();
@@ -563,7 +609,7 @@ public class HostClassServiceImpl implements HostClassService {
 			LocalDate lastDayOfThisMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
 			if (cal.getStatus().equals("폐강")
 					|| cal.getStatus().equals("반려") && !cal.getStartDate().before(Date.valueOf(firstDayOfThisMonth))
-							&& !cal.getStartDate().after(Date.valueOf(lastDayOfThisMonth))) {
+					&& !cal.getStartDate().after(Date.valueOf(lastDayOfThisMonth))) {
 				cancleCount++;
 			}
 		}
@@ -575,7 +621,7 @@ public class HostClassServiceImpl implements HostClassService {
 		int allSettleCount = 0;
 		for (AdminSettlement settle : settlementList) {
 			if(settle.getSettlementStatus().equals("CP")) {
-				settleCount += settle.getSettlementAmount();	
+				settleCount += settle.getSettlementAmount();
 				allSettleCount++;
 			}
 		}
@@ -583,7 +629,7 @@ public class HostClassServiceImpl implements HostClassService {
 
 		//전체 결제 건수
 		map.put("payCount", allSettleCount);
-		
+
 		//이번달 판매금액
 		int thisMonthSettleCount = 0;
 		for(AdminSettlement settle : settlementList) {
@@ -595,7 +641,7 @@ public class HostClassServiceImpl implements HostClassService {
 			}
 		}
 		map.put("thisMonthSettle",thisMonthSettleCount);
-		
+
 		return map;
 	}
 
