@@ -1,5 +1,7 @@
 package com.dev.moyering.socialing.service;
 
+import com.dev.moyering.common.dto.AlarmDto;
+import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.socialing.dto.FollowDto;
 import com.dev.moyering.socialing.entity.Follow;
 import com.dev.moyering.socialing.repository.FollowRepository;
@@ -23,6 +25,7 @@ public class FollowServiceImpl implements FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final LikeListRepository likeListRepository;
+    private final AlarmService alarmService;
 
     @Override
     @Transactional
@@ -36,13 +39,30 @@ public class FollowServiceImpl implements FollowService {
                 .orElseThrow(() -> new Exception("Following 사용자(ID=" + followingId + ")를 찾을 수 없습니다."));
 
         followRepository.findByFollowerUserIdAndFollowingUserId(followerId, followingId)
-                .ifPresent(f -> { throw new RuntimeException("이미 팔로우 중입니다."); });
+                .ifPresent(f -> {
+                    throw new RuntimeException("이미 팔로우 중입니다.");
+                });
 
         Follow follow = Follow.builder()
                 .follower(follower)
                 .following(following)
                 .build();
         Follow saved = followRepository.save(follow);
+
+        AlarmDto alarmDto = AlarmDto.builder()
+                .alarmType(4)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
+                .title("팔로우 시작") // 필수 사항
+                .receiverId(followingId)
+                //수신자 유저 아이디
+                .senderId(followerId)
+                //발신자 유저 아이디
+                .senderNickname(following.getNickName())
+                //발신자 닉네임 => 시스템/관리자가 발송하는 알람이면 메니저 혹은 관리자, 강사가 발송하는 알람이면 강사테이블의 닉네임, 그 외에는 유저 테이블의 닉네임(마이페이지 알림 내역에서 보낸 사람으로 보여질 이름)
+                .content("좋아요"+"님이 참여 신청하였습니다")//알림 내용
+                .build();
+        System.out.println("알람 보내기 테스트 " + alarmDto);
+        alarmService.sendAlarm(alarmDto);
+
         return saved.toDto();
     }
 
@@ -69,7 +89,7 @@ public class FollowServiceImpl implements FollowService {
 
     @Override
     @Transactional
-    public List<UserDto> getFollowers(Integer followingId,Integer page,Integer size,String search) {
+    public List<UserDto> getFollowers(Integer followingId, Integer page, Integer size, String search) {
         /*List<FollowDto> list = followRepository.findAllByFollowingUserId(followingId).stream()
                 .map(Follow::toDto)
                 .collect(Collectors.toList());

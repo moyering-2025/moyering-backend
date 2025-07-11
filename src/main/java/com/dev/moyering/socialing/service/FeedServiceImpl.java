@@ -295,10 +295,10 @@ public class FeedServiceImpl implements FeedService {
 
 
 //        UserBadge badge = userBadgeRepository.findById(writer.getUserId()).get();
-        UserBadge badge = userBadgeRepository.findById(writer.getUserId()).orElseThrow(() -> new Exception("배지를 찾을 수 없습니다."));
-        if (badge != null) {
-            feedDto.setWriterBadgeImg(badge.getBadge_img());
-        }
+//        UserBadge badge = userBadgeRepository.findById(writer.getUserId()).orElseThrow(() -> new Exception("배지를 찾을 수 없습니다."));
+//        if (badge != null) {
+//            feedDto.setWriterBadgeImg(badge.getBadge_img());
+//        }
 
         entityManager.clear();
         
