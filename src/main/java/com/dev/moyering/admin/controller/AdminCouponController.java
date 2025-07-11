@@ -52,8 +52,6 @@ public class AdminCouponController {
     /*** 쿠폰 수정*/
     @PutMapping("/{couponId}")
     public ResponseEntity<AdminCouponDto> updateCoupon(@PathVariable Integer couponId, @RequestBody AdminCouponDto couponDto){
-        log.info("쿠폰 생성 요청 : {}",  couponId);
-
         try {
             AdminCouponDto updateCoupon = adminCouponService.updateCoupon(couponId, couponDto);
             return ResponseEntity.ok(updateCoupon);

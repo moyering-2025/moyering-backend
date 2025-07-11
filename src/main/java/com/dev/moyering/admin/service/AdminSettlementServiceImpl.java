@@ -1,22 +1,30 @@
 package com.dev.moyering.admin.service;
-import com.dev.moyering.admin.dto.AdminPaymentDto;
-import com.dev.moyering.admin.dto.AdminSettlementDto;
-import com.dev.moyering.admin.entity.AdminSettlement;
-import com.dev.moyering.admin.repository.AdminSettlementRepository;
-import com.dev.moyering.host.dto.SettlementSearchRequestDto;
-import com.dev.moyering.user.repository.UserPaymentRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
+import com.dev.moyering.admin.dto.AdminPaymentDto;
+import com.dev.moyering.admin.dto.AdminSettlementDto;
+import com.dev.moyering.admin.entity.AdminSettlement;
+import com.dev.moyering.admin.repository.AdminSettlementRepository;
+import com.dev.moyering.common.dto.AlarmDto;
+import com.dev.moyering.common.service.AlarmService;
+import com.dev.moyering.host.dto.SettlementSearchRequestDto;
+import com.dev.moyering.host.entity.Host;
+import com.dev.moyering.host.repository.HostRepository;
+import com.dev.moyering.user.repository.UserPaymentRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
@@ -26,6 +34,8 @@ import java.util.stream.Collectors;
 public class AdminSettlementServiceImpl implements AdminSettlementService {
     private final AdminSettlementRepository adminSettlementRepository;
     private final UserPaymentRepository userPaymentRepository;
+    private final AlarmService alarmService;
+    private final HostRepository hostRepository;
 
 
     @Override
@@ -49,9 +59,9 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
 
     @Transactional
     @Override
-    public boolean completeSettlement(Integer settlementId) {
+    public boolean completeSettlement(Integer settlementId, Integer totalSettlementAmount) {
         try {
-            log.info("정산 완료 처리 시작 - settlementId: {}", settlementId);
+            log.info("정산 완료 처리 시작 - settlementId: {}, 받은금액: {}", settlementId, totalSettlementAmount);
 
             // 1. 정산 데이터 조회 (Entity 전체 조회)
             AdminSettlement originalSettlement = adminSettlementRepository.findById(settlementId)
@@ -62,18 +72,35 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
                     originalSettlement.getSettleAmountToDo(),
                     originalSettlement.getSettlementStatus());
 
-            // 2. 도메인 메서드로 정산 완료 처리 (예정금액을 정산금액에 복사)
-            AdminSettlement completedSettlement = originalSettlement.completeSettlement();
+            // 2. 프론트에서 받은 금액으로 직접 설정
+            originalSettlement.setSettlementAmount(totalSettlementAmount != null ? totalSettlementAmount : 0);
+            originalSettlement.setSettlementStatus("CP");
+            originalSettlement.setSettledAt(LocalDateTime.now());
 
             // 3. 저장 (JPA가 ID를 기준으로 UPDATE 수행)
-            AdminSettlement savedSettlement = adminSettlementRepository.save(completedSettlement);
+            AdminSettlement savedSettlement = adminSettlementRepository.save(originalSettlement);
 
-            log.info("정산 완료 처리 성공 - settlementId: {}, 예정금액: {}, 정산금액: {}, 상태: {}, 정산일: {}",
+            log.info("정산 완료 처리 성공 - settlementId: {}, 받은금액: {}, 저장된정산금액: {}, 상태: {}, 정산일: {}",
                     savedSettlement.getSettlementId(),
-                    savedSettlement.getSettleAmountToDo(),
+                    totalSettlementAmount,
                     savedSettlement.getSettlementAmount(),
                     savedSettlement.getSettlementStatus(),
                     savedSettlement.getSettledAt());
+
+            // 4. 알림 발송 (savedSettlement 사용하여 중복 조회 방지)
+            Host host = hostRepository.findById(savedSettlement.getHostId())
+                    .orElseThrow(() -> new IllegalArgumentException("강사 정보 없음: " + savedSettlement.getHostId()));
+
+            AlarmDto alarmDto = AlarmDto.builder()
+                    .alarmType(2) // '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람'
+                    .title("정산 완료 안내") // 필수 사항
+                    .receiverId(host.getUserId()) // 수신자 유저 아이디
+                    .senderId(4) // 발신자 유저 아이디
+                    .senderNickname("admin") // 발신자 닉네임
+                    .content(host.getName() + "님의 정산처리가 완료되었습니다.") // 알림 내용
+                    .build();
+
+            alarmService.sendAlarm(alarmDto);
 
             return true;
 

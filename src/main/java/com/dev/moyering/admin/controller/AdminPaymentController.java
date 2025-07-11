@@ -28,6 +28,8 @@ public class AdminPaymentController {
             @PageableDefault(size = 20, sort = "paidAt", direction = Sort.Direction.DESC) Pageable pageable){
 
         log.info("결제 내역 조회 요청 : keyword ={}, page={}", cond, pageable);
+        log.info(cond.getKeyword());
+        log.info(cond.getStatus());
 
         try {
             Page<AdminPaymentDto> payments = userPaymentService.getPaymentList(cond, pageable);

@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
             AdminNoticeDto result = savedAdminNotice.toDto();
             return result;
         } catch (Exception e) {
-            log.error("공지사항 등록 실패 : {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -68,13 +67,11 @@ import org.springframework.transaction.annotation.Transactional;
             if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
                 result = adminNoticeRepository.findNoticesByKeyword(searchKeyword, pageable);
             } else {
-                log.info("전체 목록 조회");
                 Page<AdminNotice> noticePage = adminNoticeRepository.findAll(pageable);
                 result = noticePage.map(AdminNotice::toDto); // Entity -> DTO 변환
             }
             return result;
         } catch (Exception e) {
-            log.error("목록 조회 실패: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -82,8 +79,6 @@ import org.springframework.transaction.annotation.Transactional;
     /*** 공지사항 단건 조회*/
     @Override
     public AdminNoticeDto getNoticeById(Integer noticeId) {
-        log.info("공지사항 단건 조회: noticeId={}", noticeId);
-
         AdminNoticeDto notice = adminNoticeRepository.findNoticeByNoticeId(noticeId);
         if (notice == null) {
             throw new IllegalArgumentException("해당 공지사항을 찾을 수 없습니다. ID: " + noticeId);
@@ -95,12 +90,9 @@ import org.springframework.transaction.annotation.Transactional;
     @Override
     @Transactional
     public AdminNoticeDto changePinStatus(Integer noticeId, boolean pinYn) {
-        log.info("공지사항 핀 상태 변경: noticeId={}, pinYn={}", noticeId, pinYn);
-
         AdminNotice adminNotice = adminNoticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 공지사항을 찾을 수 없습니다. ID: " + noticeId));
         adminNotice.changePinStatus(pinYn);
-        log.info("공지사항 핀 상태 변경 완료: noticeId={}", noticeId);
         return adminNotice.toDto();
     }
 
@@ -112,10 +104,7 @@ import org.springframework.transaction.annotation.Transactional;
         AdminNotice adminNotice = adminNoticeRepository.findById(noticeId)
                 .orElseThrow(() -> new IllegalArgumentException("공지사항이 없습니다."));
         adminNotice.hide(); // isHidden = true
-        // 더티체킹 보장
         adminNoticeRepository.save(adminNotice);
-        // 로그로 확인
-        log.info(">>> 공지사항 숨김 처리 완료: noticeId = {}", noticeId);
     }
 
     @Override
@@ -125,7 +114,6 @@ import org.springframework.transaction.annotation.Transactional;
                 .orElseThrow(() -> new IllegalArgumentException("공지사항이 없습니다."));
         adminNotice.show(); // isHidden = false
         adminNoticeRepository.save(adminNotice);
-        log.info (">>> 공지사항 표시 처리 완료 : noticeId = {}", noticeId);
     }
 
 	@Override

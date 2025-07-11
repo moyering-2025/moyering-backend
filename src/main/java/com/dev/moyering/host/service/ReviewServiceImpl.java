@@ -20,14 +20,18 @@ import com.dev.moyering.admin.service.AdminBadgeScoreService;
 import com.dev.moyering.classring.dto.UserReviewResponseDto;
 import com.dev.moyering.classring.dto.UtilSearchDto;
 import com.dev.moyering.classring.dto.WritableReviewResponseDto;
+import com.dev.moyering.common.dto.AlarmDto;
 import com.dev.moyering.common.dto.PageResponseDto;
+import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.dto.ReviewSearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
+import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.host.entity.Review;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.HostClassRepository;
+import com.dev.moyering.host.repository.HostRepository;
 import com.dev.moyering.host.repository.ReviewRepository;
 import com.dev.moyering.user.repository.UserRepository;
 import com.dev.moyering.user.service.UserBadgeService;
@@ -45,20 +49,23 @@ public class ReviewServiceImpl implements ReviewService {
 	private final UserService userService;
 	private final AdminBadgeScoreService adminBadgeScoreService;
 	private final UserBadgeService userBadgeService;
+	private final AlarmService alarmService;
+	private final HostRepository hostRepository;
     @Value("${iupload.path}")
     private String uploadPath;
 
 	
 	@Override
-	public List<ReviewDto> getReviewByHostId(Integer hostId) {
-		return reviewRepository.findTop3ByHost_HostIdOrderByReviewDateDesc(hostId)
+	public List<ReviewDto> getReviewByClassId(Integer classId)throws Exception {
+		return reviewRepository.findTop3ByClassId(classId)
 				.stream().map(r->r.toDto()).collect(Collectors.toList());
 	}
 	
 	@Override
-	public PageResponseDto<ReviewDto> getAllReviewByHostId(Integer hostId, Integer page, Integer size) {
+	public PageResponseDto<ReviewDto> getAllReviewByClassId(Integer classId, Integer page, Integer size)throws Exception {
+
 		Pageable pageable = PageRequest.of(page, size);
-		Page<Review> reviewPage = reviewRepository.findReviewsByHostId(hostId, pageable);
+		Page<Review> reviewPage = reviewRepository.findReviewsByClassId(classId, pageable);
 		
 		//dto로 변환
 		List<ReviewDto> dtoList = reviewPage.getContent().stream()
@@ -133,6 +140,21 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 		reviewRepository.save(reviewDto.toEntity());
 		
+		Host host = hostRepository.findById(hostId).get();
+		
+		AlarmDto alarmDto = AlarmDto.builder()
+				.alarmType(2)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
+				.title("문의 답변 알림") // 필수 사항
+				.receiverId(review.getUser().getUserId())
+				//수신자 유저 아이디
+				.senderId(hostId)
+				//발신자 유저 아이디 
+				.senderNickname(host.getName())
+				//발신자 닉네임 => 시스템/관리자가 발송하는 알람이면 메니저 혹은 관리자, 강사가 발송하는 알람이면 강사테이블의 닉네임, 그 외에는 유저 테이블의 닉네임(마이페이지 알림 내역에서 보낸 사람으로 보여질 이름)
+				.content(host.getName()+"강사님께서 답변을 완료하였습니다.")//알림 내용
+				.build();
+		alarmService.sendAlarm(alarmDto);
+		
 	}
 	@Override
 	public PageResponseDto<WritableReviewResponseDto> getWritableReviews(UtilSearchDto dto) throws Exception {
@@ -188,6 +210,21 @@ public class ReviewServiceImpl implements ReviewService {
         userService.addScore(reviewDto.getUserId(), score);
         //뱃지 획득 가능 여부 확인
         userBadgeService.giveBadgeWithScore(reviewDto.getUserId());
+        
+        System.out.println(saved);
+	    ClassCalendar calendar = calendarRepository.findById(reviewDto.getCalendarId())
+	            .orElseThrow(() -> new Exception("캘린더를 찾을 수 없습니다."));
+	    
+	    AlarmDto alarm =  AlarmDto.builder()
+	    		.alarmType(2)
+	    		.title("클래스 리뷰 등록")
+	    		.content(calendar.getHostClass().getName() +"에 대한 리뷰가 등록되었습니다.")
+	    		.receiverId(calendar.getHostClass().getHost().getUserId())
+	    		.senderId(reviewDto.getUserId())
+	    		.senderNickname(reviewDto.getStudentName())
+	    		.build();
+	    
+        alarmService.sendAlarm(alarm);
         return saved.getReviewId();
     }
 

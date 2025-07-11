@@ -1,6 +1,7 @@
 package com.dev.moyering.host.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -280,6 +281,20 @@ public class HostClassController {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 		}
+	}
+	
+	@GetMapping("/host/hostRateCount")
+	public ResponseEntity<Map<String,Object>> hostRateCount(@RequestParam Integer hostId){
+		try {
+			System.out.println(hostId);
+			Map<String,Object> map = hostClassService.hostRateCount(hostId);
+			System.out.print(map.get("inquiryRate"));
+			return new ResponseEntity<>(map,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
 	}
 
 }

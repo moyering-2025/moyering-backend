@@ -1,6 +1,7 @@
 package com.dev.moyering.gathering.entity;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -52,6 +53,8 @@ public class GatheringApply {
 
     @Column(columnDefinition = "TINYINT")
     private Boolean isApproved;
+    @Column(columnDefinition = "DATETIME")
+    private LocalDateTime approvedUpdate;
     
     public GatheringApplyDto toDto() {
 	    return GatheringApplyDto.builder()
@@ -78,6 +81,7 @@ public class GatheringApply {
 	    		.aspiration(aspiration)
 	    		.applyDate(applyDate)
 	    		.isApprove(isApproved)
+	    		.approvedUpdate(approvedUpdate)
 	    		.build();
     }
 }

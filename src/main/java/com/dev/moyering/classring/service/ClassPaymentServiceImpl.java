@@ -4,7 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dev.moyering.admin.entity.AdminCoupon;
 import com.dev.moyering.admin.repository.AdminCouponRepository;
@@ -12,8 +16,12 @@ import com.dev.moyering.classring.dto.ClassPaymentResponseDto;
 import com.dev.moyering.classring.dto.PaymentApproveRequestDto;
 import com.dev.moyering.classring.dto.PaymentInitRequestDto;
 import com.dev.moyering.classring.dto.UserCouponDto;
+import com.dev.moyering.classring.dto.UserPaymentHistoryDto;
+import com.dev.moyering.classring.dto.UtilSearchDto;
+import com.dev.moyering.classring.dto.WishlistItemDto;
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.classring.repository.UserCouponRepository;
+import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostDto;
 import com.dev.moyering.host.entity.ClassCalendar;
@@ -74,6 +82,7 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
             		.build();
 	}
 	
+	@Transactional
 	@Override
 	public void approvePayment(PaymentApproveRequestDto dto, User user) throws Exception {
 		// 1. 수강 정보 등록 (class_regist)
@@ -93,29 +102,43 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
         if (!payment.getAmount().equals(dto.getAmount())) {
             throw new IllegalStateException("결제 금액이 일치하지 않습니다.");
         }
-        payment.approve(regist, LocalDateTime.now()); 
-        userPaymentRepository.save(payment);
 
+        
         //3. 쿠폰 사용처리
-        if (dto.getUserCouponId() != null) {
+        //쿠폰 타입, 쿠폰 유형,수수료
+        Integer platformFee=0;
+        String couponType="", discountType="";
+        if (dto.getUserCouponId() != null) {            
             UserCoupon userCoupon = userCouponRepository.findById(dto.getUserCouponId())
                 .orElseThrow(() -> new RuntimeException("쿠폰이 존재하지 않습니다."));
             userCoupon.useCoupon();
             userCouponRepository.save(userCoupon);
+            
             
             if (userCoupon.getAdminCoupon() != null ) {
             	AdminCoupon adminCoupon = adminCouponRepository.findById(userCoupon.getAdminCoupon().getCouponId())
             			.orElseThrow(() -> new Exception("해당 어드민 쿠폰이 존재하지 않습니다."));
             	adminCoupon.incrementUsedCount();
             	adminCouponRepository.save(adminCoupon);
+            	couponType="MG";
+            	discountType=adminCoupon.getDiscountType();
+            	platformFee = dto.getAmount()/10;
             }
             if (userCoupon.getClassCoupon() != null ) {
             	ClassCoupon classCoupon = classCouponRepository.findById(userCoupon.getClassCoupon().getClassCouponId())
             			.orElseThrow(() -> new Exception("해당 클래스 쿠폰이 존재하지 않습니다."));
             	classCoupon.incrementUsedCount();
             	classCouponRepository.save(classCoupon);
+            	couponType="HT";
+            	discountType=classCoupon.getDiscountType();
+            	platformFee= payment.getClassPrice()/10;
             }
+            userPaymentRepository.save(payment);
+        } else {
+        	platformFee=payment.getAmount()/10;
         }
+        //최종 결제 저장
+        payment.approve(regist, LocalDateTime.now(),couponType,discountType,platformFee); 
         //4. 수강생 수 업데이트
         cc.incrementRegisteredCount();
         classCalendarRepository.save(cc);
@@ -123,10 +146,13 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
         if (cc.getHostClass().getRecruitMax().equals(cc.getRegisteredCount())) {
         	cc.changeStatus("모집마감");
             classCalendarRepository.save(cc);
-        }        		
+        }       
+        
+
 	}
 
 
+	@Transactional
 	@Override
 	public void initPayment(PaymentInitRequestDto dto, User user) throws Exception {
 	    ClassCalendar calendar = classCalendarRepository.findById(dto.getCalendarId())
@@ -143,11 +169,25 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
 	            .paymentType(dto.getPaymentType())
 	            .status("결제대기")
 	            .classCalendar(calendar)
+	            .classPrice(dto.getClassPrice())
 	            .userCoupon(dto.getUserCouponId() != null
 	                ? UserCoupon.builder().ucId(dto.getUserCouponId()).build()
 	                : null)
 	            .build();
 
 	    userPaymentRepository.save(payment);		
-	}	
+	}
+
+	@Override
+	public PageResponseDto<UserPaymentHistoryDto> getUserPaymentHistory(UtilSearchDto dto) throws Exception {
+	    Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
+	    Page<UserPaymentHistoryDto> pageResult = userPaymentRepository.findUserPaymentHistory(dto, pageable);
+        
+	    return PageResponseDto.<UserPaymentHistoryDto>builder()
+	            .content(pageResult.getContent())
+	            .currentPage(pageResult.getNumber() + 1)
+	            .totalPages(pageResult.getTotalPages())
+	            .totalElements(pageResult.getTotalElements())
+	            .build();
+	    }	
 }

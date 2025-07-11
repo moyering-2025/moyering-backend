@@ -1,15 +1,19 @@
 package com.dev.moyering.gathering.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.checkerframework.checker.units.qual.m;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dev.moyering.gathering.dto.GatheringApplyDto;
 import com.dev.moyering.gathering.dto.MessageDto;
+import com.dev.moyering.gathering.entity.GatheringApply;
 import com.dev.moyering.gathering.repository.GatheringApplyRepository;
 import com.dev.moyering.gathering.repository.GatheringInquiryRepository;
 import com.dev.moyering.gathering.repository.GatheringRepository;
@@ -17,18 +21,43 @@ import com.dev.moyering.gathering.repository.MessageRepository;
 @Service
 public class MessageServiceImpl implements MessageService {
 	@Autowired
-	GatheringInquiryRepository gatheringInquiryRepository;
+	private GatheringInquiryRepository gatheringInquiryRepository;
 	@Autowired
-	GatheringRepository gatheringRepository;
+	private GatheringRepository gatheringRepository;
 	@Autowired
-	GatheringApplyRepository gatheringApplyRepository;
+	private GatheringApplyRepository gatheringApplyRepository;
 	@Autowired
-	MessageRepository messageRepository;
+	private MessageRepository messageRepository;
 	@Override
 	public Boolean sendMessage(Integer gatheringId, Integer senderId, String messageContent) throws Exception {
-		//MessageDto messageDto = new MessageDto(gatheringId, senderId, messageContent);
-		
-		return null;
+		MessageDto messageDto = new MessageDto();		
+		messageDto.setGatheringId(gatheringId);
+		messageDto.setSenderId(senderId);
+		System.out.println("messageContent : "+messageContent);
+		messageDto.setMessageContent(messageContent);
+		System.out.println("messageDto : "+messageDto);
+	    try {
+	    	 LocalDateTime approvedUpdate = gatheringApplyRepository
+	    		        .findByGatheringGatheringIdAndUserUserId(gatheringId, senderId)
+	    		        .map(GatheringApply::getApprovedUpdate)
+	    		        .orElse(null);
+	    	 System.out.println("approvedUpdate : "+approvedUpdate);
+	    	 Date messageAvailableTime = Date.from(approvedUpdate.atZone(ZoneId.systemDefault()).toInstant());
+	    	 messageDto.setMessageAvailableTime(messageAvailableTime);
+	    } catch (Exception e) {
+	        System.err.println("Error querying gathering_apply: " + e.getMessage());
+	    }
+	   
+	    messageDto.setWriteDate(new Date());
+	    messageDto.setMessageHide(false);  // 기본값 설정
+	    System.out.println("messageDto : " + messageDto);
+	    try {
+	        messageRepository.save(messageDto.toEntity());
+	        return true;  
+	    } catch (Exception e) {
+	        System.err.println("Error saving message: " + e.getMessage());
+	        throw e; 
+	    }
 	}
 
 	@Override
@@ -65,9 +94,19 @@ public class MessageServiceImpl implements MessageService {
 		 return messageList;
 	}
 	@Override
-	public List<MessageDto> getMessageRoomListUserId(Integer userId) throws Exception {
-		 List<MessageDto> messageRoomList = messageRepository.getMessageRoomListUserId(userId);
+	public List<MessageDto> getAvailableMessageRoomList(Integer userId) throws Exception {
+//		public List<MessageDto> getMessageRoomListUserId(Integer userId) throws Exception {
+		 List<MessageDto> messageRoomList = messageRepository.getAvailableMessageRoomListUserId(userId);
+//		 List<MessageDto> messageRoomList = messageRepository.getMessageRoomListUserId(userId);
 			
 		 return messageRoomList;
+	}
+	@Override
+	public List<MessageDto> getDisableMessageRoomList(Integer userId) throws Exception {
+//		public List<MessageDto> getMessageRoomListUserId(Integer userId) throws Exception {
+		List<MessageDto> messageRoomList = messageRepository.getDisableMessageRoomListUserId(userId);
+//		 List<MessageDto> messageRoomList = messageRepository.getMessageRoomListUserId(userId);
+		
+		return messageRoomList;
 	}
 }

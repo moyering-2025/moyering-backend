@@ -25,6 +25,7 @@ import com.dev.moyering.gathering.dto.GatheringDto;
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.repository.GatheringApplyRepository;
 import com.dev.moyering.gathering.repository.GatheringRepository;
+import com.dev.moyering.gathering.repository.MessageRepository;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
 import com.dev.moyering.util.PageInfo;
@@ -47,6 +48,8 @@ public class GatheringServiceImpl implements GatheringService {
 	public GatheringApplyRepository gatheringApplyRepository;
 	@Autowired
 	private final UserRepository userRepository;
+	@Autowired
+	private MessageRepository messageRepository;
 	private final JPAQueryFactory jpaQueryFactory;
 	
 	public Integer writeGathering(GatheringDto gatheringDto, MultipartFile thumbnail) throws Exception {
@@ -74,12 +77,12 @@ public class GatheringServiceImpl implements GatheringService {
 	@Override
 	public List<GatheringDto> myGatheringList(Integer userId, PageInfo pageInfo, String word, String status) throws Exception {
 	    // 내가 등록한 게더링 목록 + 페이지네이션, 제목으로 검색 
-	    PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+	    PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 5);
 	    Long cnt = gatheringRepository.selectMyGatheringListCount(userId, word, status);
 	    
 	    Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
-	    Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
-	    Integer endPage = Math.min(startPage+10-1, allPage);
+	    Integer startPage = (pageInfo.getCurPage()-1)/5*5+1;
+	    Integer endPage = Math.min(startPage+5-1, allPage);
 	    
 	    pageInfo.setAllPage(allPage);
 	    pageInfo.setStartPage(startPage);
@@ -93,9 +96,9 @@ public class GatheringServiceImpl implements GatheringService {
 	        Integer gatheringId = gathering.getGatheringId();
 	        
 	        // 참여 수락된 인원수 조회
-	        Integer acceptedCount = gatheringApplyRepository.findApprovedUserCountByGatheringId(gatheringId);
+	        Integer acceptedCount = gatheringApplyRepository.countByGatheringGatheringIdAndIsApprovedTrue(gatheringId).intValue();
 	        // 전체 참여신청 인원수 조회  
-	        Integer appliedCount = gatheringApplyRepository.findApplyUserCountByGatheringId(gatheringId);
+	        Integer appliedCount = gatheringApplyRepository.countByGatheringGatheringId(gatheringId).intValue();
 	        
 	        // DTO에 값 설정
 	        gathering.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);

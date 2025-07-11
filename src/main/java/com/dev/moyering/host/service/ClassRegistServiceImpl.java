@@ -25,4 +25,9 @@ public class ClassRegistServiceImpl implements ClassRegistService {
 				)
 				.collect(Collectors.toList());
 	}
+
+	@Override
+	public List<Integer> getregisterdUsersByClassId(Integer calendarId) throws Exception {
+		return classRegistRepository.findAllByClassCalendar_CalendarId(calendarId);
+	}
 }

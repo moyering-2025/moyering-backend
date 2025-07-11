@@ -1,9 +1,19 @@
 package com.dev.moyering.user.service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
 import com.dev.moyering.common.service.EmailService;
-
+import com.dev.moyering.socialing.repository.FollowRepository;
 import com.dev.moyering.user.dto.UserBadgeDto;
 import com.dev.moyering.user.dto.UserProfileDto;
 import com.dev.moyering.user.dto.UserProfileUpdateDto;
@@ -17,28 +27,33 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.dev.moyering.user.dto.UserDto;
-import com.dev.moyering.user.entity.User;
-import com.dev.moyering.user.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.dev.moyering.admin.dto.AdminMemberDto;
+import com.dev.moyering.admin.dto.AdminMemberSearchCond;
+import com.dev.moyering.common.service.EmailService;
+import com.dev.moyering.user.dto.UserBadgeDto;
+import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.dto.UserProfileDto;
+import com.dev.moyering.user.dto.UserProfileUpdateDto;
+import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.entity.UserBadge;
+import com.dev.moyering.user.repository.UserBadgeRepository;
+import com.dev.moyering.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+	@Autowired
+	private FollowRepository followRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -108,8 +123,14 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new Exception("이메일 인증이 완료되지 않았습니다.");
         }
+        user.setRegDate(Date.valueOf(LocalDate.now()));
         user.setActiveScore(0);
         user.setUserBadgeId(1);
+        user.setBirthday(userDto.getBirthday());
+        user.setAddr(userDto.getAddr());
+        user.setDetailAddr(userDto.getDetailAddr());
+        user.setLatitude(userDto.getLatitude());
+        user.setLongitude(userDto.getLongitude());
         userRepository.save(user);
         userBadgeService.giveBadge(user.getUserId(), 1);
     }
@@ -117,7 +138,10 @@ public class UserServiceImpl implements UserService {
 
     public UserDto findUserByUserId(Integer userId) throws Exception {
         User user = userRepository.findById(userId).orElseThrow(() -> new Exception("멤버 조회 오류"));
-        return user.toDto();
+        Integer myFollowerCnt =  followRepository.countByFollowing(user);
+        UserDto userDto = user.toDto();
+        userDto.setFollower(myFollowerCnt);
+        return userDto;
     }
 
     @Override

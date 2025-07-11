@@ -3,9 +3,17 @@ package com.dev.moyering.admin.dto;
 import java.sql.Date;
 
 public class AdminClassDetailDto {
+    private String portfolioDownload;
+    private String materialDownload;
+    private String firstCategory;
+    private String secondCategory;
+    private Integer classPrice;
+//    private min
+
+
+
     // 클래스 관리 페이지 상세
     private String classStatus ; // 클래스 상태 (class_calendar.status) => 대기 / 승인 / 거절 상태 띄우고, 세부 상태 보여주기 (승인 하면 바로 모집 중으로 상태 변경, 모집마감 / 폐강)
-    // 거절할 때 거절사유 넣으면 좋을 듯
     private String name; //스케줄 명
     private String content; // 클래스 내용
     private String registered_count; //등록인원

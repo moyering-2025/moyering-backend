@@ -32,13 +32,12 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 		Gathering gathering = gatheringRepository.findById(gatheringInquiryDto.getGatheringId()).get();
 		AlarmDto alarmDto = AlarmDto.builder()
 				.alarmType(3)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
-				.title(gatheringInquiryDto.getTitle()+"에 대한 문의가 등록 안내") // 필수 사항
+				.title("문의가 등록 안내") // 필수 사항
 				.receiverId(gathering.getUser().getUserId())
 				.senderId(gatheringInquiryDto.getUserId())
 				.senderNickname(gatheringInquiryDto.getNickName())
 				.content(gathering.getTitle()+"에 대한 문의가 등록되었어요.")//알림 내용
 				.build();
-		System.out.println("41 AlarmDto : "+alarmDto);
 		alarmService.sendAlarm(alarmDto);
 		return gatheringInquiry.getInquiryId();
 	}
@@ -50,7 +49,6 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	@Override
 	public List<GatheringInquiryDto> gatheringInquiryListBygatheringId(Integer gatheringId) throws Exception {
 		List<GatheringInquiryDto> gatheringInquiryList = null;
-		System.out.println("gatheringId : "+gatheringId);
 		gatheringInquiryList = gatheringInquiryRepository.gatheringInquiryListBygatheringId(gatheringId);
 		return gatheringInquiryList;
 	}
@@ -61,14 +59,13 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 		Gathering gathering = gatheringRepository.findById(gatheringInquiryDto.getGatheringId()).get();
 		AlarmDto alarmDto = AlarmDto.builder()
 				.alarmType(3)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
-				.title("문의에 대한 답변이 등록 안내") // 필수 사항
+				.title("문의 답변 등록 안내") // 필수 사항
 				.receiverId(gatheringInquiryDto.getUserId())
 				.senderId(gathering.getUser().getUserId())
 				.senderNickname(gathering.getUser().getNickName())
 				.content(gathering.getTitle()+"에 등록하신 문의에 대한 답변이 등록되었어요.")//알림 내용
 				.build();
 		
-		System.out.println("64 AlarmDto : "+alarmDto);
 		alarmService.sendAlarm(alarmDto);
 	}
 	@Override
@@ -80,12 +77,12 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	@Override
 	public List<GatheringInquiryDto> findInquiriesSentByUser(PageInfo pageInfo, Integer loginId, Date startDate, Date endDate,
 			Boolean isAnswered) throws Exception {
-		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 5);
 		Long cnt = gatheringInquiryRepository.countInquiriesSentByUser(loginId, startDate, endDate, isAnswered);
 		
 		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
-		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
-		Integer endPage = Math.min(startPage+10-1, allPage);
+		Integer startPage = (pageInfo.getCurPage()-1)/5*5+1;
+		Integer endPage = Math.min(startPage+5-1, allPage);
 
 	    System.out.println("startDate: " + startDate);
 	    System.out.println("endDate: " + endDate);
@@ -99,12 +96,12 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	@Override
 	public List<GatheringInquiryDto> findInquiriesReceivedByOrganizer (PageInfo pageInfo, Integer loginId, Date startDate, Date endDate,
 			Boolean isAnswered) throws Exception {
-		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 5);
 		Long cnt = gatheringInquiryRepository.countInquiriesReceivedByOrganizer(loginId, startDate, endDate, isAnswered);
 		System.out.println("cnt : " + cnt);
 		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
-		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
-		Integer endPage = Math.min(startPage+10-1, allPage);
+		Integer startPage = (pageInfo.getCurPage()-1)/5*5+1;
+		Integer endPage = Math.min(startPage+5-1, allPage);
 		pageInfo.setAllPage(allPage);
 		pageInfo.setStartPage(startPage);
 		pageInfo.setEndPage(endPage);
