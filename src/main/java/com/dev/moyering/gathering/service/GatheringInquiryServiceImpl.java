@@ -77,12 +77,12 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	@Override
 	public List<GatheringInquiryDto> findInquiriesSentByUser(PageInfo pageInfo, Integer loginId, Date startDate, Date endDate,
 			Boolean isAnswered) throws Exception {
-		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 5);
 		Long cnt = gatheringInquiryRepository.countInquiriesSentByUser(loginId, startDate, endDate, isAnswered);
 		
 		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
-		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
-		Integer endPage = Math.min(startPage+10-1, allPage);
+		Integer startPage = (pageInfo.getCurPage()-1)/5*5+1;
+		Integer endPage = Math.min(startPage+5-1, allPage);
 
 	    System.out.println("startDate: " + startDate);
 	    System.out.println("endDate: " + endDate);
@@ -96,12 +96,12 @@ public class GatheringInquiryServiceImpl implements GatheringInquiryService {
 	@Override
 	public List<GatheringInquiryDto> findInquiriesReceivedByOrganizer (PageInfo pageInfo, Integer loginId, Date startDate, Date endDate,
 			Boolean isAnswered) throws Exception {
-		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 10);
+		PageRequest pageRequest = PageRequest.of(pageInfo.getCurPage()-1, 5);
 		Long cnt = gatheringInquiryRepository.countInquiriesReceivedByOrganizer(loginId, startDate, endDate, isAnswered);
 		System.out.println("cnt : " + cnt);
 		Integer allPage = (int)(Math.ceil(cnt.doubleValue()/pageRequest.getPageSize()));
-		Integer startPage = (pageInfo.getCurPage()-1)/10*10+1;
-		Integer endPage = Math.min(startPage+10-1, allPage);
+		Integer startPage = (pageInfo.getCurPage()-1)/5*5+1;
+		Integer endPage = Math.min(startPage+5-1, allPage);
 		pageInfo.setAllPage(allPage);
 		pageInfo.setStartPage(startPage);
 		pageInfo.setEndPage(endPage);

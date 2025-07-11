@@ -23,7 +23,7 @@ public interface AdminSettlementService {
     /*** 정산 내역 총 개수*/
     Long getSettlementListCount(String searchKeyword, LocalDate startDate, LocalDate endDate);
 
-    boolean completeSettlement(Integer settlementId);
+    boolean completeSettlement(Integer settlementId, Integer totalSettlementAmount);
     
     /*** 특정강사 정산 리스트 조회 */
     Page<AdminSettlementDto> getHostSettlementList(SettlementSearchRequestDto dto);

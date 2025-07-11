@@ -71,7 +71,7 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
 //                    private Integer totalPlatformFee; // 총 플랫폼 수수료
                         adminSettlement.settlementDate,
                         adminSettlement.settledAt,
-                        adminSettlement.settlementStatus, // WP, CP, RQ
+                        adminSettlement.settlementStatus, // WT, CP, RQ
                         host.bankName,
                         host.accNum,
                         userPayment.amount.sum()
@@ -104,6 +104,14 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                         adminSettlement.settlementAmount
                 )
                 .fetchOne();
+
+
+        // 디버깅 로그 추가
+        if (content != null) {
+            log.info("정산 상세 조회 결과 - settlementId: {}, 계산된예정금액: {}, 기존정산금액: {}",
+                    settlementId, content.getSettleAmountToDo(), content.getSettlementAmount());
+        }
+
         return Optional.ofNullable(content);
     }
 
