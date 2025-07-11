@@ -1,17 +1,27 @@
 package com.dev.moyering.user.entity;
 
-import com.dev.moyering.admin.dto.AdminCouponDto;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.ClassRegist;
-import com.dev.moyering.user.dto.UserPaymentDto;
-import lombok.*;
-import org.springframework.data.relational.core.sql.In;
 
-import javax.persistence.*;
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -64,14 +74,15 @@ public class UserPayment {
     private String discountType; //쿠폰 할인 유형
 
     @Column
+    private Integer platformFee;
     // 관리자 쿠폰(MG) 사용하면 => 결제금액의 10%, // 강사쿠폰이면 => 클래스 원가의 10%
     // 관리자 쿠폰 사용하면, 정산할 때 (클래스 강의 당 원가 합) - 수수료 합, 강사쿠폰일 시 정산할 때 결제금액 합 - 수수료 합
-    private BigDecimal platformFee;
+
 
 
 
 @Builder
-    public UserPayment(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, LocalDateTime canceledAt, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer classPrice, String couponType, String discountType, BigDecimal platformFee) {
+    public UserPayment(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, LocalDateTime canceledAt, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer classPrice, String couponType, String discountType, Integer platformFee) {
         this.paymentId = paymentId;
         this.orderNo = orderNo;
         this.amount = amount;
@@ -89,10 +100,13 @@ public class UserPayment {
     }
 
     
-    public void approve(ClassRegist regist, LocalDateTime paidAt) {
+    public void approve(ClassRegist regist, LocalDateTime paidAt,String couponType,String discountType,Integer platformFee) {
         this.status = "결제완료";
         this.paidAt = paidAt;
         this.classRegist = regist;
+        this.couponType=couponType;
+        this.discountType=discountType;
+        this.platformFee = platformFee;
     }
 }
 

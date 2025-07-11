@@ -1,21 +1,5 @@
 package com.dev.moyering.user.repository;
 
-import com.dev.moyering.admin.dto.AdminPaymentDto;
-import com.dev.moyering.admin.dto.AdminPaymentSearchCond;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
-import java.time.LocalDate;
-import java.util.List;
-
 import static com.dev.moyering.admin.entity.QAdminCoupon.adminCoupon;
 import static com.dev.moyering.classring.entity.QUserCoupon.userCoupon;
 import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
@@ -23,6 +7,32 @@ import static com.dev.moyering.host.entity.QClassRegist.classRegist;
 import static com.dev.moyering.host.entity.QHostClass.hostClass;
 import static com.dev.moyering.user.entity.QUser.user;
 import static com.dev.moyering.user.entity.QUserPayment.userPayment;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+
+import com.dev.moyering.admin.dto.AdminPaymentDto;
+import com.dev.moyering.admin.dto.AdminPaymentSearchCond;
+import com.dev.moyering.classring.dto.UserPaymentHistoryDto;
+import com.dev.moyering.classring.dto.UtilSearchDto;
+import com.dev.moyering.host.entity.QClassCalendar;
+import com.dev.moyering.host.entity.QClassRegist;
+import com.dev.moyering.host.entity.QHostClass;
+import com.dev.moyering.user.entity.QUserPayment;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -144,5 +154,77 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
 
         return null;
     }
+
+	@Override
+	public Page<UserPaymentHistoryDto> findUserPaymentHistory(UtilSearchDto dto, Pageable pageable) throws Exception {
+		QUserPayment p = QUserPayment.userPayment;
+	    QClassRegist r = QClassRegist.classRegist;
+	    QClassCalendar c = QClassCalendar.classCalendar;
+	    QHostClass h = QHostClass.hostClass;
+	    
+	    BooleanBuilder builder = new BooleanBuilder();
+	    builder.and(r.user.userId.eq(dto.getUserId()));
+	    
+	    String tab = dto.getTab();
+
+	    if ("ing".equals(tab)) {
+	        builder.and(p.status.eq("결제완료"))
+	           .and(c.isNotNull())
+	               .and(c.status.in("모집중", "모집마감"));
+	    } else if ("fin".equals(tab)) {
+	        builder.and(p.status.eq("결제완료"))
+	           .and(c.isNotNull())
+	               .and(c.status.eq("종료"));
+	    } else if ("cancled".equals(tab)) {
+	        builder.and(p.status.eq("취소"));
+	    } else if ("closed".equals(tab)) {
+	        builder.and(p.status.eq("결제완료"))
+	           .and(c.isNotNull())
+            .and(c.status.in("폐강"));
+	    }
+	    if (dto.getKeywords() != null && !dto.getKeywords().isBlank()) {
+	        builder.and(h.name.containsIgnoreCase(dto.getKeywords()));
+	    }
+
+	    List<UserPaymentHistoryDto> content = jpaQueryFactory
+	        .select(Projections.constructor(
+	            UserPaymentHistoryDto.class,
+	            p.paymentId,
+	            h.name,
+	            c.status,
+	            c.startDate,
+	            h.scheduleStart,
+	            h.scheduleEnd,
+	            h.locName,
+	            h.addr,
+	            p.amount,
+	            h.img1,
+	            p.status,
+	            h.material,
+	            c.calendarId,
+	            h.recruitMin,
+	            h.recruitMax,
+	            c.registeredCount
+	        ))
+	        .from(p)
+	        .join(p.classRegist, r)
+	        .join(p.classCalendar, c)
+	        .join(c.hostClass, h)
+	        .where(builder)
+	        .offset(pageable.getOffset())
+	        .limit(pageable.getPageSize())
+	        .orderBy(p.paymentId.desc())
+	        .fetch();
+
+	    long total = jpaQueryFactory
+	        .select(p.count())
+	        .from(p)
+	        .join(p.classRegist, r)
+	        .leftJoin(p.classCalendar, c) // ← 이거 빠지면 NullPointerException 혹은 count 오류
+	        .where(builder)
+	        .fetchOne();
+
+	    return new PageImpl<>(content, pageable, total);
+	   }
 
 }
