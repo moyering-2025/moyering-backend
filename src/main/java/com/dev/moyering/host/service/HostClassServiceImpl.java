@@ -4,10 +4,7 @@ import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -77,7 +74,7 @@ public class HostClassServiceImpl implements HostClassService {
 	private final ReviewRepository reviewRepository;
 	private final AdminSettlementRepository settlementRepository;
 
-// 알람서비스 선언
+	// 알람서비스 선언
 	private final AlarmService alarmService;
 	@Value("${iupload.path}")
 	private String iuploadPath;
@@ -608,7 +605,7 @@ public class HostClassServiceImpl implements HostClassService {
 			LocalDate lastDayOfThisMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
 			if (cal.getStatus().equals("폐강")
 					|| cal.getStatus().equals("반려") && !cal.getStartDate().before(Date.valueOf(firstDayOfThisMonth))
-							&& !cal.getStartDate().after(Date.valueOf(lastDayOfThisMonth))) {
+					&& !cal.getStartDate().after(Date.valueOf(lastDayOfThisMonth))) {
 				cancleCount++;
 			}
 		}
@@ -620,7 +617,7 @@ public class HostClassServiceImpl implements HostClassService {
 		int allSettleCount = 0;
 		for (AdminSettlement settle : settlementList) {
 			if(settle.getSettlementStatus().equals("CP")) {
-				settleCount += settle.getSettlementAmount();	
+				settleCount += settle.getSettlementAmount();
 				allSettleCount++;
 			}
 		}
@@ -628,7 +625,7 @@ public class HostClassServiceImpl implements HostClassService {
 
 		//전체 결제 건수
 		map.put("payCount", allSettleCount);
-		
+
 		//이번달 판매금액
 		int thisMonthSettleCount = 0;
 		for(AdminSettlement settle : settlementList) {
@@ -640,7 +637,7 @@ public class HostClassServiceImpl implements HostClassService {
 			}
 		}
 		map.put("thisMonthSettle",thisMonthSettleCount);
-		
+
 		return map;
 	}
 

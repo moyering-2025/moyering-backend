@@ -33,6 +33,8 @@ public interface HostClassRepositoryCustom {
 
     // 관리자가 강사가 요청한 강의 승인
     int updateClassStatus(Integer classId) throws Exception;
+
+    List<ClassCalendar> findByHostId(Integer hostId);
 }
 
 
