@@ -30,5 +30,7 @@ public interface AdminSettlementRepositoryCustom {
     /*** 특정 정산에 대한 수강생 결제 리스트*/
     List<AdminPaymentDto> getPaymentListBySettlementId(Integer settlementId);
 
+    /*** 특정 강사에 대한 결제 리스트*/
+    List<AdminSettlement> findByHostIdsettlementList(Integer hostId);
 
 }

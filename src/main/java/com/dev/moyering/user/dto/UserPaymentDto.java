@@ -34,9 +34,9 @@ public class UserPaymentDto {
     private Integer classPrice; // 클래스 금액
     private String couponType; //사용한 쿠폰 유형
     private String discountType; //쿠폰 할인 유형
-    private BigDecimal platformFee; // 수수료
+    private Integer platformFee; // 수수료
 
-    public UserPaymentDto(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer classPrice, String couponType, String discountType, BigDecimal platformFee) {
+    public UserPaymentDto(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer classPrice, String couponType, String discountType, Integer platformFee) {
         this.paymentId = paymentId;
         this.orderNo = orderNo;
         this.amount = amount;
