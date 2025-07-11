@@ -28,13 +28,13 @@ public class UserReviewController {
 	private final ReviewService reviewService;
 
 	//클래스 상세 리뷰 더보기
-    @GetMapping("/class/classRingReviewList/{hostId}") 
+    @GetMapping("/class/classRingReviewList/{classId}") 
     public ResponseEntity<PageResponseDto<ReviewDto>> classRingReviewList (
-    		@PathVariable("hostId") Integer hostId,
+    		@PathVariable("classId") Integer classId,
     		@RequestParam(defaultValue = "0") int page,
     		@RequestParam(defaultValue = "10") int size) {
     	try {
-    		PageResponseDto<ReviewDto> reviewList = reviewService.getAllReviewByHostId(hostId, page, size);
+    		PageResponseDto<ReviewDto> reviewList = reviewService.getAllReviewByClassId(classId, page, size);
             return ResponseEntity.ok(reviewList);
 
 		} catch (Exception e) {
