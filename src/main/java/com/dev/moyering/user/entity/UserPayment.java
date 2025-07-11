@@ -1,12 +1,27 @@
 package com.dev.moyering.user.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.ClassRegist;
-import lombok.*;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -31,7 +46,7 @@ public class UserPayment {
     private LocalDateTime paidAt; // 결제일
 
     @Column
-    private String status; // 상태 (주문, 취소, 환불)
+    private String status; // 상태 (주문, 취소)
     
     @Column
     private LocalDateTime canceledAt; //취소시간
@@ -60,8 +75,11 @@ public class UserPayment {
 
     @Column
     private Integer platformFee;
+    // 관리자 쿠폰(MG) 사용하면 => 결제금액의 10%, // 강사쿠폰이면 => 클래스 원가의 10%
+    // 관리자 쿠폰 사용하면, 정산할 때 (클래스 강의 당 원가 합) - 수수료 합, 강사쿠폰일 시 정산할 때 결제금액 합 - 수수료 합
 
-    // 관리자 쿠폰 사용하면 => 클래스 원가의 10%, // 강사쿠폰이면 => 결제금액의 10%%
+
+
 
 @Builder
     public UserPayment(Integer paymentId, String orderNo, Integer amount, String paymentType, LocalDateTime paidAt, String status, LocalDateTime canceledAt, ClassRegist classRegist, ClassCalendar classCalendar, UserCoupon userCoupon, Integer classPrice, String couponType, String discountType, Integer platformFee) {

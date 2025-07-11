@@ -2,6 +2,7 @@ package com.dev.moyering.gathering.dto;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import com.dev.moyering.gathering.entity.Gathering;
 import com.dev.moyering.gathering.entity.GatheringApply;
@@ -51,6 +52,7 @@ public class GatheringApplyDto {
     private String intro;
     private Date applyDate;   
     private Boolean isApprove;
+    private LocalDateTime approvedUpdate;
     private String aspiration;
     private Integer acceptedCount;
     
@@ -62,6 +64,7 @@ public class GatheringApplyDto {
     			.applyDate(applyDate)
     			.isApproved(isApprove)
     			.aspiration(aspiration)
+    			.approvedUpdate(approvedUpdate)
     			.build();
     }
 

@@ -1,22 +1,29 @@
 package com.dev.moyering.admin.service;
-import com.dev.moyering.admin.dto.AdminPaymentDto;
-import com.dev.moyering.admin.dto.AdminSettlementDto;
-import com.dev.moyering.admin.entity.AdminSettlement;
-import com.dev.moyering.admin.repository.AdminSettlementRepository;
-import com.dev.moyering.host.dto.SettlementSearchRequestDto;
-import com.dev.moyering.user.repository.UserPaymentRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dev.moyering.admin.dto.AdminPaymentDto;
+import com.dev.moyering.admin.dto.AdminSettlementDto;
+import com.dev.moyering.admin.entity.AdminSettlement;
+import com.dev.moyering.admin.repository.AdminSettlementRepository;
+import com.dev.moyering.common.dto.AlarmDto;
+import com.dev.moyering.common.service.AlarmService;
+import com.dev.moyering.host.dto.SettlementSearchRequestDto;
+import com.dev.moyering.host.entity.Host;
+import com.dev.moyering.host.repository.HostRepository;
+import com.dev.moyering.user.repository.UserPaymentRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
@@ -26,6 +33,8 @@ import java.util.stream.Collectors;
 public class AdminSettlementServiceImpl implements AdminSettlementService {
     private final AdminSettlementRepository adminSettlementRepository;
     private final UserPaymentRepository userPaymentRepository;
+    private final AlarmService alarmService;
+    private final HostRepository hostRepository;
 
 
     @Override
@@ -74,7 +83,25 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
                     savedSettlement.getSettlementAmount(),
                     savedSettlement.getSettlementStatus(),
                     savedSettlement.getSettledAt());
-
+            
+            Integer hostId = adminSettlementRepository.findById(settlementId).get().getHostId();
+            Host host = hostRepository.findById(hostId).get();
+            Integer userId = host.getUserId();
+            
+            AlarmDto alarmDto = AlarmDto.builder()
+    				.alarmType(2)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
+    				.title("정산 완료 안내") // 필수 사항
+    				.receiverId(userId)
+    				//수신자 유저 아이디
+    				.senderId(4)
+    				//발신자 유저 아이디 
+    				.senderNickname("admin")
+    				//발신자 닉네임 => 시스템/관리자가 발송하는 알람이면 메니저 혹은 관리자, 강사가 발송하는 알람이면 강사테이블의 닉네임, 그 외에는 유저 테이블의 닉네임(마이페이지 알림 내역에서 보낸 사람으로 보여질 이름)
+    				.content(host.getName()+"님의 정산처리가 완료되었습니다.")//알림 내용
+    				.build();
+            
+            alarmService.sendAlarm(alarmDto);
+            
             return true;
 
         } catch (IllegalArgumentException | IllegalStateException e) {

@@ -12,6 +12,7 @@ public interface MessageService {
 
 	List<MessageDto> getMessageListByGatheringIdAndUserId(Integer gatheringId, Integer userId) throws Exception;
 
-	List<MessageDto> getMessageRoomListUserId(Integer userId) throws Exception;
+	List<MessageDto> getAvailableMessageRoomList(Integer userId) throws Exception;
+	List<MessageDto> getDisableMessageRoomList(Integer userId)throws Exception;
 
 }

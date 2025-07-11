@@ -79,7 +79,14 @@ public class CommentServiceImpl implements CommentService {
         userService.addScore(comment.getUser().getUserId(), score);
         //뱃지 획득 가능 여부 확인
         userBadgeService.giveBadgeWithScore(comment.getUser().getUserId());
-        
+
+        // ---------- parentWriterId 채우기 ----------
+        CommentDto dto = saved.toDto();
+        if (parentId != null) {
+            Comment parent = commentRepository.findById(parentId)
+                    .orElseThrow(() -> new NoSuchElementException("부모 댓글을 찾을 수 없습니다. parentId=" + parentId));
+            dto.setParentWriterId(parent.getUser().getNickName());
+        }
         return saved.toDto();
     }
 }

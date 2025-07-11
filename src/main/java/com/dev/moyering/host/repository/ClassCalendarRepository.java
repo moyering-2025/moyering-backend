@@ -15,4 +15,8 @@ public interface ClassCalendarRepository extends JpaRepository<ClassCalendar, In
 	List<ClassCalendar> findAllByHostClass_ClassIdAndStatus(Integer classId,String status);
 	List<ClassCalendar> findByHostClassClassId(Integer classId)throws Exception;
 	List<ClassCalendar> findByStartDateLessThanEqualAndStatus(Date classDate, String string)throws Exception;
+
+//    Integer calendarId(Integer calendarId);
+//
+//	List<ClassCalendar> calendarId(Integer calendarId);
 }

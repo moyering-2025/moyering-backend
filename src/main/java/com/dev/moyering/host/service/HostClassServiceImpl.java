@@ -3,15 +3,17 @@ package com.dev.moyering.host.service;
 import java.io.File;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.dev.moyering.common.dto.AlarmDto;
+import com.dev.moyering.common.service.AlarmService;
+import com.dev.moyering.host.entity.Host;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -20,11 +22,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
+import com.dev.moyering.admin.entity.AdminSettlement;
+import com.dev.moyering.admin.repository.AdminSettlementRepository;
 import com.dev.moyering.common.dto.ClassSearchRequestDto;
 import com.dev.moyering.common.dto.PageResponseDto;
 import com.dev.moyering.common.entity.SubCategory;
@@ -38,12 +43,16 @@ import com.dev.moyering.host.dto.StudentSearchRequestDto;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.ClassRegist;
 import com.dev.moyering.host.entity.HostClass;
+import com.dev.moyering.host.entity.Inquiry;
 import com.dev.moyering.host.entity.QClassCalendar;
 import com.dev.moyering.host.entity.QHostClass;
+import com.dev.moyering.host.entity.Review;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.ClassRegistRepository;
 import com.dev.moyering.host.repository.HostClassRepository;
 import com.dev.moyering.host.repository.HostRepository;
+import com.dev.moyering.host.repository.InquiryRepository;
+import com.dev.moyering.host.repository.ReviewRepository;
 import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
 import com.dev.moyering.user.repository.UserRepository;
@@ -64,7 +73,12 @@ public class HostClassServiceImpl implements HostClassService {
 	private final HostRepository hostRepository;
 	private final SubCategoryRepository subCategoryRepository;
 	private final ClassRegistRepository classRegistRepository;
+	private final InquiryRepository inquiryRepository;
+	private final ReviewRepository reviewRepository;
+	private final AdminSettlementRepository settlementRepository;
 
+// 알람서비스 선언
+	private final AlarmService alarmService;
 	@Value("${iupload.path}")
 	private String iuploadPath;
 
@@ -125,15 +139,12 @@ public class HostClassServiceImpl implements HostClassService {
 		dates.forEach(date -> {
 			ClassCalendar cc = ClassCalendar.builder().startDate(date).endDate(date).status("승인대기")
 					.hostClass(HostClass.builder().classId(hostClass.getClassId()).build()).build();
-			
+
 			classCalendarRepository.save(cc);
 		});
 
 		return hostClass.getClassId();
 	}
-	
-	
-	
 
 	@Override
 	public PageResponseDto<HostClassDto> searchClasses(ClassSearchRequestDto dto) throws Exception {
@@ -391,19 +402,59 @@ public class HostClassServiceImpl implements HostClassService {
 	public Page<AdminClassDto> getHostClassListForAdmin(AdminClassSearchCond cond, Pageable pageable) throws Exception {
 		log.info("클래스 목록 관리 조회 - cond : {}, pageable : {}", cond, pageable);
 		try {
-			List<AdminClassDto> content = hostClassRepository.searchClassForAdmin(cond, pageable);
-			log.info("조회된 content 개수 : {}", content.size());
+			Page<AdminClassDto> content = hostClassRepository.searchClassForAdmin(cond, pageable);
 
 			Long total = hostClassRepository.countClasses(cond); // 검색 조건에 따른 페이지 계산
-			log.info("전체 개수 : {}", total);
-
-			return new PageImpl<>(content, pageable, total);
+			return content;
 		} catch (Exception e) {
 			log.error("getClassList 에러 상새 : ", e);
 			throw e;
 		}
 	}
 
+	/*** 관리자가 강사 클래스를 승인 */
+	@Override
+	@Transactional
+	public void approveClass(Integer classId) throws Exception {
+		try {
+			// 1. 클래스 상태 업데이트
+			int updatedStatus = hostClassRepository.updateClassStatus(classId);
+			if (updatedStatus == 0) {
+				throw new RuntimeException("업데이트 할 상태가 없습니다.");
+			}
+
+			// 2. 클래스 정보 조회 및 userId 추출
+			HostClass hostClass = hostClassRepository.findById(classId)
+					.orElseThrow(() -> new RuntimeException("클래스를 찾을 수 없습니다."));
+
+			Host host = hostClass.getHost();
+			if (host == null) {
+				throw new RuntimeException("호스트 정보를 찾을 수 없습니다.");
+			}
+
+			Integer userId = host.getUserId(); // 이미 userId를 올바르게 가져오고 있음
+			if (userId == null) {
+				throw new RuntimeException("사용자 ID를 찾을 수 없습니다.");
+			}
+
+			// 3. 알람 생성 및 발송
+			AlarmDto alarmDto = AlarmDto.builder()
+					.alarmType(2) // 클래스링 알람
+					.title("클래스 승인 안내")
+					.receiverId(userId) // userId 사용
+					.senderId(1) // 관리자 ID
+					.senderNickname("관리자")
+					.content("클래스가 승인 되었습니다")
+					.build();
+
+			log.info("클래스 승인 알람 발송 - 클래스ID: {}, 수신자 userId: {}", classId, userId);
+			alarmService.sendAlarm(alarmDto);
+
+		} catch (Exception e) {
+			log.error("클래스 승인 처리 중 오류 발생 - 클래스ID: {}, 오류: {}", classId, e.getMessage(), e);
+			throw e;
+		}
+	}
 	@Override
 	public Integer updateClass(HostClassDto hostClassDto) throws Exception {
 		HostClassDto classDto = hostClassRepository.findByClassId(hostClassDto.getClassId()).toDto();
@@ -427,11 +478,11 @@ public class HostClassServiceImpl implements HostClassService {
 		} else {
 			hostClassDto.setImgName2(classDto.getImgName2());
 		}
-			
+
 		if (files[2] != null && !files[2].isEmpty()) {
 			hostClassDto.setImgName3(files[2].getOriginalFilename());
 		} else {
-			hostClassDto.setImgName3(classDto.getImgName3());	
+			hostClassDto.setImgName3(classDto.getImgName3());
 		}
 		if (files[3] != null && !files[3].isEmpty()) {
 			hostClassDto.setImgName4(files[3].getOriginalFilename());
@@ -450,7 +501,7 @@ public class HostClassServiceImpl implements HostClassService {
 		}
 
 		hostClassRepository.save(hostClassDto.toEntity());
-		
+
 		return hostClassDto.getClassId();
 
 	}
@@ -459,7 +510,7 @@ public class HostClassServiceImpl implements HostClassService {
 	public List<UserDto> selectClassStudentList(Integer calendarId) throws Exception {
 		List<ClassRegist> classRegistList = classRegistRepository.findByClassCalendarCalendarId(calendarId);
 		List<User> studnetList = new ArrayList<>();
-		for(ClassRegist regist : classRegistList) {
+		for (ClassRegist regist : classRegistList) {
 			studnetList.add(userRepository.findById(regist.getUser().getUserId()).get());
 		}
 		List<UserDto> dtoList = studnetList.stream().map(User::toDto).collect(Collectors.toList());
@@ -470,34 +521,127 @@ public class HostClassServiceImpl implements HostClassService {
 	public List<UserDto> selectStudentList(Integer hostId) throws Exception {
 		List<ClassRegist> regList = classRegistRepository.findByCalendar_HostClass_Host_HostId(hostId);
 		List<UserDto> userDtoList = new ArrayList<>();
-		for(ClassRegist reg : regList) {
+		for (ClassRegist reg : regList) {
 			User user = userRepository.findById(reg.getUser().getUserId()).get();
 			userDtoList.add(user.toDto());
 		}
-		
+
 		return userDtoList;
 	}
 
 	@Override
 	public Page<UserDto> searchStudents(StudentSearchRequestDto dto) throws Exception {
-		PageRequest pageable = PageRequest.of(dto.getPage(),dto.getSize());
+		PageRequest pageable = PageRequest.of(dto.getPage(), dto.getSize());
 		Page<User> resultPage = hostClassRepository.searchClassStudent(dto, pageable);
 		return resultPage.map(User::toDto);
 	}
 
 	@Override
 	public List<CalendarUserDto> searchStudentClass(Integer hostId, Integer userId) throws Exception {
-		List<CalendarUserDto> dtoList=classRegistRepository.findByStudentClass(hostId, userId);
+		List<CalendarUserDto> dtoList = classRegistRepository.findByStudentClass(hostId, userId);
 		return dtoList;
 	}
 
 	@Override
-	public List<HostClassDto> getRecommendClassesInDetail(Integer subCategoryId,Integer classId) throws Exception {
-		SubCategory subCategory = subCategoryRepository.findById(subCategoryId).orElseThrow(()-> new Exception("해당 카테고리가 존재하지 않습니다.ㄴ"));
-		List<HostClassDto> result =hostClassRepository.findRecommendClassesInDetail(subCategoryId, subCategory.getFirstCategory().getCategoryId(), classId);
-		return 	result;
+	public List<HostClassDto> getRecommendClassesInDetail(Integer subCategoryId, Integer classId) throws Exception {
+		SubCategory subCategory = subCategoryRepository.findById(subCategoryId)
+				.orElseThrow(() -> new Exception("해당 카테고리가 존재하지 않습니다.ㄴ"));
+		List<HostClassDto> result = hostClassRepository.findRecommendClassesInDetail(subCategoryId,
+				subCategory.getFirstCategory().getCategoryId(), classId);
+		return result;
 	}
 
-	
+	@Override
+	public Map<String, Object> hostRateCount(Integer hostId) throws Exception {
+		Map<String, Object> map = new HashMap<>();
+		// 문의 응답률
+		List<Inquiry> inquiryList = inquiryRepository.hostInquiryCount(hostId);
+		int size = inquiryList.size();
+		int count = 0;
+		for (Inquiry iq : inquiryList) {
+			if (iq.getState() == 1) {
+				count++;
+			}
+		}
+		if (size == 0) {
+			map.put("inquiryRate", 0.0);
+		} else {
+			Double result = (count / (double) size) * 100;
+			result = Math.round(result * 100.0) / 100.0;
+			map.put("inquiryRate", result);
+
+		}
+
+		// 리뷰 총 갯수
+		List<Review> reviewList = reviewRepository.findByHostHostId(hostId);
+		map.put("reviewRate", reviewList.size());
+
+		// 평점
+		int star = 0;
+		for (Review review : reviewList) {
+			star += review.getStar();
+		}
+
+		double starRate = ((double) star / reviewList.size()) * 100;
+		starRate = Math.round(starRate * 100.0) / 100.0;
+		map.put("starRate", starRate);
+
+		// 이번달 진행한 클래스갯수
+		List<ClassCalendar> calendarList = hostClassRepository.findByHostId(hostId);
+		int calendarCount = 0;
+		for (ClassCalendar cal : calendarList) {
+			LocalDate currentDate = LocalDate.now();
+			LocalDate firstDayOfThisMonth = currentDate.withDayOfMonth(1);
+			LocalDate lastDayOfThisMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+			if (cal.getStatus().equals("종료") && !cal.getStartDate().before(Date.valueOf(firstDayOfThisMonth))
+					&& !cal.getStartDate().after(Date.valueOf(lastDayOfThisMonth))) {
+				calendarCount++;
+			}
+		}
+		map.put("calendarCount", calendarCount);
+
+		// 이번달 취소 건수
+		int cancleCount = 0;
+		for (ClassCalendar cal : calendarList) {
+			LocalDate currentDate = LocalDate.now();
+			LocalDate firstDayOfThisMonth = currentDate.withDayOfMonth(1);
+			LocalDate lastDayOfThisMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+			if (cal.getStatus().equals("폐강")
+					|| cal.getStatus().equals("반려") && !cal.getStartDate().before(Date.valueOf(firstDayOfThisMonth))
+							&& !cal.getStartDate().after(Date.valueOf(lastDayOfThisMonth))) {
+				cancleCount++;
+			}
+		}
+		map.put("cancleCount", cancleCount);
+
+		// 전체정상금액
+		List<AdminSettlement> settlementList = settlementRepository.findByHostIdsettlementList(hostId);
+		int settleCount = 0;
+		int allSettleCount = 0;
+		for (AdminSettlement settle : settlementList) {
+			if(settle.getSettlementStatus().equals("CP")) {
+				settleCount += settle.getSettlementAmount();	
+				allSettleCount++;
+			}
+		}
+		map.put("settleCount", settleCount);
+
+		//전체 결제 건수
+		map.put("payCount", allSettleCount);
+		
+		//이번달 판매금액
+		int thisMonthSettleCount = 0;
+		for(AdminSettlement settle : settlementList) {
+			LocalDate currentDate = LocalDate.now();
+			LocalDate firstDayOfThisMonth = currentDate.withDayOfMonth(1);
+			LocalDate lastDayOfThisMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+			if(settle.getSettlementStatus().equals("CP") && !settle.getSettlementDate().isBefore(firstDayOfThisMonth) && !settle.getSettlementDate().isAfter(lastDayOfThisMonth)) {
+				thisMonthSettleCount += settle.getSettlementAmount();
+			}
+		}
+		map.put("thisMonthSettle",thisMonthSettleCount);
+		
+		return map;
+	}
 
 }

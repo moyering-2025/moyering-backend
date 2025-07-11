@@ -1,5 +1,7 @@
 package com.dev.moyering.host.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,4 +14,5 @@ public interface InquiryRepositoryCustom {
 	Page<Inquiry> findInquiriesByClassId(Integer classId, Pageable pageable) throws Exception;
 	Page<Inquiry> searchInquiries(InquirySearchRequestDto dto, Pageable pageable) throws Exception;
 	Page<InquiryResponseDto> findInquriesByUserId(UtilSearchDto dto, Pageable pageable) throws Exception;
+	List<Inquiry> hostInquiryCount(Integer hostId);
 }
