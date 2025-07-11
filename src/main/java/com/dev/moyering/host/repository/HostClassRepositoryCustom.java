@@ -12,6 +12,7 @@ import com.dev.moyering.common.dto.MainSearchRequestDto;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.dto.StudentSearchRequestDto;
+import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.HostClass;
 import com.dev.moyering.user.entity.User;
 

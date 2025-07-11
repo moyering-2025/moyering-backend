@@ -303,4 +303,23 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
 
         return content;
     }
+
+	@Override
+	public List<AdminSettlement> findByHostIdsettlementList(Integer hostId) {
+		QAdminSettlement settlement = QAdminSettlement.adminSettlement;
+		QClassCalendar calendar = QClassCalendar.classCalendar;
+		QHostClass hostClass = QHostClass.hostClass;
+		QHost host = QHost.host;
+		
+		BooleanBuilder builder= new BooleanBuilder();
+		builder.and(host.hostId.eq(hostId));
+		
+		List<AdminSettlement> list = queryFactory.selectFrom(settlement)
+				.leftJoin(settlement.classCalendar,calendar)
+				.leftJoin(calendar.hostClass,hostClass)
+				.leftJoin(hostClass.host,host)
+				.where(builder).fetch();
+		
+		return list;
+	}
 }

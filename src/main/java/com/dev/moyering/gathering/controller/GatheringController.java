@@ -53,9 +53,7 @@ public class GatheringController {
 		try {
 			gatheringDto.setUserId(principal.getUser().getUserId());
 			gatheringDto.setThumbnailFileName(thumbnail.getOriginalFilename());
-//			System.out.println("gatheringDto : "+gatheringDto +", "+thumbnail);
 			Integer gatheringId = gatheringService.writeGathering(gatheringDto, thumbnail);
-//			System.out.println("게더링 등록 성공 새 게더링 아이디 : " + gatheringId);
 			return new ResponseEntity<>(gatheringId, HttpStatus.OK);
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -81,7 +79,6 @@ public class GatheringController {
 		try {
 			GatheringDto nGatheringDto = gatheringService.detailGathering(gatheringId);
 			//호스트,신청 멤버 정보 추가
-//			System.out.println("조회된 게더링 : " + nGatheringDto);
 			Map<String,Object> res = new HashMap<>();
 			res.put("gathering", nGatheringDto);
 			UserDto userDto = userService.findUserByUserId(nGatheringDto.getUserId());

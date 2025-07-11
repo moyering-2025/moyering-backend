@@ -83,8 +83,7 @@ public class GatheringSchedulerService {
             Integer minAttendees = gathering.getMinAttendees();
             
             // 승인된 참여자 수 조회
-            Integer approvedCount = gatheringApplyRepository.findApprovedUserCountByGatheringId(gatheringId);
-            
+            Integer approvedCount = gatheringApplyRepository.countByGatheringGatheringIdAndIsApprovedTrue(gatheringId).intValue();            
             logger.info("모임 ID: {}, 최소 참여 인원: {}, 승인된 참여자 수: {}", 
                        gatheringId, minAttendees, approvedCount);
             
@@ -117,14 +116,12 @@ public class GatheringSchedulerService {
         try {
             AlarmDto alarmDto = AlarmDto.builder()
                     .alarmType(3) // 게더링 알람
-                    .title("모임 취소 알림")
+                    .title("모임 취소")
                     .receiverId(gathering.getUser().getUserId())
                     .senderId(null) // 시스템 알림
                     .senderNickname("시스템")
-                    .content(String.format("'%s' 모임이 최소 참여 인원 미달(승인: %d명, 최소: %d명)로 자동 취소되었습니다.", 
-                            gathering.getTitle(), 
-                            approvedCount != null ? approvedCount : 0, 
-                            minAttendees))
+                    .content(String.format("'%s' 모임이 최소 참여 인원 미달로 자동 취소되었습니다.", 
+                            gathering.getTitle()))
                     .build();
             
             alarmService.sendAlarm(alarmDto);
@@ -146,7 +143,7 @@ public class GatheringSchedulerService {
             for (GatheringApplyDto approvedUser : approvedUsers) {
                 AlarmDto alarmDto = AlarmDto.builder()
                         .alarmType(3) // 게더링 알람
-                        .title("참여 모임 취소 알림")
+                        .title("참여 모임 취소")
                         .receiverId(approvedUser.getUserId())
                         .senderId(null) // 시스템 알림
                         .senderNickname("시스템")

@@ -46,4 +46,6 @@ public interface HostClassService {
 	//클래스 상세 추천 강의
 	List<HostClassDto> getRecommendClassesInDetail(Integer subCategoryId, Integer classId)throws Exception;
 	
+	Map<String,Object> hostRateCount(Integer hostId)throws Exception; 
+	
 }

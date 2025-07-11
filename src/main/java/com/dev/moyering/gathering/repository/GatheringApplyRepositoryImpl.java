@@ -2,6 +2,7 @@ package com.dev.moyering.gathering.repository;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,26 +65,6 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	        )
 	        .fetch();
 	}
-	
-	@Override
-	public Integer findApprovedUserCountByGatheringId(Integer gatheringId) throws Exception {
-		QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
-		return jpaQueryFactory
-			    .select(gatheringApply.count())
-			    .from(gatheringApply)
-			    .where(gatheringApply.gathering.gatheringId.eq(gatheringId)
-			        .and(gatheringApply.isApproved.isTrue()))
-			    .fetchOne().intValue();
-	}
-	@Override
-	public Integer findApplyUserCountByGatheringId(Integer gatheringId) throws Exception {
-		QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
-		return jpaQueryFactory
-			    .select(gatheringApply.count())
-			    .from(gatheringApply)
-			    .where(gatheringApply.gathering.gatheringId.eq(gatheringId))
-			    .fetchOne().intValue();
-	}
 	@Override
 	public List<GatheringApplyDto> findApplyUserListByGatheringIdForOrganizer(Integer gatheringId) throws Exception {
 		QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
@@ -119,32 +100,14 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	@Override
 	@Transactional
 	public void updateGatheringApplyApproval(Integer gatheringApplyId, boolean isApproved) throws Exception {
+		  LocalDateTime now = LocalDateTime.now();
+		
 	    QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
 	    JPAUpdateClause clause = jpaQueryFactory.update(gatheringApply)
 	            .set(gatheringApply.isApproved, isApproved)
+	            .set(gatheringApply.approvedUpdate, now)
 	            .where(gatheringApply.gatheringApplyId.eq(gatheringApplyId));
-//	    java.sql.Date today = java.sql.Date.valueOf(LocalDate.now());
-//	    if(isApproved) {
-//	        clause.set(gatheringApply.rejectionDate,(Date) null)
-//            .set(gatheringApply.approvalDate, today);
-//	    } else {
-//	        clause.set(gatheringApply.rejectionDate, today);
-//	    }
 	    clause.execute();
-	}
-
-	@Override
-	public Integer findByGatheringIdAndUserId(Integer gatheringId, Integer userId) throws Exception {
-		QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
-	    QUser user = QUser.user;
-		return jpaQueryFactory.select(gatheringApply.count())
-		        .from(gatheringApply)
-		        .join(user).on(gatheringApply.user.userId.eq(user.userId))
-		        .where(
-		            gatheringApply.gathering.gatheringId.eq(gatheringId),
-		            gatheringApply.user.userId.eq(userId)
-		        )
-		        .fetchOne().intValue();
 	}
 
 	@Override
@@ -177,7 +140,6 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	    
 	    // 상태별 정렬 기준 적용
 	    if ("거절됨".equals(status)) {
-	        // 거절됨 상태: 지원일 최신순
 	        query = query.orderBy(
 	            gatheringApply.applyDate.desc(),
 	            gatheringApply.gatheringApplyId.desc()
@@ -241,9 +203,11 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	    }
 	    switch (status) {
 	        case "대기중":
-	            return gatheringApply.isApproved.isNull(); 
+	            return gatheringApply.isApproved.isNull()
+	                    .and(gatheringApply.gathering.canceled.isFalse());
 	        case "수락됨":
-	            return gatheringApply.isApproved.isTrue(); 
+	            return gatheringApply.isApproved.isTrue()
+	                    .and(gatheringApply.gathering.canceled.isFalse());
 	        case "거절됨":
 	            return gatheringApply.isApproved.isFalse()
 	                    .or(gatheringApply.gathering.canceled.isTrue());
@@ -251,17 +215,4 @@ public class GatheringApplyRepositoryImpl implements GatheringApplyRepositoryCus
 	            return null;
 	    }
 	}
-
-	@Override
-	@Transactional
-	 public void cancelGatheringApply(Integer gatheringApplyId) throws Exception {
-		 QGatheringApply gatheringApply = QGatheringApply.gatheringApply;
-	        
-		 long deletedCount = jpaQueryFactory.delete(gatheringApply)
-            .where(gatheringApply.gatheringApplyId.eq(gatheringApplyId))
-            .execute();
-		 if (deletedCount == 0) {
-			 throw new Exception("비상~~~!");
-		 }
-    }
 }
