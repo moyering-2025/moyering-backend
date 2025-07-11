@@ -12,8 +12,8 @@ import com.dev.moyering.host.dto.ReviewDto;
 import com.dev.moyering.host.dto.ReviewSearchRequestDto;
 
 public interface ReviewService {
-	List<ReviewDto> getReviewByHostId(Integer hostId);
-	PageResponseDto<ReviewDto> getAllReviewByHostId(Integer hostId, Integer page, Integer size);
+	List<ReviewDto> getReviewByClassId(Integer classId)throws Exception;
+	PageResponseDto<ReviewDto> getAllReviewByClassId(Integer classId, Integer page, Integer size)throws Exception;
 	PageResponseDto<ReviewDto> getReviewsForHost(Integer hostId,int page,int size)throws Exception;
 	Page<ReviewDto> searchReviews(ReviewSearchRequestDto dto)throws Exception;
 	List<ReviewDto> getReviews(Integer hostId)throws Exception;
