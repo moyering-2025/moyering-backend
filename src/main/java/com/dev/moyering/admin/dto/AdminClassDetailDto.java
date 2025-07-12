@@ -1,30 +1,76 @@
 package com.dev.moyering.admin.dto;
 
-import java.sql.Date;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.sql.Date;
+import java.time.LocalTime;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AdminClassDetailDto {
-    private String portfolioDownload;
-    private String materialDownload;
+    // 기본 클래스 정보
+    private Integer classId;
+    private String className;
+    private String hostName;
+    private String processStatus;
+    private Integer currentCount;
+    private Integer recruitMax;
+    private Integer recruitMin;
+
+    // 카테고리 정보
     private String firstCategory;
     private String secondCategory;
-    private Integer classPrice;
-//    private min
 
+    // 가격 및 일정
+    private Integer price;
+    private Date startDate;
+    private Date endDate;
+    private LocalTime scheduleStart;
+    private LocalTime scheduleEnd;
 
+    // 위치 정보
+    private String location;
+    private String detailAddr;
 
-    // 클래스 관리 페이지 상세
-    private String classStatus ; // 클래스 상태 (class_calendar.status) => 대기 / 승인 / 거절 상태 띄우고, 세부 상태 보여주기 (승인 하면 바로 모집 중으로 상태 변경, 모집마감 / 폐강)
-    private String name; //스케줄 명
-    private String content; // 클래스 내용
-    private String registered_count; //등록인원
-    private String email;
+    // 상세 정보
+    private String description;
+    private String keywords;
+    private String inclusion;
+    private String preparation;
+    private String caution;
 
+    // 파일 정보
+    private String portfolioName;
+    private String materialName;
 
-    // 강의 상세페이지를 보여주고 승인 등록 버튼 클릭할 수 있도록 하기!
-    // 클래스 횟수 ? 를 보여주기  (몇회차인지??? )
-    private Date startDate; // 클래스 일자
-    // 클래스 관리 페이지에서는 승인, 거절만 할 수 있도록 설계하기 ! (클래스 날짜)
-    // (상세쪽에서 개강, 폐강, 모집중, 모집마감 상태관리) => 클래스 날짜 여러개 보여주기
-    // 상세페이지에 수강인원, 각 클래스 날짜, 상태 관리하기
-    // 등록인원(registered_People)
+    // 이미지 정보
+    private String imgName1;
+    private String imgName2;
+    private String imgName3;
+    private String imgName4;
+    private String imgName5;
+
+    // 수강생 목록
+    private List<StudentDto> students;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class StudentDto {
+        private String userId;
+        private String name;
+        private String phone;
+        private String email;
+        private Date regDate;
+        private String status;
+    }
 }

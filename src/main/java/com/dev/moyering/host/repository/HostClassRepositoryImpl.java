@@ -307,5 +307,10 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 
 		return calendars.size();
 	}
-	
+
+	@Override
+	public List<ClassCalendar> findByHostId(Integer hostId) {
+		return List.of();
+	}
+
 }

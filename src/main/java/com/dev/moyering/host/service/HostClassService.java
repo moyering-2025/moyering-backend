@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.dev.moyering.admin.dto.AdminClassDetailDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -36,6 +37,12 @@ public interface HostClassService {
 
 	// 관리자 > 클래스 승인
 	void approveClass(Integer classId) throws Exception;
+
+	// 관리자 > 틀래스 거절
+	void rejectClass(Integer classId) throws Exception;
+
+	 // 관리자 > 클래스 관리 > 클래스 상세
+	AdminClassDetailDto getClassDetailForAdmin(Integer classId) throws Exception;
 
 	List<UserDto> selectClassStudentList(Integer calendarId) throws Exception;
 	List<UserDto> selectStudentList(Integer hostId)throws Exception;
