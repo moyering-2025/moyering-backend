@@ -56,15 +56,16 @@ public class ReviewServiceImpl implements ReviewService {
 
 	
 	@Override
-	public List<ReviewDto> getReviewByHostId(Integer hostId) {
-		return reviewRepository.findTop3ByHost_HostIdOrderByReviewDateDesc(hostId)
+	public List<ReviewDto> getReviewByClassId(Integer classId)throws Exception {
+		return reviewRepository.findTop3ByClassId(classId)
 				.stream().map(r->r.toDto()).collect(Collectors.toList());
 	}
 	
 	@Override
-	public PageResponseDto<ReviewDto> getAllReviewByHostId(Integer hostId, Integer page, Integer size) {
+	public PageResponseDto<ReviewDto> getAllReviewByClassId(Integer classId, Integer page, Integer size)throws Exception {
+
 		Pageable pageable = PageRequest.of(page, size);
-		Page<Review> reviewPage = reviewRepository.findReviewsByHostId(hostId, pageable);
+		Page<Review> reviewPage = reviewRepository.findReviewsByClassId(classId, pageable);
 		
 		//dto로 변환
 		List<ReviewDto> dtoList = reviewPage.getContent().stream()

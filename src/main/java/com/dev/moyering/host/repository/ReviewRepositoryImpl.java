@@ -194,4 +194,48 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
 	}
 
+	@Override
+	public List<Review> findTop3ByClassId(Integer classId) throws Exception {
+        QReview review = QReview.review;
+        QClassCalendar calendar = QClassCalendar.classCalendar;
+        QHostClass hostClass = QHostClass.hostClass;
+
+        return jpaQueryFactory
+            .selectFrom(review)
+            .join(review.classCalendar, calendar)
+            .join(calendar.hostClass, hostClass)
+            .where(hostClass.classId.eq(classId))
+            .orderBy(review.reviewDate.desc())
+            .limit(3)
+            .fetch();	
+        }
+
+	@Override
+	public Page<Review> findReviewsByClassId(Integer classId, Pageable pageable) throws Exception {
+ 
+		QReview review = QReview.review;
+		    QClassCalendar calendar = QClassCalendar.classCalendar;
+		    QHostClass hostClass = QHostClass.hostClass;
+
+		    List<Review> content = jpaQueryFactory
+		            .selectFrom(review)
+		            .join(review.classCalendar, calendar)
+		            .join(calendar.hostClass, hostClass)
+		            .where(hostClass.classId.eq(classId))
+		            .orderBy(review.reviewDate.desc())
+		            .offset(pageable.getOffset())
+		            .limit(pageable.getPageSize())
+		            .fetch();
+
+		    Long total = jpaQueryFactory
+		            .select(review.count())
+		            .from(review)
+		            .join(review.classCalendar, calendar)
+		            .join(calendar.hostClass, hostClass)
+		            .where(hostClass.classId.eq(classId))
+		            .fetchOne();
+
+		    return new PageImpl<>(content, pageable, total == null ? 0 : total);		
+	}
+
 }

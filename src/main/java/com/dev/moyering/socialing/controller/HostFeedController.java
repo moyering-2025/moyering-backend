@@ -27,7 +27,7 @@ public class HostFeedController {
             @RequestParam(required = false) String category,
             @RequestHeader(value = "Authorization", required = false) String header
     ) throws Exception {
-
+    	
         Integer userId = jwtUtil.extractUserIdFromHeader(header);  // 토큰 없으면 null 반환
         System.out.println("▶▶▶ extracted userId = " + userId);
 
