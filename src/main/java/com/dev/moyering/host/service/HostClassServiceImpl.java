@@ -325,14 +325,6 @@ public class HostClassServiceImpl implements HostClassService {
 			stream = stream.filter(c -> c.getName() != null && c.getName().contains(dto.getKeyword()));
 		}
 
-		if (dto.getCategory1() != null) {
-			stream = stream.filter(c -> c.getCategory1() != null && c.getCategory1().equals(dto.getCategory1()));
-		}
-
-		if (dto.getCategory2() != null) {
-			stream = stream.filter(c -> c.getCategory2() != null && c.getCategory2().equals(dto.getCategory2()));
-		}
-
 		if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
 			stream = stream.filter(c -> c.getStatus() != null && c.getStatus().equals(dto.getStatus()));
 		}
