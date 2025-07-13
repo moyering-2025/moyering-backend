@@ -1,6 +1,7 @@
 package com.dev.moyering.classring.dto;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -35,4 +36,11 @@ public class UserPaymentHistoryDto {
     private Integer min;
     private Integer max;
     private Integer regCnt;
+    private Integer hostClassId;
+    private String orderNo;
+    private LocalDateTime paidAt;
+    private String paymentType;
+    private LocalDateTime canceledAt;
+    private String couponType;
+    private String discountType;
 }
