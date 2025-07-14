@@ -91,6 +91,7 @@ public class AlarmServiceImpl implements AlarmService {
 		}
 		String fcmToken = ouser.get().getFcmToken();
 		if(fcmToken==null || fcmToken.trim().length()==0) {
+			System.out.println("FCM ㅎㅇ"+fcmToken);
 			System.out.println("FCM Token 오류");
 			return false;
 		}

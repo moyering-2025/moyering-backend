@@ -72,7 +72,8 @@ public class SecurityConfig {
 			.antMatchers("/host/regist").authenticated()
 			.antMatchers("/host/**").access("hasRole('ROLE_HT') or hasRole('ROLE_MG')") //로그인 필수
 //			.antMatchers("/api/login/","/api/verify").permitAll()
-			.antMatchers("/admin/**").access("hasRole('ROLE_MG')")//로그인 필수 && 권한이 ADMIN이거나 MANAGER 만 허용 
+			.antMatchers("/admin/**").access("hasRole('ROLE_MG')")//로그인 필수 && 권한이 ADMIN이거나 MANAGER 만 허용
+				.antMatchers("/ws/**").permitAll()
 			.anyRequest().permitAll();
 		
 		return http.build();

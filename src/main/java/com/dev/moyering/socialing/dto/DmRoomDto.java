@@ -24,6 +24,9 @@ public class DmRoomDto {
     private String lastMessage;
     private LocalDateTime lastSendAt;
 
+    private String opponentNickname;
+    private String opponentProfile;
+
     public DmRoom toEntity() {
         DmRoom entity = DmRoom.builder()
                 .roomId(roomId)
