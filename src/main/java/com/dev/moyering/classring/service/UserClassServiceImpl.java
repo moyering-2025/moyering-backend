@@ -38,7 +38,7 @@ public class UserClassServiceImpl implements UserClassService {
 		HostClassDto     hostclass    = hostClassService.getClassDetailByClassID(classId);
         List<ClassCalendarDto> classCalendar = classCalendarService.getClassCalendarByHostClassId(classId);
         HostDto          host         = hostService.getHostById(hostclass.getHostId());
-        List<ReviewDto>  reviews      = reviewService.getReviewByHostId(hostclass.getHostId());
+        List<ReviewDto>  reviews      = reviewService.getReviewByClassId(classId);
         List<ClassCouponDto> classCoupons = classCouponService.getCouponByClassId(classId);
         List<ScheduleDetailDto> detailDtos = scheduleDetailService.getScheduleByClassId(classId);
         List<HostClassDto> recommends = hostClassService.getRecommendClassesInDetail(hostclass.getSubCategoryId(),classId);

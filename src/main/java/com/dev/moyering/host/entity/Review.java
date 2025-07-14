@@ -75,7 +75,7 @@ public class Review {
 		}
 		if(user!=null) {
 			dto.setUserId(user.getUserId());
-			dto.setStudentName(user.getName());
+			dto.setStudentName(user.getNickName());
 			dto.setProfileName(user.getProfile());
 		}
 		return dto;
