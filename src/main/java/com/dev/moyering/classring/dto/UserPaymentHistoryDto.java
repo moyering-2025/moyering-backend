@@ -43,4 +43,7 @@ public class UserPaymentHistoryDto {
     private LocalDateTime canceledAt;
     private String couponType;
     private String discountType;
+    private Integer ucId;
+    private String couponName;
+    private Integer classPrice;
 }

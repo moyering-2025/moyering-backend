@@ -213,7 +213,10 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
 	            p.paymentType,
 	            p.canceledAt,
 	            p.couponType,
-	            p.discountType
+	            p.discountType,
+	            p.userCoupon.ucId,
+	            p.status,
+	            p.classPrice
 	            ))
 	        .from(p)
 	        .join(p.classRegist, r)
