@@ -70,9 +70,9 @@ public class FeedServiceImpl implements FeedService {
     // 피드 전체
     @Override
     @Transactional
-    public List<FeedDto> getFeeds(String sortType, Integer userId) throws Exception {
+    public List<FeedDto> getFeeds(String sortType, Integer userId, int offset, int size) throws Exception {
 
-        List<FeedDto> feeds = feedRepository.findFeedsWithoutLiked(sortType);
+        List<FeedDto> feeds = feedRepository.findFeedsWithoutLiked(sortType,offset,size);
 
         if (userId != null) {
             // 로그인한 경우 좋아요한 피드 id 리스트를 가져와서
@@ -131,7 +131,7 @@ public class FeedServiceImpl implements FeedService {
         );
         dto.setCommentsCount(commentRepository.countByFeedFeedIdAndIsDeletedFalse(feedId));
 
-        // 4) 댓글 + 대댓글 구성
+       /* // 4) 댓글 + 대댓글 구성
         List<CommentDto> commentDtos = commentRepository
                 .findByFeedFeedIdAndParentIdIsNullAndIsDeletedFalseOrderByCreateAtAsc(feedId)
                 .stream()
@@ -146,6 +146,18 @@ public class FeedServiceImpl implements FeedService {
                     return pd;
                 })
                 .collect(Collectors.toList());
+        dto.setComments(commentDtos);*/
+        // 🔥🔥 4) 댓글 + 대댓글 + parentWriterId 까지 채우기 위해
+        // 전체 댓글 먼저 다 가져오기
+        List<Comment> allComments = commentRepository.findByFeedFeedId(feedId);
+
+        // 최상위 댓글만 필터
+        List<CommentDto> commentDtos = allComments.stream()
+                .filter(c -> c.getParentId() == null && !c.isDeleted())
+                .sorted((c1, c2) -> c1.getCreateAt().compareTo(c2.getCreateAt()))
+                .map(parent -> parent.toDto(allComments))
+                .collect(Collectors.toList());
+
         dto.setComments(commentDtos);
 
         // 5) 더 많은 게시물 썸네일(img1)
@@ -201,8 +213,18 @@ public class FeedServiceImpl implements FeedService {
 //                        dto.setWriterBadgeImg(null);
 //                    }
 
-                    List<CommentDto> commentDtos = commentRepository.findByFeed_FeedIdOrderByCreateAtAsc(feed.getFeedId())
+                    /*List<CommentDto> commentDtos = commentRepository.findByFeed_FeedIdOrderByCreateAtAsc(feed.getFeedId())
                             .stream().map(Comment::toDto)
+                            .collect(Collectors.toList());
+                    dto.setComments(commentDtos);*/
+                    // 🔥 전체 댓글 먼저 조회
+                    List<Comment> allComments = commentRepository.findByFeedFeedId(feed.getFeedId());
+
+                    // 🔥 최상위 댓글만 뽑아서 트리로 구성하면서 parentWriterId까지 채우기
+                    List<CommentDto> commentDtos = allComments.stream()
+                            .filter(c -> c.getParentId() == null && !c.isDeleted())
+                            .sorted((c1, c2) -> c1.getCreateAt().compareTo(c2.getCreateAt()))
+                            .map(parent -> parent.toDto(allComments))
                             .collect(Collectors.toList());
                     dto.setComments(commentDtos);
 
@@ -215,7 +237,6 @@ public class FeedServiceImpl implements FeedService {
                     return dto;
                 })
                 .collect(Collectors.toList());
-
     }
 
     @Override

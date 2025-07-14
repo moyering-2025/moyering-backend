@@ -13,7 +13,7 @@ import java.util.Map;
 public interface FeedService {
 
     // 전체 피드 목록 조회
-    List<FeedDto> getFeeds(String sortType, Integer userId) throws Exception;
+    List<FeedDto> getFeeds(String sortType, Integer userId,int offset, int size) throws Exception;
 
     // 피드 상세 조회
     FeedDto getFeedDetail(Integer feedId, Integer currentUserId);

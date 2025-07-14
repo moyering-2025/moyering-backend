@@ -1,6 +1,7 @@
 package com.dev.moyering.socialing.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.dev.moyering.socialing.entity.Comment;
@@ -33,7 +34,8 @@ public class CommentDto {
 
     private String parentWriterId;
 
-    private List<CommentDto> replies;
+    @Builder.Default
+    private List<CommentDto> replies = new ArrayList<>();
 
     public Comment toEntity() {
         Comment entity = Comment.builder()
