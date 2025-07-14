@@ -211,7 +211,7 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
     }
 
     @Override
-    public List<FeedDto> findFeedsWithoutLiked(String sortType) {
+    public List<FeedDto> findFeedsWithoutLiked(String sortType, int offset, int size) {
         QFeed feed = QFeed.feed;
         QComment comment = QComment.comment;
         QLikeList likeList = QLikeList.likeList;
@@ -243,6 +243,8 @@ public class FeedRepositoryImpl implements FeedRepositoryCustom {
                 .where(feed.isDeleted.eq(false))
                 .groupBy(feed.feedId)
                 .orderBy(getSortOrder(sortType, comment, likeList, feed))
+                .offset(offset)
+                .limit(size)
                 .fetch();
     }
 

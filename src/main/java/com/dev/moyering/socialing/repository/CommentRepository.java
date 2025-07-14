@@ -15,4 +15,6 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findByFeedFeedIdAndParentIdIsNullAndIsDeletedFalseOrderByCreateAtAsc(Integer feedId);
 
     List<Comment> findByParentIdAndIsDeletedFalseOrderByCreateAtAsc(Integer parentId);
+
+    List<Comment> findByFeedFeedId(Integer feedId);
 }

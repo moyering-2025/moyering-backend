@@ -42,6 +42,8 @@ public class Follow {
                 .id(id)
                 .followerId(follower.getUserId())
                 .followingId(following.getUserId())
+                .followerNickname(follower.getNickName())
+                .followingNickname(following.getNickName())
                 .build();
     }
 }

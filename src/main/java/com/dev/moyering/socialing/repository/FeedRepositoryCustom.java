@@ -27,7 +27,7 @@ public interface FeedRepositoryCustom {
     List<FeedDto> findTopLikedFeeds(int offset, int size);
 
     // 좋아요여부 없이 조회
-    List<FeedDto> findFeedsWithoutLiked(String sortType);
+    List<FeedDto> findFeedsWithoutLiked(String sortType, int offset, int size);
     
     Page<Feed> findSearchFeed(MainSearchRequestDto dto,Pageable pageable);
 

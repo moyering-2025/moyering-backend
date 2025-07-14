@@ -12,7 +12,9 @@ public class FollowDto {
     private Integer id;
 
     private Integer followerId;
+    private String followerNickname;
     private Integer followingId;
+    private String followingNickname;
 
 
     public Follow toentity() {
