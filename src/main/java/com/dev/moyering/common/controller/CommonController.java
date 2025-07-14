@@ -65,7 +65,7 @@ public class CommonController {
 			String savedName = UUID.randomUUID().toString() + extension;
 
 			// 저장할 파일 객체 생성
-			File dest = new File(iuploadPath, savedName);
+			File dest = new File(iuploadPath, originalFilename);
 			image.transferTo(dest);
 
 			// 접근 가능한 URL 생성 (정적 리소스 매핑을 기준으로)
@@ -73,6 +73,7 @@ public class CommonController {
 
 			Map<String, String> result = new HashMap<>();
 			result.put("url", imageUrl);
+			result.put("imageName", originalFilename);
 
 			return ResponseEntity.ok(result);
 
