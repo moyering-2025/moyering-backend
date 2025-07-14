@@ -34,11 +34,12 @@ public class ClassCouponServiceImpl implements ClassCouponService {
 	@Override
 	public void insertHostSelectedCoupon(List<ClassCouponDto> couponList,Integer classId) throws Exception {
 		for(ClassCouponDto coupon : couponList) {
-			if(coupon.getValidFrom().isAfter(LocalDateTime.now())) {
-				coupon.setStatus("활성");
-			}else if(coupon.getValidFrom().isBefore(LocalDateTime.now())) {				
-				coupon.setStatus("예정");
-			}
+//			if(coupon.getValidFrom().isAfter(LocalDateTime.now())) {
+//				coupon.setStatus("활성");
+//			}else if(coupon.getValidFrom().isBefore(LocalDateTime.now())) {				
+//				coupon.setStatus("예정");
+//			}
+			coupon.setStatus("활성");
 			coupon.setUsedCnt(0);
 			classCouponRepository.save(coupon.toEntity());
 		}

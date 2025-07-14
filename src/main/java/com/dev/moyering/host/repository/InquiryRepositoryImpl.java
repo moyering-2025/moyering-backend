@@ -43,60 +43,72 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 
 	@Override
 	public Page<Inquiry> searchInquiries(InquirySearchRequestDto dto, Pageable pageable) throws Exception {
-		QInquiry inquiry = QInquiry.inquiry;
-		QClassCalendar classCalendar = QClassCalendar.classCalendar;
-		QHostClass hostClass = QHostClass.hostClass;
-		QHost host = QHost.host;
-		QUser user = QUser.user; // 학생명 검색 시 필요
+	    QInquiry inquiry = QInquiry.inquiry;
+	    QClassCalendar classCalendar = QClassCalendar.classCalendar;
+	    QHostClass hostClass = QHostClass.hostClass;
+	    QHost host = QHost.host;
+	    QUser user = QUser.user;
 
-		BooleanBuilder builder = new BooleanBuilder();
+	    BooleanBuilder builder = new BooleanBuilder();
 
-		// 🔥 join 필수 (null 방지)
-		builder.and(host.hostId.eq(dto.getHostId()));
+//	    builder.and(inquiry.classCalendar.hostClass.host.hostId.eq(dto.getHostId()));
+	    builder.and(host.hostId.eq(dto.getHostId()));
+	    
+	    
+	    if(dto.getCalendarId() !=null) {
+	    	builder.and(classCalendar.calendarId.eq(dto.getCalendarId()));
+	    }
+	    if(dto.getHostClassId() != null) {
+	    	builder.and(hostClass.classId.eq(dto.getHostClassId()));
+	    }
 
-		// 검색어 필터
-		if (dto.getSearchQuery() != null && !dto.getSearchQuery().isBlank()) {
-			if ("클래스명".equals(dto.getSearchFilter())) {
-				builder.and(hostClass.name.containsIgnoreCase(dto.getSearchQuery()));
-			} else if ("학생명".equals(dto.getSearchFilter())) {
-				builder.and(user.name.containsIgnoreCase(dto.getSearchQuery()));
-			}
-		}
+	    // 검색어 필터
+	    if (dto.getSearchQuery() != null && !dto.getSearchQuery().isBlank()) {
+	        if ("클래스명".equals(dto.getSearchFilter())) {
+	            builder.and(hostClass.name.containsIgnoreCase(dto.getSearchQuery()));
+	        } else if ("학생명".equals(dto.getSearchFilter())) {
+	            builder.and(user.name.containsIgnoreCase(dto.getSearchQuery()));
+	        }
+	    }
 
-		// 날짜 필터
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		if (dto.getStartDate() != null && !dto.getStartDate().isBlank()) {
-			builder.and(inquiry.inquiryDate.goe(Date.valueOf(LocalDate.parse(dto.getStartDate(), formatter))));
-		}
-		if (dto.getEndDate() != null && !dto.getEndDate().isBlank()) {
-			builder.and(inquiry.inquiryDate.loe(Date.valueOf(LocalDate.parse(dto.getEndDate(), formatter))));
-		}
-		if(dto.getHostClassId()!=null) {
-			builder.and(hostClass.classId.eq(dto.getHostClassId()));
-		}
-		if(dto.getCalendarId()!=null) {
-			builder.and(classCalendar.calendarId.eq(dto.getCalendarId()));
-		}
+	    // 날짜 필터
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	    if (dto.getStartDate() != null && !dto.getStartDate().isBlank()) {
+	        builder.and(inquiry.inquiryDate.goe(Date.valueOf(LocalDate.parse(dto.getStartDate(), formatter))));
+	    }
+	    if (dto.getEndDate() != null && !dto.getEndDate().isBlank()) {
+	        builder.and(inquiry.inquiryDate.loe(Date.valueOf(LocalDate.parse(dto.getEndDate(), formatter))));
+	    }
+	    //답변상태 숫자로 변환
+	    
+	    // 답변 상태 필터
+	    if (1 == dto.getReplyStatus()) {
+	        builder.and(inquiry.state.eq(1));  // 답변완료
+	    } else if (0 == dto.getReplyStatus()) {
+	        builder.and(inquiry.state.eq(0));  // 답변대기
+	    }
 
-		// 답변 상태 필터
-		if ("1".equals(dto.getReplyStatus())) {
-			builder.and(inquiry.state.eq(1));
-		} else if ("0".equals(dto.getReplyStatus())) {
-			builder.and(inquiry.state.eq(0));
-		}
+	    // 🔥 join 설정
+	    List<Inquiry> content = jpaQueryFactory.selectFrom(inquiry)
+	            .join(inquiry.classCalendar, classCalendar)
+	            .join(classCalendar.hostClass, hostClass)
+	            .join(hostClass.host, host)
+	            .where(builder)
+	            .orderBy(inquiry.inquiryDate.desc())
+	            .offset(pageable.getOffset())
+	            .limit(pageable.getPageSize())
+	            .fetch();
 
-		// 🔥 join 설정
-		List<Inquiry> content = jpaQueryFactory.selectFrom(inquiry).join(inquiry.classCalendar, classCalendar)
-				.join(classCalendar.hostClass, hostClass).join(hostClass.host, host).join(inquiry.user, user)
-				.where(builder).orderBy(inquiry.inquiryDate.desc()).offset(pageable.getOffset())
-				.limit(pageable.getPageSize()).fetch();
+	    long total = jpaQueryFactory.selectFrom(inquiry)
+	            .join(inquiry.classCalendar, classCalendar)
+	            .join(classCalendar.hostClass, hostClass)
+	            .join(hostClass.host, host)
+	            .where(builder)
+	            .fetchCount();
 
-		long total = jpaQueryFactory.selectFrom(inquiry).join(inquiry.classCalendar, classCalendar)
-				.join(classCalendar.hostClass, hostClass).join(hostClass.host, host).join(inquiry.user, user)
-				.where(builder).fetchCount();
-
-		return new PageImpl<>(content, pageable, total);
+	    return new PageImpl<>(content, pageable, total);
 	}
+
 
 
 	@Override

@@ -74,6 +74,7 @@ public class HostClassController {
 
 	@PostMapping("/host/inquiry/search")
 	public ResponseEntity<HostPageResponseDto<InquiryDto>> searchInquries(@RequestBody InquirySearchRequestDto dto) {
+		System.out.println(dto.getReplyStatus());
 		try {
 			Page<InquiryDto> page = inquiryService.searchInquiries(dto);
 

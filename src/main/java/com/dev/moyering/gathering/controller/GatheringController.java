@@ -85,16 +85,26 @@ public class GatheringController {
 			List<GatheringApplyDto> member = gatheringApplyService.findApprovedUserListByGatheringId(gatheringId);
 			for(GatheringApplyDto gaMember : member) {
 				UserBadge b = userService.getUserFirstBadge(gaMember.getUserId());
-				gaMember.setUserBadgeId(b.getUserBadgeId());
-				gaMember.setUserBadgeImg(b.getBadge_img());
+				if(b !=null) {
+				gaMember.setUserBadgeId(b.getUserBadgeId() != null ? b.getUserBadgeId() : 1);
+				gaMember.setUserBadgeImg(b.getBadge_img() != null ? b.getBadge_img() : "badge_moyasessak.png");
+				}else {
+					gaMember.setUserBadgeId(1);
+					gaMember.setUserBadgeImg("badge_moyasessak.png");
+				}
 			}
 			List<GatheringDto> recommendations = gatheringService.findGatheringWithCategory(nGatheringDto.getGatheringId(), nGatheringDto.getSubCategoryId(), nGatheringDto.getCategoryId());
 			
 	        Integer acceptedCount = gatheringApplyService.findApprovedUserCountByGatheringId(gatheringId);
 	        nGatheringDto.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);
 			UserBadge badge = userService.getUserFirstBadge(nGatheringDto.getUserId());
-	        userDto.setUserBadgeId(badge.getUserBadgeId());
-	        userDto.setUserBadgeImg(badge.getBadge_img());
+			if(badge !=null) {
+		        userDto.setUserBadgeId(badge.getUserBadgeId());
+		        userDto.setUserBadgeImg(badge.getBadge_img());
+			}else {
+				userDto.setUserBadgeId(1);
+				userDto.setUserBadgeImg("badge_moyasessak.png");
+			}
 			userDto.setPassword(null);
 			res.put("organizer", userDto);
 			res.put("member", member);
