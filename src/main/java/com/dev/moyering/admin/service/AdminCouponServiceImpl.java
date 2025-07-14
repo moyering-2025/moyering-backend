@@ -1,9 +1,16 @@
 package com.dev.moyering.admin.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.dev.moyering.classring.entity.UserCoupon;
+import com.dev.moyering.classring.repository.UserCouponRepository;
+import com.dev.moyering.user.entity.User;
+import com.dev.moyering.user.repository.UserRepository;
+import org.hibernate.validator.internal.util.stereotypes.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +24,8 @@ import com.dev.moyering.admin.repository.AdminCouponRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import static com.dev.moyering.classring.entity.QUserCoupon.userCoupon;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminCouponServiceImpl implements AdminCouponService {
 
     private final AdminCouponRepository adminCouponRepository;
+    private final UserRepository userRepository;
+    private final UserCouponRepository userCouponRepository;
 
     @Override
     public Page<AdminCouponDto> getCouponList(AdminCouponSearchCond cond, Pageable pageable) {
@@ -57,6 +68,16 @@ public class AdminCouponServiceImpl implements AdminCouponService {
                     .build();
         }
         AdminCoupon savedCoupon = adminCouponRepository.save(couponDto.toEntity());
+
+        // 관리자 쿠폰인 경우, 모든 활성 사용자에게 자동 지급
+        if ("MG".equals(couponDto.getCouponType())) {
+            try {
+                distributeCouponToActiveUsers(savedCoupon.getCouponId());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         return savedCoupon.toDto();
     }
 
@@ -116,4 +137,33 @@ public class AdminCouponServiceImpl implements AdminCouponService {
         }
 		return couponDtoList;
 	}
+
+    // 쿠폰 지급을 위한 활성사용자 조회
+    @Override
+    public List<User> distributeCouponToActiveUsers(Integer couponId) {
+        try {
+            // use_yn이 'Y'인 활성 사용자들 조회
+            List<User> allUsers = userRepository.findAll();
+            List<User> activeUsers = allUsers.stream()
+                    .filter(user -> "Y".equals(user.getUseYn()))
+                    .collect(Collectors.toList());
+
+
+            List<UserCoupon> userCoupons = activeUsers.stream()
+                    .map(user -> UserCoupon.builder()
+                            .user(user)
+                            .adminCoupon(AdminCoupon.builder().couponId(couponId).build())
+                            .status("미사용")  // 초기 상태
+                            .downloadedAt(LocalDateTime.now())  // 다운로드 시간
+                            .build())
+                    .collect(Collectors.toList());
+
+            userCouponRepository.saveAll(userCoupons);
+            return activeUsers;
+        } catch (Exception e) {
+            System.out.println("erorr");
+            throw new RuntimeException(e);
+        }
+    }
+
 }

@@ -2,6 +2,7 @@ package com.dev.moyering.admin.service;
 
 import java.util.List;
 
+import com.dev.moyering.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,5 +21,9 @@ public interface AdminCouponService {
     AdminCouponDto deleteCoupon(Integer couponId) throws Exception;             // 삭제 + 권한체크 + 로깅
     
     List<AdminCouponDto> selectHostAllCoupon(String type) throws Exception; //모든 쿠폰 조회
+
+    //    // 쿠폰 지급을 위한 활성사용자 조회
+    List<User> distributeCouponToActiveUsers(Integer couponId);
+
 
 }
