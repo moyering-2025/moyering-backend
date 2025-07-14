@@ -18,7 +18,6 @@ import com.dev.moyering.classring.dto.PaymentInitRequestDto;
 import com.dev.moyering.classring.dto.UserCouponDto;
 import com.dev.moyering.classring.dto.UserPaymentHistoryDto;
 import com.dev.moyering.classring.dto.UtilSearchDto;
-import com.dev.moyering.classring.dto.WishlistItemDto;
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.classring.repository.UserCouponRepository;
 import com.dev.moyering.common.dto.PageResponseDto;
@@ -183,6 +182,25 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
 	    Pageable pageable = PageRequest.of(dto.getPage(), dto.getSize());
 	    Page<UserPaymentHistoryDto> pageResult = userPaymentRepository.findUserPaymentHistory(dto, pageable);
         
+	    for (UserPaymentHistoryDto dto2: pageResult) {
+	    	if (dto2.getUcId()!=null) {
+		    	UserCoupon uc = userCouponRepository.findById(dto2.getUcId())
+		    			.orElseThrow(()-> new Exception("해당 쿠폰이 존재하지 않습니다."));
+		    	if (uc.getAdminCoupon()!=null) {
+		    		String ucName = adminCouponRepository.findById(uc.getAdminCoupon().getCouponId())
+		    				.orElseThrow(()-> new Exception("해당 쿠폰이 존재하지 않습니다.")).getCouponCode();
+		    		dto2.setCouponName(ucName);
+		    	} else {
+		    		String ucName = classCouponRepository.findById(uc.getClassCoupon().getClassCouponId())
+		    				.orElseThrow(()-> new Exception("해당 쿠폰이 존재하지 않습니다.")).getCouponName();
+		    		dto2.setCouponName(ucName);
+		    	}
+	    	} else {
+	    		dto2.setCouponName("쿠폰없음");
+	    	}
+
+	    }
+	    
 	    return PageResponseDto.<UserPaymentHistoryDto>builder()
 	            .content(pageResult.getContent())
 	            .currentPage(pageResult.getNumber() + 1)

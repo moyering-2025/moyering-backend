@@ -1,6 +1,7 @@
 package com.dev.moyering.user.repository;
 
 import static com.dev.moyering.admin.entity.QAdminCoupon.adminCoupon;
+import static com.dev.moyering.host.entity.QClassCoupon.classCoupon;
 import static com.dev.moyering.classring.entity.QUserCoupon.userCoupon;
 import static com.dev.moyering.host.entity.QClassCalendar.classCalendar;
 import static com.dev.moyering.host.entity.QClassRegist.classRegist;
@@ -28,6 +29,7 @@ import com.dev.moyering.user.entity.QUserPayment;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -204,8 +206,18 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
 	            c.calendarId,
 	            h.recruitMin,
 	            h.recruitMax,
-	            c.registeredCount
-	        ))
+	            c.registeredCount,
+	            h.classId,
+	            p.orderNo,
+	            p.paidAt,
+	            p.paymentType,
+	            p.canceledAt,
+	            p.couponType,
+	            p.discountType,
+	            p.userCoupon.ucId,
+	            p.status,
+	            p.classPrice
+	            ))
 	        .from(p)
 	        .join(p.classRegist, r)
 	        .join(p.classCalendar, c)

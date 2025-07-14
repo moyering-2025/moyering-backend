@@ -35,6 +35,7 @@ public interface HostClassRepositoryCustom {
     int updateClassStatus(Integer classId) throws Exception;
 
     List<ClassCalendar> findByHostId(Integer hostId);
+    
 }
 
 
