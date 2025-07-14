@@ -35,6 +35,8 @@ public class FeedController {
     @GetMapping("/socialing/feeds")
     public ResponseEntity<List<FeedDto>> getFeeds(
             @RequestParam(defaultValue = "all") String sort,
+@RequestParam(defaultValue = "0") int offset,
+@RequestParam(defaultValue = "10") int size,
 //            @RequestParam(required = false) String userId
             @RequestHeader(value = "Authorization", required = false) String header
     ) {
@@ -45,7 +47,7 @@ public class FeedController {
 
         List<FeedDto> feeds = null;
         try {
-            feeds = feedService.getFeeds(sort, userId);
+            feeds = feedService.getFeeds(sort, userId,offset,size);
             return new ResponseEntity<>(feeds, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();

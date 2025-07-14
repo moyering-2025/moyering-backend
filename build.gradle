@@ -79,6 +79,11 @@ dependencies {
 	implementation 'com.google.firebase:firebase-admin:9.2.0'           // Google Firebase Admin
 
 	//implementation("com.tosspayments:toss-payments-server-sdk:1.14.0")
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'com.fasterxml.jackson.core:jackson-databind' // JSON 직렬화
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.springframework.boot:spring-boot-starter'
 }
 
 tasks.named('bootBuildImage') {

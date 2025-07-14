@@ -8,6 +8,9 @@ import com.dev.moyering.socialing.dto.CommentDto;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -41,23 +44,56 @@ public class Comment {
     @Column(nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
     private boolean isDeleted;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parentId", referencedColumnName = "commentId", insertable = false, updatable = false)
+    private List<Comment> replies;
+
     @PrePersist
     public void prePersist() {
         if (createAt == null) {
             this.createAt = LocalDateTime.now();
         }
     }
-    public CommentDto toDto() {
-        return CommentDto.builder()
-                .commentId(commentId)
-                .content(content)
-                .parentId(parentId)
-                .isDeleted(isDeleted)
-                .createAt(createAt)
-                .userId(user.getUserId())
-                .writerId(user.getNickName())
-                .userBadge(user.getUserBadgeId())
-                .feedId(feed.getFeedId())
-                .build();
+//    public CommentDto toDto() {
+//        return CommentDto.builder()
+//                .commentId(commentId)
+//                .content(content)
+//                .parentId(parentId)
+//                .isDeleted(isDeleted)
+//                .createAt(createAt)
+//                .userId(user.getUserId())
+//                .writerId(user.getNickName())
+//                .userBadge(user.getUserBadgeId())
+//                .feedId(feed.getFeedId())
+//                .replies(replies != null
+//                        ? replies.stream().map(Comment::toDto).collect(Collectors.toList())
+//                        : new ArrayList<>())
+//                .build();
+//    }
+public CommentDto toDto(List<Comment> allComments) {
+    String parentWriter = null;
+    if (this.parentId != null) {
+        parentWriter = allComments.stream()
+                .filter(c -> c.getCommentId().equals(this.parentId))
+                .map(c -> c.getUser().getNickName())
+                .findFirst()
+                .orElse(null);
     }
+
+    return CommentDto.builder()
+            .commentId(commentId)
+            .content(content)
+            .parentId(parentId)
+            .isDeleted(isDeleted)
+            .createAt(createAt)
+            .userId(user.getUserId())
+            .writerId(user.getNickName())
+            .userBadge(user.getUserBadgeId())
+            .feedId(feed.getFeedId())
+            .parentWriterId(parentWriter)
+            .replies(replies != null
+                    ? replies.stream().map(child -> child.toDto(allComments)).collect(Collectors.toList())
+                    : new ArrayList<>())
+            .build();
+}
 }
