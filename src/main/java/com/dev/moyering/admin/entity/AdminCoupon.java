@@ -40,8 +40,8 @@ public class AdminCoupon {
     @Column(nullable = false)
     private LocalDateTime createdAt; // 생성일
     
-    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
-    private Integer usedCount; //사용량
+    @Column(nullable = false)
+    private Integer usedCount = 0; //사용량 (기본값 0으로 설정)
     
 
 
@@ -75,7 +75,7 @@ public class AdminCoupon {
                 .validFrom(this.validFrom)
                 .validUntil(this.validUntil)
                 .createdAt(this.createdAt)
-                .usedCount(this.usedCount)
+                .usedCount(0)
                 .build();
     }
 
@@ -85,7 +85,12 @@ public class AdminCoupon {
         if (this.createdAt == null) {
             this.createdAt = LocalDateTime.now();
         }
+        if (this.usedCount == null){
+            this.usedCount = 0;
+        }
     }
+
+
     
     //쿠폰 사용 시 매수 차감
     public void incrementUsedCount() {

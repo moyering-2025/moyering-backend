@@ -113,6 +113,7 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		List<AdminClassDto> content = jpaQueryFactory
 				.select(Projections.constructor(AdminClassDto.class,
 						hostClass.classId,
+						classCalendar.calendarId,
 						hostClass.subCategory.firstCategory.categoryName,
 						hostClass.subCategory.subCategoryName,
 						hostClass.host.userId,
@@ -223,22 +224,7 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		return new PageImpl<>(content, pageable, totla);
 	}
 
-	@Override
-	public List<ClassCalendar> findByHostId(Integer hostId) {
-		QHost host = QHost.host;
-		QHostClass hostClass = QHostClass.hostClass;
-		QClassCalendar calendar = QClassCalendar.classCalendar;
 
-		BooleanBuilder builder = new BooleanBuilder();
-		builder.and(host.hostId.eq(hostId));
-
-		List<ClassCalendar> list = jpaQueryFactory.selectFrom(calendar)
-				.leftJoin(calendar.hostClass,hostClass)
-				.leftJoin(hostClass.host,host)
-				.where(builder).fetch();
-
-		return list;
-	}
 	@Override
 	public Page<HostClass> findSearchClass(MainSearchRequestDto dto,Pageable pageable) throws Exception {
 		QHostClass hostClass= QHostClass.hostClass;
@@ -322,5 +308,10 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 
 		return calendars.size();
 	}
-	
+
+	@Override
+	public List<ClassCalendar> findByHostId(Integer hostId) {
+		return List.of();
+	}
+
 }

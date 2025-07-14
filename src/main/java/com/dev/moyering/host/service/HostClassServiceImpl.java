@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.dev.moyering.admin.dto.AdminClassDetailDto;
 import com.dev.moyering.common.dto.AlarmDto;
 import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.host.entity.Host;
@@ -325,14 +326,6 @@ public class HostClassServiceImpl implements HostClassService {
 			stream = stream.filter(c -> c.getName() != null && c.getName().contains(dto.getKeyword()));
 		}
 
-		if (dto.getCategory1() != null) {
-			stream = stream.filter(c -> c.getCategory1() != null && c.getCategory1().equals(dto.getCategory1()));
-		}
-
-		if (dto.getCategory2() != null) {
-			stream = stream.filter(c -> c.getCategory2() != null && c.getCategory2().equals(dto.getCategory2()));
-		}
-
 		if (dto.getStatus() != null && !dto.getStatus().isEmpty()) {
 			stream = stream.filter(c -> c.getStatus() != null && c.getStatus().equals(dto.getStatus()));
 		}
@@ -455,6 +448,82 @@ public class HostClassServiceImpl implements HostClassService {
 			log.error("클래스 승인 처리 중 오류 발생 - 클래스ID: {}, 오류: {}", classId, e.getMessage(), e);
 			throw e;
 		}
+	}
+
+	@Override
+	public void rejectClass(Integer classId) throws Exception {
+		HostClass hostClass = hostClassRepository.findById(classId)
+				.orElseThrow(() -> new RuntimeException("클래스르 찾을 수 없습니다."));
+		ClassCalendar calendar = classCalendarRepository.findFirstByHostClassClassId(classId);
+				if(calendar == null) {
+					throw new RuntimeException("캘린더 정보를 찾을 수 없습니다.");
+				}
+				calendar.setStatus("거절");
+				classCalendarRepository.save(calendar);
+	}
+
+	@Override
+	public AdminClassDetailDto getClassDetailForAdmin(Integer classId) throws Exception {
+		// 1. 클래스 기본 정보 조회
+		HostClass hostClass = hostClassRepository.findById(classId)
+				.orElseThrow(() -> new RuntimeException("클래스를 찾을 수 없습니다."));
+
+		// 2. 캘린더 정보 조회(상태, 등록 수강생 수) - 단일 결과 반환 메서드 사용
+		ClassCalendar calendar = classCalendarRepository.findFirstByHostClassClassId(classId);
+
+		// 3. 수강생 목록 조회 (등록요청 상태가 아닌 경우만)
+		List<AdminClassDetailDto.StudentDto> students = new ArrayList<>();
+		if(calendar != null && !"승인대기".equals(calendar.getStatus())){
+			List<ClassRegist> registList = classRegistRepository.findByClassCalendarCalendarId(calendar.getCalendarId());
+			students = registList.stream()
+					.map(regist -> {
+						User user = userRepository.findById(regist.getStudentId()).orElse(null);
+						return AdminClassDetailDto.StudentDto.builder()
+								.userId(user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "")
+								.name(user != null ? user.getName() : "")
+								.phone(user != null ? user.getTel() : "")
+								.email(user != null ? user.getEmail() : "")
+								.regDate(user != null ? user.getRegDate() : null) // user에서 가져오기
+								.status(calendar.getStatus())
+								.build();
+					})
+					.collect(Collectors.toList());
+		}
+
+		// 4. DTO 생성 및 반환
+		return AdminClassDetailDto.builder()
+				.classId(hostClass.getClassId())
+				.calendarId(calendar != null ? calendar.getCalendarId() : null)
+				.className(hostClass.getName())
+				.hostName(hostClass.getHost() != null ? hostClass.getHost().getName() : "")
+				.processStatus(calendar != null ? calendar.getStatus() : "")
+				.currentCount(calendar != null ? calendar.getRegisteredCount() : 0)
+				.recruitMax(hostClass.getRecruitMax())
+				.recruitMin(hostClass.getRecruitMin())
+				.firstCategory(hostClass.getSubCategory() != null && hostClass.getSubCategory().getFirstCategory() != null ?
+						hostClass.getSubCategory().getFirstCategory().getCategoryName() : "")
+				.secondCategory(hostClass.getSubCategory() != null ? hostClass.getSubCategory().getSubCategoryName() : "")
+				.price(hostClass.getPrice())
+				.startDate(calendar != null ? calendar.getStartDate() : null)
+				.endDate(calendar != null ? calendar.getEndDate() : null)
+				.scheduleStart(hostClass.getScheduleStart())
+				.scheduleEnd(hostClass.getScheduleEnd())
+				.location(hostClass.getAddr())
+				.detailAddr(hostClass.getDetailAddr())
+				.description(hostClass.getDetailDescription())
+				.keywords(hostClass.getKeywords())
+				.inclusion(hostClass.getIncluision())
+				.preparation(hostClass.getPreparation())
+				.caution(hostClass.getCaution())
+				.portfolioName(hostClass.getPortfolio())
+				.materialName(hostClass.getMaterial())
+				.imgName1(hostClass.getImg1())
+				.imgName2(hostClass.getImg2())
+				.imgName3(hostClass.getImg3())
+				.imgName4(hostClass.getImg4())
+				.imgName5(hostClass.getImg5())
+				.students(students)
+				.build();
 	}
 	@Override
 	public Integer updateClass(HostClassDto hostClassDto) throws Exception {

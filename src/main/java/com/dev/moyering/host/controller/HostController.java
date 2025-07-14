@@ -9,8 +9,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dev.moyering.auth.PrincipalDetails;
 import com.dev.moyering.common.dto.CategoryDto;
 import com.dev.moyering.common.dto.SubCategoryDto;
 import com.dev.moyering.common.service.CategoryService;
@@ -229,7 +228,7 @@ public class HostController {
 	}
 	
 	@PostMapping("/host/classUpdate/submit")
-	public ResponseEntity<Integer> classUpdate(HostClassDto hostClassDto, @RequestPart("coupons") String couponsJson,
+	public ResponseEntity<Integer> classUpdate(@ModelAttribute HostClassDto hostClassDto, @RequestPart("coupons") String couponsJson,
 			@RequestPart("scheduleDetail") String scheduleDetail) {
 		try {
 			System.out.println("호스트:" + hostClassDto);

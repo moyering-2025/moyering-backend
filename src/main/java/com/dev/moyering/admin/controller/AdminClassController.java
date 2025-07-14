@@ -1,5 +1,6 @@
 package com.dev.moyering.admin.controller;
 
+import com.dev.moyering.admin.dto.AdminClassDetailDto;
 import com.dev.moyering.admin.dto.AdminClassDto;
 import com.dev.moyering.admin.dto.AdminClassSearchCond;
 import com.dev.moyering.host.service.HostClassService;
@@ -43,6 +44,29 @@ public class AdminClassController {
             return ResponseEntity.ok().build();
         } catch(Exception e) {
             log.error("<UNK> <UNK> <UNK> <UNK> <UNK> <UNK>", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /*** 관리자가 강사 클래스를 거절 */
+    @PatchMapping("/{classId}/reject")
+    public ResponseEntity<String> rejectClass(@PathVariable Integer classId) {
+        try {
+            hostClassService.rejectClass(classId);
+            return ResponseEntity.ok("거절");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    /*** 클래스 상세페이지 조회  */
+    @GetMapping("/{classId}/detail")
+    public ResponseEntity<AdminClassDetailDto> getClassDetail(@PathVariable Integer classId){
+        try {
+            AdminClassDetailDto classDetail = hostClassService.getClassDetailForAdmin(classId);
+            return ResponseEntity.ok(classDetail);
+        } catch (Exception e){
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }

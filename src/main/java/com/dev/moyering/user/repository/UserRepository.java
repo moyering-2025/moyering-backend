@@ -1,5 +1,6 @@
 package com.dev.moyering.user.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -16,6 +17,8 @@ public interface UserRepository extends JpaRepository<User, Integer>,  UserRepos
 	Optional<User> findByProviderAndProviderId(String provider,String providerId);
 	Optional<User> findByEmailVerificationToken(String token);
 	Optional<User> findByEmailAndNameAndUsername(String email,String name,String username);
+
+
 
 
 	//feed
