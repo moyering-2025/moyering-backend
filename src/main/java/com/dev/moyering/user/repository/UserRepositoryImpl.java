@@ -3,13 +3,18 @@ package com.dev.moyering.user.repository;
 import static com.dev.moyering.user.entity.QUser.user;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.dev.moyering.admin.entity.AdminCoupon;
+import com.dev.moyering.classring.entity.UserCoupon;
+import com.dev.moyering.classring.repository.UserCouponRepository;
+import com.dev.moyering.user.entity.User;
 import org.springframework.data.domain.Pageable;
 
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
-import com.dev.moyering.user.entity.QUser;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepositoryCustom {
 	private final JPAQueryFactory jpaQueryFactory;
+	private final UserCouponRepository userCouponRepository;
 
 	// 관리자페이지 회원관리 내 키워드 검색 + 가입기간 필터 + 사용자 구분(전체, 일반, 강사) 필터 조회
 	@Override
@@ -56,6 +62,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 				)
 				.fetchOne();
 	}
+
 
 
 
