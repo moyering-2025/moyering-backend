@@ -113,6 +113,7 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		List<AdminClassDto> content = jpaQueryFactory
 				.select(Projections.constructor(AdminClassDto.class,
 						hostClass.classId,
+						classCalendar.calendarId,
 						hostClass.subCategory.firstCategory.categoryName,
 						hostClass.subCategory.subCategoryName,
 						hostClass.host.userId,

@@ -18,6 +18,7 @@ import java.util.List;
 public class AdminClassDetailDto {
     // 기본 클래스 정보
     private Integer classId;
+    private Integer calendarId;
     private String className;
     private String hostName;
     private String processStatus;

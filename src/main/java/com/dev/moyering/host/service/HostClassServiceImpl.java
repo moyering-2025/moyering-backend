@@ -501,6 +501,7 @@ public class HostClassServiceImpl implements HostClassService {
 		// 4. DTO 생성 및 반환
 		return AdminClassDetailDto.builder()
 				.classId(hostClass.getClassId())
+				.calendarId(calendar != null ? calendar.getCalendarId() : null)
 				.className(hostClass.getName())
 				.hostName(hostClass.getHost() != null ? hostClass.getHost().getName() : "")
 				.processStatus(calendar != null ? calendar.getStatus() : "")
