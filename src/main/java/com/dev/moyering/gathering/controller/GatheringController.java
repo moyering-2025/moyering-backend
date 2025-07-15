@@ -94,7 +94,7 @@ public class GatheringController {
 				}
 			}
 			List<GatheringDto> recommendations = gatheringService.findGatheringWithCategory(nGatheringDto.getGatheringId(), nGatheringDto.getSubCategoryId(), nGatheringDto.getCategoryId());
-			
+			System.out.println("recommendations : "+recommendations);
 	        Integer acceptedCount = gatheringApplyService.findApprovedUserCountByGatheringId(gatheringId);
 	        nGatheringDto.setAcceptedCount(acceptedCount != null ? acceptedCount : 0);
 			UserBadge badge = userService.getUserFirstBadge(nGatheringDto.getUserId());

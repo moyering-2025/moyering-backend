@@ -231,10 +231,10 @@ public class GatheringRepositoryImpl implements GatheringRepositoryCustom {
 	    }
 	    
 	    return jpaQueryFactory
-	        .select(Projections.bean(GatheringDto.class,
+	    .select(Projections.bean(GatheringDto.class,
 	            gathering.gatheringId,
 	            gathering.title,
-	            gathering.thumbnail,
+	            gathering.thumbnail.as("thumbnailFileName"), // 별칭 사용
 	            gathering.meetingDate,
 	            gathering.locName,
 	            category.categoryName,
