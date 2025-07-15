@@ -48,7 +48,7 @@ public class FollowServiceImpl implements FollowService {
                 .following(following)
                 .build();
         Follow saved = followRepository.save(follow);
-
+        System.out.println("수신자 : "+followingId +"발신자 : "+followerId);
         AlarmDto alarmDto = AlarmDto.builder()
                 .alarmType(4)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
                 .title("팔로우 시작") // 필수 사항
@@ -56,7 +56,7 @@ public class FollowServiceImpl implements FollowService {
                 //수신자 유저 아이디
                 .senderId(followerId)
                 //발신자 유저 아이디
-                .senderNickname(following.getNickName())
+                .senderNickname(follower.getNickName())
                 //발신자 닉네임 => 시스템/관리자가 발송하는 알람이면 메니저 혹은 관리자, 강사가 발송하는 알람이면 강사테이블의 닉네임, 그 외에는 유저 테이블의 닉네임(마이페이지 알림 내역에서 보낸 사람으로 보여질 이름)
                 .content("좋아요"+"님이 참여 신청하였습니다")//알림 내용
                 .build();
