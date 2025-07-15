@@ -1,4 +1,4 @@
-package com.dev.moyering.gathering.service;
+package com.dev.moyering.scheuler;
 
 import java.sql.Timestamp;
 import java.util.List;
