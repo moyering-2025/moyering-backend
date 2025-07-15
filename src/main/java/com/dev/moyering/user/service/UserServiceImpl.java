@@ -52,8 +52,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-	@Autowired
-	private FollowRepository followRepository;
+    @Autowired
+    private FollowRepository followRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -64,9 +64,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserBadgeRepository userBadgeRepository;
-    
+
     private final UserBadgeService userBadgeService;
-    
+
 
     @Value("${iupload.path}")
     private String iuploadPath;
@@ -105,8 +105,7 @@ public class UserServiceImpl implements UserService {
         }
         return false;
     }
-    
-   
+
 
     @Override
     @Transactional
@@ -138,7 +137,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDto findUserByUserId(Integer userId) throws Exception {
         User user = userRepository.findById(userId).orElseThrow(() -> new Exception("멤버 조회 오류"));
-        Integer myFollowerCnt =  followRepository.countByFollowing(user);
+        Integer myFollowerCnt = followRepository.countByFollowing(user);
         UserDto userDto = user.toDto();
         userDto.setFollower(myFollowerCnt);
         return userDto;
@@ -234,7 +233,10 @@ public class UserServiceImpl implements UserService {
             user.setProfile(fileName);
         }
 
+
+
         //user.setUsername(dto.getUsername());
+
         user.setName(dto.getName());
         user.setTel(dto.getTel());
         user.setEmail(dto.getEmail());
@@ -305,8 +307,8 @@ public class UserServiceImpl implements UserService {
     public UserBadge getUserFirstBadge(Integer userId) {
         List<UserBadge> list = userBadgeRepository.findByUser_UserId(userId);
         UserBadge firstBadge = null;
-        for(UserBadge badge : list) {
-            if(badge.getIsRepresentative() == true){
+        for (UserBadge badge : list) {
+            if (badge.getIsRepresentative() == true) {
                 firstBadge = badge;
             }
         }
@@ -339,44 +341,50 @@ public class UserServiceImpl implements UserService {
         user.setUserBadgeId(targetBadge.getUserBadgeId());
     }
 
-	@Override
-	public String findId(String name, String tel) {
-		User user = userRepository.findByNameAndTel(name, tel).get();
-		
-		return user.getUsername();
-	}
+    @Override
+    public String findId(String name, String tel) {
+        User user = userRepository.findByNameAndTel(name, tel).get();
 
-	@Override
-	public void sendEamilVerifiedTokenForPassword(String email,String username,String name) throws Exception {
-		User user = userRepository.findByEmailAndNameAndUsername(email,name,username).orElseThrow(()-> new IllegalArgumentException("존재하지 않는 이메일 입니다."));
-		
-		String code = UUID.randomUUID().toString();
-		
-		user.setEmailVerificationToken(code);
-		userRepository.save(user);
-		
-		emailService.sendVerificationEmail(email, code);
-	}
+        return user.getUsername();
+    }
 
-	@Override
-	public String findPass(String name, String username, String email) {
-		User user = userRepository.findByEmailAndNameAndUsername(email, name, username).get();
-		return user.getPassword();
-	}
+    @Override
+    public void sendEamilVerifiedTokenForPassword(String email, String username, String name) throws Exception {
+        User user = userRepository.findByEmailAndNameAndUsername(email, name, username).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일 입니다."));
 
-	@Override
-	public void changePassword(String password,String username) throws Exception {
-		User user = userRepository.findByUsername(username).get();
-		user.setPassword(bCryptPasswordEncoder.encode(password));
-		userRepository.save(user);
-	}
-	
-	@Override
-	public void addScore(Integer userId, Integer score) throws Exception {
-		User user = userRepository.findById(userId).orElseThrow(()-> new Exception("해당 회원이 존재하지 않습니다."));
-		user.addScore(score);
-	}
-	
-	
+        String code = UUID.randomUUID().toString();
 
+        user.setEmailVerificationToken(code);
+        userRepository.save(user);
+
+        emailService.sendVerificationEmail(email, code);
+    }
+
+    @Override
+    public String findPass(String name, String username, String email) {
+        User user = userRepository.findByEmailAndNameAndUsername(email, name, username).get();
+        return user.getPassword();
+    }
+
+    @Override
+    public void changePassword(String password, String username) throws Exception {
+        User user = userRepository.findByUsername(username).get();
+        user.setPassword(bCryptPasswordEncoder.encode(password));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void addScore(Integer userId, Integer score) throws Exception {
+        User user = userRepository.findById(userId).orElseThrow(() -> new Exception("해당 회원이 존재하지 않습니다."));
+        user.addScore(score);
+    }
+
+    @Override
+    public UserDto getByNickNameWithBadge(String nickName) throws Exception {
+        UserDto dto = userRepository.findUserDtoByNickName(nickName);
+        if (dto == null) {
+            throw new IllegalArgumentException("없는 닉네임입니다: " + nickName);
+        }
+        return dto;
+    }
 }

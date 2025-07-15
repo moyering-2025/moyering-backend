@@ -748,7 +748,7 @@ public class HostClassServiceImpl implements HostClassService {
 			star += review.getStar();
 		}
 
-		double starRate = ((double) star / reviewList.size()) * 100;
+		double starRate = ((double) star / reviewList.size());
 		starRate = Math.round(starRate * 100.0) / 100.0;
 		map.put("starRate", starRate);
 
