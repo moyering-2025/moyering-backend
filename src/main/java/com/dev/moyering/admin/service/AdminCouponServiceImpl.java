@@ -100,7 +100,8 @@ public class AdminCouponServiceImpl implements AdminCouponService {
                 .couponCode(dto.getCouponCode())
                 .discountType(dto.getDiscountType())
                 .discount(dto.getDiscount())
-                .issueCount(dto.getIssueCount())
+                .issueCount(dto.getIssueCount() != null ? dto.getIssueCount() : 0)
+                .usedCount(dto.getUsedCount() != null ? dto.getUsedCount() : 0)
                 .validFrom(dto.getValidFrom())
                 .validUntil(dto.getValidUntil())
                 .createdAt(existingCoupon.getCreatedAt()) // 기존 생성일시 유지
