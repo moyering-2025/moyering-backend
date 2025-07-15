@@ -17,6 +17,8 @@ public interface FeedRepository extends JpaRepository<Feed, Integer>, FeedReposi
     List<Feed> findByUserNickName(String nickname);
 
     List<Feed> findByUserUserId(Integer userId);
+
+    List<Feed> findByUserUserIdAndIsDeletedFalse(Integer userId);
     
     
 }
