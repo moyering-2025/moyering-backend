@@ -187,6 +187,7 @@ public class FeedServiceImpl implements FeedService {
                     dto.setCreatedAt(feed.getCreateDate());
                     dto.setMine(feed.getUser().getUserId().equals(userId));
 
+
                     Integer badgeId = user.getUserBadgeId();
                     String badgeImg = (badgeId != null)
                             ? userBadgeRepository.findById(badgeId)
@@ -219,7 +220,7 @@ public class FeedServiceImpl implements FeedService {
 
     @Override
     public Map<String, Object> getFeedsByUserId(Integer userId) throws Exception {
-        List<Feed> feedList = feedRepository.findByUserUserId(userId);
+        List<Feed> feedList = feedRepository.findByUserUserIdAndIsDeletedFalse(userId);
         List<FeedDto> dtoList = new ArrayList<>();
         List<LikeList> likeList = new ArrayList<>();
         List<LikeListDto> likeListDtos = new ArrayList<>();
