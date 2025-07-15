@@ -53,6 +53,10 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		
 		builder.and(hostClass.host.hostId.eq(requestDto.getHostId()));
 		
+		if(requestDto.getCalendarId() != null) {
+			builder.and(calendar.calendarId.eq(requestDto.getCalendarId()));
+		}
+		
 		if(requestDto.getSearchQuery() != null && !requestDto.getSearchQuery().isBlank()) {
 			if("클래스명".equals(requestDto.getSearchFilter())) {
 				builder.and(hostClass.name.containsIgnoreCase(requestDto.getSearchQuery()));
@@ -216,6 +220,9 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		QReview review = QReview.review;
 		    QClassCalendar calendar = QClassCalendar.classCalendar;
 		    QHostClass hostClass = QHostClass.hostClass;
+		    
+		    
+		    
 
 		    List<Review> content = jpaQueryFactory
 		            .selectFrom(review)
