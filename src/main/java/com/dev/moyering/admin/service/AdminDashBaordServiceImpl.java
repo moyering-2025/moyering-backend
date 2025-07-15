@@ -131,7 +131,7 @@ public class AdminDashBaordServiceImpl implements AdminDashBoardService {
 		map.put("todayCalendarCount", todayCalendarCount);
 		int todaySignClass = 0;
 		for (ClassCalendar cal : calendarList) {
-			if (cal.getStatus().equals("검수중")) {
+			if (cal.getStatus().equals("승인대기")) {
 				todaySignClass++;
 			}
 		}

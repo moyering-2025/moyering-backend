@@ -26,7 +26,7 @@ public class AdminCouponDto {
     private LocalDateTime validFrom; //쿠폰 시작일
     private LocalDateTime validUntil; //쿠폰 종료일
     private LocalDateTime createdAt; // 쿠폰 생성일
-    private Integer usedCount; //사용량 
+    private Integer usedCount; //사용량
 
     // 동적으로 계산되는 필드
     private CouponStatus status; // 쿠폰 상태
@@ -60,7 +60,7 @@ public class AdminCouponDto {
                 .validFrom(this.validFrom)
                 .validUntil(this.validUntil)
                 .createdAt(this.createdAt)
-                .usedCount(usedCount)
+                .usedCount(this.usedCount != null ? this.usedCount : 0)
                 .build();
     }
 }

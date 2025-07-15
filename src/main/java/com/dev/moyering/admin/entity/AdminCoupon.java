@@ -19,7 +19,6 @@ public class AdminCoupon {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer couponId; // 쿠폰 아이디
 
-
     @Column(nullable = false)
     private String couponType; // 관리자 쿠폰인지, 강사 쿠폰인지
 
@@ -32,6 +31,7 @@ public class AdminCoupon {
     @Column(nullable = false)
     private Integer discount; // 예: 10 (%), 5000 (금액)
 
+    @Column(nullable = false)
     private Integer issueCount; // 발급매수
 
     private LocalDateTime validFrom; //쿠폰 시작일
@@ -41,7 +41,7 @@ public class AdminCoupon {
     @Column(nullable = false)
     private LocalDateTime createdAt; // 생성일
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer usedCount = 0; //사용량 (기본값 0으로 설정)
 
 
