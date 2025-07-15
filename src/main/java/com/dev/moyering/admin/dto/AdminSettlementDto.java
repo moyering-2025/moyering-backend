@@ -32,6 +32,8 @@ public class AdminSettlementDto {
     private String accNum;          // 지급계좌 정보
     private Integer settleAmountToDo;      // 정산예정 금액
     private Integer settlementAmount; // 실제 지급액
+    
+    
 
     public AdminSettlementDto(Integer settlementId, Integer calendarId, Integer hostId, String username, String hostName, String className, LocalDate settlementDate, LocalDateTime settledAt, String settlementStatus, String bankName, String accNum, Integer settleAmountToDo, Integer settlementAmount) {
         this.settlementId = settlementId;

@@ -18,4 +18,9 @@ public interface UserPaymentRepositoryCustom {
 
     //마이페이지 수강 결제 내역
     Page<UserPaymentHistoryDto> findUserPaymentHistory(UtilSearchDto dto, Pageable pageable) throws Exception;
+
+//    boolean existsCompletedPayment(Integer userId, Integer calendarId) throws Exception;
+
+
+
 }

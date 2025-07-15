@@ -6,6 +6,7 @@ import com.dev.moyering.socialing.entity.QFeed;
 import com.dev.moyering.socialing.entity.QScrap;
 import com.dev.moyering.socialing.entity.Scrap;
 import com.dev.moyering.user.entity.QUser;
+import com.dev.moyering.user.entity.QUserBadge;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -53,6 +54,7 @@ public class ScrapRepositoryImpl implements ScrapRepositoryCustom {
         QScrap scrap = QScrap.scrap;
         QFeed feed = QFeed.feed;
         QUser user = QUser.user;
+        QUserBadge userBadge = QUserBadge.userBadge;
 
         return queryFactory
                 .select(new QScrapListDto(
@@ -63,11 +65,15 @@ public class ScrapRepositoryImpl implements ScrapRepositoryCustom {
                         feed.createDate,
                         user.userId,
                         user.nickName,
-                        user.profile
+                        user.profile,
+                        userBadge.badge_img
                 ))
                 .from(scrap)
                 .join(scrap.feed, feed)
                 .join(feed.user, user)
+                .leftJoin(userBadge)
+                .on(userBadge.user.userId.eq(user.userId)
+                        .and(userBadge.isRepresentative.isTrue()))
                 .where(
                         scrap.user.userId.eq(userId),
                         lastScrapId != null ? scrap.scrapId.lt(lastScrapId) : null

@@ -539,14 +539,16 @@ public class HostClassServiceImpl implements HostClassService {
 			// 해당 캘린더의 수강생들을 StudentDto로 변환
 			List<AdminClassDetailDto.StudentDto> calendarStudents = registList.stream()
 					.map(regist -> {
-						User user = userRepository.findById(regist.getStudentId()).orElse(null);
+						User user = userRepository.findById(regist.getUser().getUserId()).orElse(null);
 						log.info("등록자 정보: studentId={}, user={}, calendarId={}",
-								regist.getStudentId(),
+								regist.getUser().getUserId(),
+								regist.getUser().getUsername(),
 								user != null ? user.getName() : "null",
 								calendar.getCalendarId());
 
 						return AdminClassDetailDto.StudentDto.builder()
 								.userId(user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "")
+								.username(user != null ? user.getName() : "")
 								.name(user != null ? user.getName() : "")
 								.phone(user != null ? user.getTel() : "")
 								.email(user != null ? user.getEmail() : "")
@@ -585,6 +587,7 @@ public class HostClassServiceImpl implements HostClassService {
 				.currentCount(mainCalendar != null ? mainCalendar.getRegisteredCount() : 0)
 				.recruitMax(hostClass.getRecruitMax())
 				.recruitMin(hostClass.getRecruitMin())
+				.classRegDate(hostClass.getRegDate())
 				.firstCategory(hostClass.getSubCategory() != null && hostClass.getSubCategory().getFirstCategory() != null ?
 						hostClass.getSubCategory().getFirstCategory().getCategoryName() : "")
 				.secondCategory(hostClass.getSubCategory() != null ? hostClass.getSubCategory().getSubCategoryName() : "")
@@ -745,7 +748,7 @@ public class HostClassServiceImpl implements HostClassService {
 			star += review.getStar();
 		}
 
-		double starRate = ((double) star / reviewList.size()) * 100;
+		double starRate = ((double) star / reviewList.size());
 		starRate = Math.round(starRate * 100.0) / 100.0;
 		map.put("starRate", starRate);
 
