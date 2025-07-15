@@ -449,19 +449,52 @@ public class HostClassServiceImpl implements HostClassService {
 			throw e;
 		}
 	}
-
 	@Override
+	@Transactional
 	public void rejectClass(Integer classId) throws Exception {
-		HostClass hostClass = hostClassRepository.findById(classId)
-				.orElseThrow(() -> new RuntimeException("클래스르 찾을 수 없습니다."));
-		ClassCalendar calendar = classCalendarRepository.findFirstByHostClassClassId(classId);
-				if(calendar == null) {
-					throw new RuntimeException("캘린더 정보를 찾을 수 없습니다.");
-				}
-				calendar.setStatus("거절");
-				classCalendarRepository.save(calendar);
-	}
+		try {
+			// 1. 클래스 확인
+			HostClass hostClass = hostClassRepository.findById(classId)
+					.orElseThrow(() -> new RuntimeException("클래스를 찾을 수 없습니다."));
 
+			// 2. 해당 클래스의 모든 캘린더 조회
+			List<ClassCalendar> calendars = classCalendarRepository.findByHostClassClassId(classId);
+
+			if (calendars.isEmpty()) {
+				throw new RuntimeException("캘린더 정보를 찾을 수 없습니다.");
+			}
+
+			// 3. 모든 캘린더 상태를 "반려"로 변경
+			for (ClassCalendar calendar : calendars) {
+				calendar.setStatus("반려");
+			}
+
+			// 4. 일괄 저장
+			classCalendarRepository.saveAll(calendars);
+
+			// 5. 알람 발송
+			Host host = hostClass.getHost();
+			if (host != null && host.getUserId() != null) {
+				AlarmDto alarmDto = AlarmDto.builder()
+						.alarmType(2)
+						.title("클래스 반려 안내")
+						.receiverId(host.getUserId())
+						.senderId(1)
+						.senderNickname("관리자")
+						.content("클래스가 반려 되었습니다")
+						.build();
+
+				log.info("클래스 반려 알람 발송 - 클래스ID: {}, 수신자 userId: {}", classId, host.getUserId());
+				alarmService.sendAlarm(alarmDto);
+			}
+
+			log.info("클래스 반려 처리 완료 - 클래스ID: {}, 처리된 캘린더 수: {}", classId, calendars.size());
+
+		} catch (Exception e) {
+			log.error("클래스 반려 처리 중 오류 발생 - 클래스ID: {}, 오류: {}", classId, e.getMessage(), e);
+			throw e;
+		}
+	}
 	@Override
 	public AdminClassDetailDto getClassDetailForAdmin(Integer classId) throws Exception {
 		// 1. 클래스 기본 정보 조회
@@ -506,14 +539,16 @@ public class HostClassServiceImpl implements HostClassService {
 			// 해당 캘린더의 수강생들을 StudentDto로 변환
 			List<AdminClassDetailDto.StudentDto> calendarStudents = registList.stream()
 					.map(regist -> {
-						User user = userRepository.findById(regist.getStudentId()).orElse(null);
+						User user = userRepository.findById(regist.getUser().getUserId()).orElse(null);
 						log.info("등록자 정보: studentId={}, user={}, calendarId={}",
-								regist.getStudentId(),
+								regist.getUser().getUserId(),
+								regist.getUser().getUsername(),
 								user != null ? user.getName() : "null",
 								calendar.getCalendarId());
 
 						return AdminClassDetailDto.StudentDto.builder()
 								.userId(user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "")
+								.username(user != null ? user.getName() : "")
 								.name(user != null ? user.getName() : "")
 								.phone(user != null ? user.getTel() : "")
 								.email(user != null ? user.getEmail() : "")
@@ -552,6 +587,7 @@ public class HostClassServiceImpl implements HostClassService {
 				.currentCount(mainCalendar != null ? mainCalendar.getRegisteredCount() : 0)
 				.recruitMax(hostClass.getRecruitMax())
 				.recruitMin(hostClass.getRecruitMin())
+				.classRegDate(hostClass.getRegDate())
 				.firstCategory(hostClass.getSubCategory() != null && hostClass.getSubCategory().getFirstCategory() != null ?
 						hostClass.getSubCategory().getFirstCategory().getCategoryName() : "")
 				.secondCategory(hostClass.getSubCategory() != null ? hostClass.getSubCategory().getSubCategoryName() : "")
@@ -712,7 +748,7 @@ public class HostClassServiceImpl implements HostClassService {
 			star += review.getStar();
 		}
 
-		double starRate = ((double) star / reviewList.size()) * 100;
+		double starRate = ((double) star / reviewList.size());
 		starRate = Math.round(starRate * 100.0) / 100.0;
 		map.put("starRate", starRate);
 

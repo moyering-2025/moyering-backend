@@ -37,6 +37,7 @@ public class AdminDashBaordServiceImpl implements AdminDashBoardService {
 		LocalDate currentDate = LocalDate.now();
 		LocalDate firstDayOfThisMonth = currentDate.withDayOfMonth(1);
 		LocalDate lastDayOfThisMonth = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+		
 		// 총 회원 수
 		List<User> userList = userRepository.findAll();
 		int thisMonthMemberCount = 0;
@@ -100,12 +101,12 @@ public class AdminDashBaordServiceImpl implements AdminDashBoardService {
 		int todaySettle = 0;
 		for (AdminSettlement settle : settlementList) {
 			if (settle.getSettlementStatus().equals("CP")) {
-				allSettle += settle.getSettlementAmount();
+				allSettle += settle.getSettleAmountToDo();
 			}
 			if (settle.getSettlementStatus().equals("CP")
 					&& !settle.getSettledAt().toLocalDate().isBefore(firstDayOfThisMonth)
 					&& !settle.getSettledAt().toLocalDate().isAfter(lastDayOfThisMonth)) {
-				thisMonthSettle += settle.getSettlementAmount();
+				thisMonthSettle += settle.getSettleAmountToDo();
 			}
 			if (settle.getSettlementStatus().equals("RQ")) {
 				todaySettle++;
@@ -122,16 +123,14 @@ public class AdminDashBaordServiceImpl implements AdminDashBoardService {
 		List<ClassCalendar> calendarList = calendarRepository.findAll();
 		int todayCalendarCount = 0;
 		for (ClassCalendar cal : calendarList) {
-			if (cal.getStatus().equals("모집중") && cal.getStatus().equals("모집마감")
-					&& !cal.getStartDate().before(Date.valueOf(currentDate))
-					&& !cal.getEndDate().after(Date.valueOf(currentDate))) {
+			if (cal.getStatus().equals("모집중")) {
 				todayCalendarCount++;
 			}
 		}
 		map.put("todayCalendarCount", todayCalendarCount);
 		int todaySignClass = 0;
 		for (ClassCalendar cal : calendarList) {
-			if (cal.getStatus().equals("검수중")) {
+			if (cal.getStatus().equals("승인대기")) {
 				todaySignClass++;
 			}
 		}
@@ -156,12 +155,12 @@ public class AdminDashBaordServiceImpl implements AdminDashBoardService {
 			resultMonth.add(monthData);
 		}
 		map.put("monthlyStats", resultMonth);
-		
+
 		// 분기별 클래스 개설 추이
-		List<Map<String,Object>> resultQuater = new ArrayList<>();
-		
-		for(int i=1; i<=4; i++) {
-			Map<String,Object> quaterData = new HashMap<>();
+		List<Map<String, Object>> resultQuater = new ArrayList<>();
+
+		for (int i = 1; i <= 4; i++) {
+			Map<String, Object> quaterData = new HashMap<>();
 			String label = String.format("%d분기", i);
 			int classCount = getClassCountForQuater(i);
 			int studentCount = classCount - getStudentCountForQuater(i);
@@ -170,7 +169,7 @@ public class AdminDashBaordServiceImpl implements AdminDashBoardService {
 			quaterData.put("class", classCount);
 			quaterData.put("student", studentCount);
 			quaterData.put("rate", rate);
-			
+
 			resultQuater.add(quaterData);
 		}
 		map.put("resultQuater", resultQuater);
@@ -188,13 +187,11 @@ public class AdminDashBaordServiceImpl implements AdminDashBoardService {
 			yearData.put("class", classCount);
 			yearData.put("student", studentCount);
 			yearData.put("rate", rate);
-			
+
 			resultYear.add(yearData);
 		}
 		map.put("resultYear", resultYear);
-		
-		
-		
+
 		return map;
 	}
 
@@ -222,33 +219,33 @@ public class AdminDashBaordServiceImpl implements AdminDashBoardService {
 		}
 		return count;
 	}
-	
-	//분기별 모든 클래스 수
+
+	// 분기별 모든 클래스 수
 	public int getClassCountForQuater(int quater) {
 		List<ClassCalendar> list = calendarRepository.findAll();
 		int count = 0;
 		for (ClassCalendar cal : list) {
-			if ((cal.getStartDate().toLocalDate().getMonthValue() - 1) / 3+1 == quater) {
+			if ((cal.getStartDate().toLocalDate().getMonthValue() - 1) / 3 + 1 == quater) {
 				count++;
 			}
 		}
 		return count;
 	}
-	
-	//분기별 특정 클래스의 특정상태의 수
+
+	// 분기별 특정 클래스의 특정상태의 수
 	public int getStudentCountForQuater(int quater) {
 		List<ClassCalendar> list = calendarRepository.findAll();
 		int count = 0;
 		for (ClassCalendar cal : list) {
-			if ((cal.getStartDate().toLocalDate().getMonthValue() - 1) / 3+1 == quater && cal.getStatus().equals("검수중")
-					&& cal.getStatus().equals("폐강") && cal.getStatus().equals("반려")) {
+			if ((cal.getStartDate().toLocalDate().getMonthValue() - 1) / 3 + 1 == quater
+					&& cal.getStatus().equals("검수중") && cal.getStatus().equals("폐강") && cal.getStatus().equals("반려")) {
 				count++;
 			}
 		}
 		return count;
 	}
-	
-	//년도별 모든 클래스 수
+
+	// 년도별 모든 클래스 수
 	public int getClassCountForYear(int year) {
 		List<ClassCalendar> list = calendarRepository.findAll();
 		int count = 0;
@@ -259,20 +256,18 @@ public class AdminDashBaordServiceImpl implements AdminDashBoardService {
 		}
 		return count;
 	}
-	
-	//분기별 특정 클래스의 특정상태의 수
-		public int getStudentCountForYear(int year) {
-			List<ClassCalendar> list = calendarRepository.findAll();
-			int count = 0;
-			for (ClassCalendar cal : list) {
-				if (cal.getStartDate().toLocalDate().getYear() == year && cal.getStatus().equals("검수중")
-						&& cal.getStatus().equals("폐강") && cal.getStatus().equals("반려")) {
-					count++;
-				}
+
+	// 분기별 특정 클래스의 특정상태의 수
+	public int getStudentCountForYear(int year) {
+		List<ClassCalendar> list = calendarRepository.findAll();
+		int count = 0;
+		for (ClassCalendar cal : list) {
+			if (cal.getStartDate().toLocalDate().getYear() == year && cal.getStatus().equals("검수중")
+					&& cal.getStatus().equals("폐강") && cal.getStatus().equals("반려")) {
+				count++;
 			}
-			return count;
 		}
-	
-	
+		return count;
+	}
 
 }

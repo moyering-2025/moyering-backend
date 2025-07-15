@@ -58,4 +58,6 @@ public interface UserService {
     
     //유저의 활동 점수 추가
     void addScore(Integer userId, Integer score) throws Exception;
+
+    UserDto getByNickNameWithBadge(String nickName) throws Exception;
 }

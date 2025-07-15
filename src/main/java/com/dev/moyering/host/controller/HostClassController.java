@@ -121,6 +121,7 @@ public class HostClassController {
 	public ResponseEntity<HostPageResponseDto<ReviewDto>> studentReview(@RequestBody ReviewSearchRequestDto dto) {
 		try {
 			Page<ReviewDto> page = reviewService.searchReviews(dto);
+			System.out.println(dto.getCalendarId());
 
 			PageInfo pageInfo = new PageInfo();
 			int curPage = page.getNumber() + 1;
@@ -281,6 +282,19 @@ public class HostClassController {
 		}catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+		}
+	}
+	
+	
+	@PostMapping("/host/settlementRequest")
+	public ResponseEntity<Boolean> settlementRequest(@RequestParam Integer settlementId){
+		try {
+			settlementService.settelementRequest(settlementId);
+			System.out.println(settlementId);
+			return new ResponseEntity<>(true,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(false,HttpStatus.BAD_REQUEST);
 		}
 	}
 	

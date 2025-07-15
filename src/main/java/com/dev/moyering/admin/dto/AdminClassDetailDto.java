@@ -26,6 +26,7 @@ public class AdminClassDetailDto {
     private Integer currentCount;
     private Integer recruitMax;
     private Integer recruitMin;
+    private Date classRegDate;
 
     // 카테고리 정보
     private String firstCategory;

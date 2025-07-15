@@ -171,7 +171,9 @@ public class HostClassRepositoryImpl implements HostClassRepositoryCustom {
 		// 대소문자 구분없이 문자열 포함해서 검색
 		return hostClass.name.containsIgnoreCase(keyword) // 클래스명
 				.or(hostClass.host.name.containsIgnoreCase(keyword)) // 강사 이름
+				.or(classCalendar.calendarId.stringValue().contains(keyword))
 				.or(user.username.containsIgnoreCase(keyword)); // 강사 로그인 아이디
+
 	}
 
 	// 클래스 상태

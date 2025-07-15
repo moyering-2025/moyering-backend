@@ -8,8 +8,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.dev.moyering.admin.entity.AdminCoupon;
+import com.dev.moyering.admin.entity.QAdminBadge;
 import com.dev.moyering.classring.entity.UserCoupon;
 import com.dev.moyering.classring.repository.UserCouponRepository;
+import com.dev.moyering.user.dto.UserDto;
+import com.dev.moyering.user.entity.QUser;
+import com.dev.moyering.user.entity.QUserBadge;
 import com.dev.moyering.user.entity.User;
 import org.springframework.data.domain.Pageable;
 
@@ -20,6 +24,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import static com.querydsl.core.types.Projections.constructor;
 
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepositoryCustom {
@@ -63,7 +68,25 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 				.fetchOne();
 	}
 
+	@Override
+	public UserDto findUserDtoByNickName(String nickName) {
+		QUser user = QUser.user;
+		QUserBadge userBadge = QUserBadge.userBadge;
 
+		return jpaQueryFactory
+				.select(Projections.bean(UserDto.class,
+						user.userId.as("userId"),
+						user.username,
+						user.nickName,
+						user.profile,
+						userBadge.badge_img.as("badgeImg")
+				))
+				.from(user)
+				.leftJoin(userBadge).on(userBadge.user.eq(user)
+						.and(userBadge.isRepresentative.isTrue()))
+				.where(user.nickName.eq(nickName))
+				.fetchOne();
+	}
 
 
 	// 관리자용 쿼리 조건 메서드 (키워드, 회원구분, 가입기간)
