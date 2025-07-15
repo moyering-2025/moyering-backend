@@ -13,9 +13,10 @@ public class ClassStatusScheduler {
     private final ClassCalendarService classCalendarService;
 	
 	// 매일 00:00에 모집 마감 또는 폐강 처리 (수업일 -2일 )
-    @Scheduled(cron = "0 0 0 * * *") // 매일 12:02 PM 실행
+    @Scheduled(cron = "0 59 17 * * *") // 매일 12:02 PM 실행
 	public void handleRecruitmentClosureOrCancellation() {
 		try {
+			System.out.println("==============================");
 			classCalendarService.checkHostClassStatus();
 		} catch (Exception e) {
 			e.printStackTrace();

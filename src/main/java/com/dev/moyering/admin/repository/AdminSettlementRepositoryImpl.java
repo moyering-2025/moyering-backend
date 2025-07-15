@@ -302,7 +302,8 @@ public class AdminSettlementRepositoryImpl implements AdminSettlementRepositoryC
                 .join(classCalendar.hostClass, hostClass)
                 .leftJoin(userPayment.userCoupon, userCoupon)
                 .leftJoin(userCoupon.adminCoupon, adminCoupon)
-                .where(classCalendar.calendarId.eq(calendarId)) // 핵심: calendarId로 필터링
+                .where(classCalendar.calendarId.eq(calendarId)
+                		.and(userPayment.status.eq("결제완료"))) // 핵심: calendarId로 필터링
                 .orderBy(userPayment.paidAt.desc())  // 결제 최신순 정렬
                 .fetch();
 

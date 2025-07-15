@@ -125,6 +125,7 @@ public class UserServiceImpl implements UserService {
         user.setRegDate(Date.valueOf(LocalDate.now()));
         user.setActiveScore(0);
         user.setUserBadgeId(1);
+        user.setUseYn("Y");
         user.setBirthday(userDto.getBirthday());
         user.setAddr(userDto.getAddr());
         user.setDetailAddr(userDto.getDetailAddr());

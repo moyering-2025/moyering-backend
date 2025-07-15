@@ -178,7 +178,7 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
 	           .and(c.isNotNull())
 	               .and(c.status.eq("종료"));
 	    } else if ("cancled".equals(tab)) {
-	        builder.and(p.status.eq("취소"));
+	        builder.and(p.status.eq("취소됨"));
 	    } else if ("closed".equals(tab)) {
 	        builder.and(p.status.eq("결제완료"))
 	           .and(c.isNotNull())
