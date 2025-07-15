@@ -186,8 +186,6 @@ public class FeedServiceImpl implements FeedService {
 
                     dto.setCreatedAt(feed.getCreateDate());
                     dto.setMine(feed.getUser().getUserId().equals(userId));
-//                    UserBadge badge =userBadgeRepository.findById(dto.getWriterBadge()).get();
-//                    dto.setWriterBadgeImg(badge.getBadge_img());
 
                     Integer badgeId = user.getUserBadgeId();
                     String badgeImg = (badgeId != null)
@@ -196,27 +194,7 @@ public class FeedServiceImpl implements FeedService {
                             .orElse(null)
                             : null;
                     dto.setWriterBadgeImg(badgeImg);
-//                    Integer userIdInFeed = user.getUserId();
-//                    if (userIdInFeed != null) {
-//                        User userInFeed = userRepository.findById(userIdInFeed)
-//                                .orElseThrow(() -> new RuntimeException("User not found"));
-//                        Integer badgeId = userInFeed.getUserBadgeId();
-//
-//                        dto.setWriterBadgeImg(
-//                                badgeId != null
-//                                        ? userBadgeRepository.findById(badgeId)
-//                                        .map(UserBadge::getBadge_img)
-//                                        .orElse(null)
-//                                        : null
-//                        );
-//                    } else {
-//                        dto.setWriterBadgeImg(null);
-//                    }
 
-                    /*List<CommentDto> commentDtos = commentRepository.findByFeed_FeedIdOrderByCreateAtAsc(feed.getFeedId())
-                            .stream().map(Comment::toDto)
-                            .collect(Collectors.toList());
-                    dto.setComments(commentDtos);*/
                     // 🔥 전체 댓글 먼저 조회
                     List<Comment> allComments = commentRepository.findByFeedFeedId(feed.getFeedId());
 

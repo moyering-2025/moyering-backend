@@ -62,7 +62,7 @@ public class AdminClassController {
     public ResponseEntity<String> rejectClass(@PathVariable Integer classId) {
         try {
             hostClassService.rejectClass(classId);
-            return ResponseEntity.ok("거절");
+            return ResponseEntity.ok("반려");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

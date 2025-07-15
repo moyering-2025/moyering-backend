@@ -21,10 +21,11 @@ public class ScrapListDto {
     private Integer writerUserId;
     private String writerNickName;
     private String writerProfile;
+    private String writerBadgeImg;
 
     @QueryProjection
     public ScrapListDto(Integer scrapId, Integer feedId, String content, String img1, LocalDateTime createDate,
-                        Integer writerUserId, String writerNickName, String writerProfile) {
+                        Integer writerUserId, String writerNickName, String writerProfile,String writerBadgeImg) {
         this.scrapId = scrapId;
         this.feedId = feedId;
         this.content = content;
@@ -33,6 +34,7 @@ public class ScrapListDto {
         this.writerUserId = writerUserId;
         this.writerNickName = writerNickName;
         this.writerProfile = writerProfile;
+        this.writerBadgeImg = writerBadgeImg;
     }
 
 }

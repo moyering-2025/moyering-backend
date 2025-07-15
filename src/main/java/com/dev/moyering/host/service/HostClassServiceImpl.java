@@ -449,19 +449,52 @@ public class HostClassServiceImpl implements HostClassService {
 			throw e;
 		}
 	}
-
 	@Override
+	@Transactional
 	public void rejectClass(Integer classId) throws Exception {
-		HostClass hostClass = hostClassRepository.findById(classId)
-				.orElseThrow(() -> new RuntimeException("클래스르 찾을 수 없습니다."));
-		ClassCalendar calendar = classCalendarRepository.findFirstByHostClassClassId(classId);
-				if(calendar == null) {
-					throw new RuntimeException("캘린더 정보를 찾을 수 없습니다.");
-				}
-				calendar.setStatus("거절");
-				classCalendarRepository.save(calendar);
-	}
+		try {
+			// 1. 클래스 확인
+			HostClass hostClass = hostClassRepository.findById(classId)
+					.orElseThrow(() -> new RuntimeException("클래스를 찾을 수 없습니다."));
 
+			// 2. 해당 클래스의 모든 캘린더 조회
+			List<ClassCalendar> calendars = classCalendarRepository.findByHostClassClassId(classId);
+
+			if (calendars.isEmpty()) {
+				throw new RuntimeException("캘린더 정보를 찾을 수 없습니다.");
+			}
+
+			// 3. 모든 캘린더 상태를 "반려"로 변경
+			for (ClassCalendar calendar : calendars) {
+				calendar.setStatus("반려");
+			}
+
+			// 4. 일괄 저장
+			classCalendarRepository.saveAll(calendars);
+
+			// 5. 알람 발송
+			Host host = hostClass.getHost();
+			if (host != null && host.getUserId() != null) {
+				AlarmDto alarmDto = AlarmDto.builder()
+						.alarmType(2)
+						.title("클래스 반려 안내")
+						.receiverId(host.getUserId())
+						.senderId(1)
+						.senderNickname("관리자")
+						.content("클래스가 반려 되었습니다")
+						.build();
+
+				log.info("클래스 반려 알람 발송 - 클래스ID: {}, 수신자 userId: {}", classId, host.getUserId());
+				alarmService.sendAlarm(alarmDto);
+			}
+
+			log.info("클래스 반려 처리 완료 - 클래스ID: {}, 처리된 캘린더 수: {}", classId, calendars.size());
+
+		} catch (Exception e) {
+			log.error("클래스 반려 처리 중 오류 발생 - 클래스ID: {}, 오류: {}", classId, e.getMessage(), e);
+			throw e;
+		}
+	}
 	@Override
 	public AdminClassDetailDto getClassDetailForAdmin(Integer classId) throws Exception {
 		// 1. 클래스 기본 정보 조회
