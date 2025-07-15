@@ -28,7 +28,7 @@ public class SettlementSchedulerService {
     private final AdminSettlementRepository adminSettlementRepository;
 
     // 매일 오전 9시에 실행
-    @Scheduled(cron = "0 46 15 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void processAutoSettlement() {
         log.info("=== 정산 자동 처리 스케줄러 시작 ===");

@@ -1,5 +1,6 @@
 package com.dev.moyering.classring.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -207,5 +208,37 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
 	            .totalPages(pageResult.getTotalPages())
 	            .totalElements(pageResult.getTotalElements())
 	            .build();
-	    }	
+	    }
+
+	@Transactional
+	@Override
+	public void cancelClass(Integer paymentId, Integer userId) throws Exception {
+		UserPayment payment = userPaymentRepository.findById(paymentId)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 결제 정보를 찾을 수 없습니다."));
+        ClassCalendar cc = classCalendarRepository.findById(payment.getClassCalendar().getCalendarId())
+       		 .orElseThrow(() -> new IllegalArgumentException("해당 클래스 정보를 찾을 수 없습니다."));
+        
+		if (!"결제완료".equals(payment.getStatus())) {
+            throw new IllegalStateException("결제 완료 상태에서만 수강 취소가 가능합니다.");
+        } 
+	    // 수업 시작일 기준 2일 전 자정 계산
+	    LocalDate classDate = cc.getStartDate().toLocalDate(); // Date → LocalDate
+	    LocalDate cancelDeadline = classDate.minusDays(2);
+	    LocalDateTime now = LocalDateTime.now();
+	    
+	    if (!now.isBefore(cancelDeadline.atStartOfDay())) {
+	        throw new IllegalStateException("수업 시작일 2일 전까지만 수강 취소가 가능합니다.");
+	    }
+        
+        payment.setPaymentStatus("취소됨");
+        
+        //등록 테이블에서 삭제
+        ClassRegist cr = classRegistRepository.findByClassCalendar_CalendarIdAndUser_UserId(payment.getClassCalendar().getCalendarId(),userId);
+        classCalendarRepository.deleteById(cr.getStudentId());
+        
+        //수강생 수 증가
+        cc.decrementRegisteredCount();
+        cc.changeStatus("모집중");
+        
+	}	
 }
