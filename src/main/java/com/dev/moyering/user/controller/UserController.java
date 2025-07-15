@@ -74,7 +74,7 @@ public class UserController {
 	@GetMapping("/socialing/feedUser/{nickname}")
 	public ResponseEntity<UserDto> getUserByNickname(@PathVariable String nickname) {
 		try {
-			UserDto user = userService.getByNickname(nickname);
+			UserDto user = userService.getByNickNameWithBadge(nickname);
 			return ResponseEntity.ok(user);
 		} catch (Exception e) {
 			// 닉네임이 없으면 404

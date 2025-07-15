@@ -1,15 +1,21 @@
 package com.dev.moyering.socialing.repository;
 
 
+import com.dev.moyering.socialing.dto.DmRoomDto;
 import com.dev.moyering.socialing.entity.QDmMessage;
+import com.dev.moyering.socialing.entity.QDmRoom;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
-public class DmMessageRepositoryImpl implements DmMessageRepositoryCustom{
+public class DmMessageRepositoryImpl implements DmMessageRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -27,3 +33,4 @@ public class DmMessageRepositoryImpl implements DmMessageRepositoryCustom{
                 .execute();
     }
 }
+
