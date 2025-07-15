@@ -89,6 +89,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
 	}
 
 
+
 	// 관리자용 쿼리 조건 메서드 (키워드, 회원구분, 가입기간)
 	private BooleanExpression likeUsername(String keyword) {  // 키워드
 		return (keyword == null || keyword.isEmpty()) ? null : user.username.containsIgnoreCase(keyword);
