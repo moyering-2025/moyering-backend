@@ -1,6 +1,8 @@
 package com.dev.moyering.socialing.service;
 
 import com.dev.moyering.admin.service.AdminBadgeScoreService;
+import com.dev.moyering.common.dto.AlarmDto;
+import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.socialing.dto.CommentDto;
 import com.dev.moyering.socialing.entity.Comment;
 import com.dev.moyering.socialing.entity.Feed;
@@ -30,6 +32,7 @@ public class CommentServiceImpl implements CommentService {
 	private final UserService userService;
 	private final AdminBadgeScoreService adminBadgeScoreService;
 	private final UserBadgeService userBadgeService;
+	private final AlarmService alarmService;
 	
     @Override
     public List<CommentDto> getComments(Integer feedId) {
@@ -40,6 +43,25 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void saveComment(CommentDto commentDto) throws Exception {
         Comment comment = commentDto.toEntity();
+        
+        Integer feedId = comment.getFeed().getFeedId();
+        Feed feed = feedRepository.findById(feedId).get();
+        
+        
+        
+//        AlarmDto alarmDto = AlarmDto.builder()
+//				.alarmType(2)// '1: 시스템,관리자 알람 2 : 클래스링 알람, 3 : 게더링 알람, 4: 소셜링 알람',
+//				.title("댓글 알림") // 필수 사항
+//				.receiverId(feed.getUser().getUserId())
+//				//수신자 유저 아이디
+//				.senderId(comment.getUser().getUserId())
+//				//발신자 유저 아이디 
+//				.senderNickname(feed.getUser().getNickName())
+//				//발신자 닉네임 => 시스템/관리자가 발송하는 알람이면 메니저 혹은 관리자, 강사가 발송하는 알람이면 강사테이블의 닉네임, 그 외에는 유저 테이블의 닉네임(마이페이지 알림 내역에서 보낸 사람으로 보여질 이름)
+//				.content(comment.getUser().getNickName()+"님께서 댓글을 남기셨습니다.")//알림 내용
+//				.build();
+//		alarmService.sendAlarm(alarmDto);
+        
         commentRepository.save(comment);
     }
 
