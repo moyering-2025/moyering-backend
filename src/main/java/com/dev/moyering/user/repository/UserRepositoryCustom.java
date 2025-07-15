@@ -3,6 +3,7 @@ package com.dev.moyering.user.repository;
 import com.dev.moyering.admin.dto.AdminMemberDto;
 import com.dev.moyering.admin.dto.AdminMemberSearchCond;
 
+import com.dev.moyering.user.dto.UserDto;
 import com.dev.moyering.user.entity.User;
 import org.springframework.data.domain.Pageable;
 
@@ -15,7 +16,7 @@ public interface UserRepositoryCustom {
     // 검색 후 조회 건수
     Long countMembers(AdminMemberSearchCond cond);
 
-
+    UserDto findUserDtoByNickName(String nickName);
 //
 }
 

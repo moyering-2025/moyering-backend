@@ -20,4 +20,6 @@ public interface DmRoomRepository extends JpaRepository<DmRoom, Integer> {
 
     @Query("select r from DmRoom r where r.user1.userId = :userId or r.user2.userId = :userId")
     List<DmRoom> findAllByUser(@Param("userId") Integer userId);
+
+
 }
