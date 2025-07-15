@@ -112,6 +112,10 @@ public class UserPayment {
     public void setPaymentStatus(String status) {
     	this.status = status;
     }
+    
+    public void setCanceledAt() {
+        this.canceledAt = LocalDateTime.now();
+    }
 }
 
 

@@ -231,6 +231,7 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
 	    }
         
         payment.setPaymentStatus("취소됨");
+        payment.setCanceledAt();
         
         //등록 테이블에서 삭제
         ClassRegist cr = classRegistRepository.findByClassCalendar_CalendarIdAndUser_UserId(payment.getClassCalendar().getCalendarId(),userId);
@@ -240,5 +241,14 @@ public class ClassPaymentServiceImpl implements ClassPaymentService {
         cc.decrementRegisteredCount();
         cc.changeStatus("모집중");
         
+	}
+
+	@Override
+	public void refundAllForCalendar(Integer calendarId) throws Exception {
+		//폐강시 자동 환불
+		List<UserPayment> pays = userPaymentRepository.findAllByClassCalendar_CalendarId(calendarId);
+		for (UserPayment pay : pays) {
+			pay.setPaymentStatus("취소됨");
+		}
 	}	
 }

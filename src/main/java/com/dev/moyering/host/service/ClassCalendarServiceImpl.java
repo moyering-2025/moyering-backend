@@ -15,6 +15,7 @@ import com.dev.moyering.common.service.AlarmService;
 import com.dev.moyering.host.dto.ClassCalendarDto;
 import com.dev.moyering.host.dto.HostClassDto;
 import com.dev.moyering.host.entity.ClassCalendar;
+import com.dev.moyering.host.entity.ClassRegist;
 import com.dev.moyering.host.repository.ClassCalendarRepository;
 import com.dev.moyering.host.repository.ScheduleDetailRepository;
 import com.dev.moyering.user.entity.User;
@@ -97,6 +98,7 @@ public class ClassCalendarServiceImpl implements ClassCalendarService {
 	@Transactional
 	@Override
 	public void checkHostClassStatus() throws Exception {
+		System.out.println("-------------------------------");
         LocalDate localDate = LocalDate.now().plusDays(2);
         Date classDate = java.sql.Date.valueOf(localDate);
         List<ClassCalendar> list = classCalendarRepository.findByStartDateLessThanEqualAndStatus(classDate, "모집중");
@@ -109,11 +111,11 @@ public class ClassCalendarServiceImpl implements ClassCalendarService {
                 cal.changeStatus("모집마감");
                 
               //개강하는 알림 (등록된 모든 사람들에게)
-                List<Integer> registerdUsers =  classRegistService.getregisterdUsersByClassId(cal.getCalendarId());
+                List<ClassRegist> registerdUsers =  classRegistService.getregisterdUsersByClassId(cal.getCalendarId());
                 
-                for (Integer userId :registerdUsers ) {
-        			User user = userRepository.findById(userId)
-        					.orElseThrow(() -> new Exception("해당 사용자를 찾을 수 없습니다: id=" + userId));
+                for (ClassRegist cr :registerdUsers ) {
+        			User user = userRepository.findById(cr.getUser().getUserId())
+        					.orElseThrow(() -> new Exception("해당 사용자를 찾을 수 없습니다: id=" + cr));
         			
 	    			AlarmDto alarm =  AlarmDto.builder()
 	    		    		.alarmType(2)
@@ -127,14 +129,14 @@ public class ClassCalendarServiceImpl implements ClassCalendarService {
                 }
             } else {
                 cal.changeStatus("폐강");
-                //classPaymentService.refundAllForCalendar(cal.getCalendarId());
+                classPaymentService.refundAllForCalendar(cal.getCalendarId());
                 
                 //폐강하는 알림 (등록된 모든 사람들에게)
-                List<Integer> registerdUsers =  classRegistService.getregisterdUsersByClassId(cal.getCalendarId());
+                List<ClassRegist> registerdUsers =  classRegistService.getregisterdUsersByClassId(cal.getCalendarId());
                 
-                for (Integer userId :registerdUsers ) {
-        			User user = userRepository.findById(userId)
-        					.orElseThrow(() -> new Exception("해당 사용자를 찾을 수 없습니다: id=" + userId));
+                for (ClassRegist cr :registerdUsers ) {
+        			User user = userRepository.findById(cr.getUser().getUserId())
+        					.orElseThrow(() -> new Exception("해당 사용자를 찾을 수 없습니다: id=" + cr));
         			
 	    			AlarmDto alarm =  AlarmDto.builder()
 	    		    		.alarmType(2)
