@@ -121,6 +121,7 @@ public class HostClassController {
 	public ResponseEntity<HostPageResponseDto<ReviewDto>> studentReview(@RequestBody ReviewSearchRequestDto dto) {
 		try {
 			Page<ReviewDto> page = reviewService.searchReviews(dto);
+			System.out.println(dto.getCalendarId());
 
 			PageInfo pageInfo = new PageInfo();
 			int curPage = page.getNumber() + 1;

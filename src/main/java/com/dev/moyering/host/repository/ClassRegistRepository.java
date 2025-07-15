@@ -12,5 +12,6 @@ public interface ClassRegistRepository extends JpaRepository<ClassRegist, Intege
 	ClassRegist findByUserUserId(Integer userInd)throws Exception;
 	List<ClassRegist> findAllByUser_UserId(Integer userId) throws Exception;
 	List<Integer> findAllByClassCalendar_CalendarId(Integer calendarId) throws Exception;
+	ClassRegist findByClassCalendar_CalendarIdAndUser_UserId(Integer calendarId, Integer userId)throws Exception;
 
 }

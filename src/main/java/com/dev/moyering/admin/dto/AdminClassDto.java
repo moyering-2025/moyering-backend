@@ -1,10 +1,8 @@
 package com.dev.moyering.admin.dto;
 
-import com.dev.moyering.common.entity.SubCategory;
 import com.dev.moyering.host.entity.ClassCalendar;
 import com.dev.moyering.host.entity.Host;
 import com.dev.moyering.host.entity.HostClass;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -12,12 +12,12 @@ import lombok.*;
 @Getter
 @ToString(of = {"couponId", "couponType", "couponCode", "discountType", "discount", "issueCount",
 "validFrom", "validUntil", "createdAt"})
+@Builder
 
 @Table(name="coupon")
 public class AdminCoupon {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer couponId; // 쿠폰 아이디
-
 
     @Column(nullable = false)
     private String couponType; // 관리자 쿠폰인지, 강사 쿠폰인지
@@ -31,6 +31,7 @@ public class AdminCoupon {
     @Column(nullable = false)
     private Integer discount; // 예: 10 (%), 5000 (금액)
 
+    @Column(nullable = false)
     private Integer issueCount; // 발급매수
 
     private LocalDateTime validFrom; //쿠폰 시작일
@@ -39,18 +40,12 @@ public class AdminCoupon {
 
     @Column(nullable = false)
     private LocalDateTime createdAt; // 생성일
-    
-    @Column(nullable = false)
+
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer usedCount = 0; //사용량 (기본값 0으로 설정)
-    
 
 
-     // PAYMENT구현 끝나고 usedCount 추가
-    @Builder
-    public AdminCoupon(Integer couponId, String couponType, String couponCode,
-                       String discountType, Integer discount, Integer issueCount, Integer usedCount,
-                       LocalDateTime validFrom, LocalDateTime validUntil,
-                       LocalDateTime createdAt) {
+    public AdminCoupon(Integer couponId, String couponType, String couponCode, String discountType, Integer discount, Integer issueCount, LocalDateTime validFrom, LocalDateTime validUntil, LocalDateTime createdAt, Integer usedCount) {
         this.couponId = couponId;
         this.couponType = couponType;
         this.couponCode = couponCode;

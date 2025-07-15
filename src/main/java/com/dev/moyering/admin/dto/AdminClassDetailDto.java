@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -36,6 +37,8 @@ public class AdminClassDetailDto {
     private Date endDate;
     private LocalTime scheduleStart;
     private LocalTime scheduleEnd;
+
+    private List<ScheduleDto> schedules;
 
     // 위치 정보
     private String location;
@@ -68,10 +71,23 @@ public class AdminClassDetailDto {
     @Builder
     public static class StudentDto {
         private String userId;
+        private String username;
         private String name;
         private String phone;
         private String email;
         private Date regDate;
         private String status;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ScheduleDto {
+        private Integer calendarId;     // 일정 ID
+        private Date startDate;         // 시작일 (기존 Date 타입 유지)
+        private Date endDate;           // 종료일
+        private String status;          // 상태 (승인대기, 모집중, 종료, 취소 등)
+        private Integer registeredCount; // 현재 등록된 수강생 수
     }
 }

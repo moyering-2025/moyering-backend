@@ -233,7 +233,10 @@ public class UserServiceImpl implements UserService {
             user.setProfile(fileName);
         }
 
-//        user.setUsername(dto.getUsername());
+
+
+        //user.setUsername(dto.getUsername());
+
         user.setName(dto.getName());
         user.setTel(dto.getTel());
         user.setEmail(dto.getEmail());

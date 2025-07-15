@@ -28,12 +28,12 @@ public class SettlementSchedulerService {
     private final AdminSettlementRepository adminSettlementRepository;
 
     // 매일 오전 9시에 실행
-    @Scheduled(cron = "0 0 9 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void processAutoSettlement() {
         log.info("=== 정산 자동 처리 스케줄러 시작 ===");
-
-        Date sevenDaysAgo = Date.valueOf(LocalDate.now().minusDays(7));
+        System.out.println("sdfsdf");
+        Date sevenDaysAgo = Date.valueOf(LocalDate.now().minusDays(1));
 
         // 7일 전 종료된 클래스 중 정산 미처리된 것들 조회
         List<SettlementProcessDto> targetClasses = queryFactory

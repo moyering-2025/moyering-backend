@@ -89,9 +89,12 @@ public class AdminSettlementController {
         Map<String, Object> response = new HashMap<>();
         try {
             // 프론트에서 보낸 계산된 금액 추출
-            Integer totalSettlementAmount = (Integer) requestData.get("totalSettlementAmount");
+        	Number totalNum = (Number) requestData.get("totalSettlementAmount");
+        	int total = totalNum == null ? 0 : totalNum.intValue();
+
+            System.out.println(total+"skdfhksdhfuksd");
             // 서비스에서 계산된 금액 전달
-            boolean result = adminSettlementService.completeSettlement(settlementId, totalSettlementAmount);
+            boolean result = adminSettlementService.completeSettlement(settlementId, total);
             if (result) {
                 return ResponseEntity.ok(response);
             } else {

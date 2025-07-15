@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
 @NoArgsConstructor // 매개변수 없는 기본 생성자 생성
 @AllArgsConstructor // 모든 필드를 매개변수로 받는 생성자를 생성
+@Builder
 public class AdminCouponDto {
     private Integer couponId; // 쿠폰 아이디
     private String couponType; // 쿠폰 유형 (관리자면 'MG' 강사면 'HT")
@@ -26,7 +26,7 @@ public class AdminCouponDto {
     private LocalDateTime validFrom; //쿠폰 시작일
     private LocalDateTime validUntil; //쿠폰 종료일
     private LocalDateTime createdAt; // 쿠폰 생성일
-    private Integer usedCount; //사용량 
+    private Integer usedCount; //사용량
 
     // 동적으로 계산되는 필드
     private CouponStatus status; // 쿠폰 상태
@@ -48,7 +48,6 @@ public class AdminCouponDto {
         // status는 null로 초기화 (나중에 설정)
     }
 
-
     // DTO -> Entity 변환
     public AdminCoupon toEntity() {
         return AdminCoupon.builder()
@@ -61,7 +60,7 @@ public class AdminCouponDto {
                 .validFrom(this.validFrom)
                 .validUntil(this.validUntil)
                 .createdAt(this.createdAt)
-                .usedCount(usedCount)
+                .usedCount(this.usedCount != null ? this.usedCount : 0)
                 .build();
     }
 }

@@ -449,63 +449,148 @@ public class HostClassServiceImpl implements HostClassService {
 			throw e;
 		}
 	}
-
 	@Override
+	@Transactional
 	public void rejectClass(Integer classId) throws Exception {
-		HostClass hostClass = hostClassRepository.findById(classId)
-				.orElseThrow(() -> new RuntimeException("클래스르 찾을 수 없습니다."));
-		ClassCalendar calendar = classCalendarRepository.findFirstByHostClassClassId(classId);
-				if(calendar == null) {
-					throw new RuntimeException("캘린더 정보를 찾을 수 없습니다.");
-				}
-				calendar.setStatus("거절");
-				classCalendarRepository.save(calendar);
-	}
+		try {
+			// 1. 클래스 확인
+			HostClass hostClass = hostClassRepository.findById(classId)
+					.orElseThrow(() -> new RuntimeException("클래스를 찾을 수 없습니다."));
 
+			// 2. 해당 클래스의 모든 캘린더 조회
+			List<ClassCalendar> calendars = classCalendarRepository.findByHostClassClassId(classId);
+
+			if (calendars.isEmpty()) {
+				throw new RuntimeException("캘린더 정보를 찾을 수 없습니다.");
+			}
+
+			// 3. 모든 캘린더 상태를 "반려"로 변경
+			for (ClassCalendar calendar : calendars) {
+				calendar.setStatus("반려");
+			}
+
+			// 4. 일괄 저장
+			classCalendarRepository.saveAll(calendars);
+
+			// 5. 알람 발송
+			Host host = hostClass.getHost();
+			if (host != null && host.getUserId() != null) {
+				AlarmDto alarmDto = AlarmDto.builder()
+						.alarmType(2)
+						.title("클래스 반려 안내")
+						.receiverId(host.getUserId())
+						.senderId(1)
+						.senderNickname("관리자")
+						.content("클래스가 반려 되었습니다")
+						.build();
+
+				log.info("클래스 반려 알람 발송 - 클래스ID: {}, 수신자 userId: {}", classId, host.getUserId());
+				alarmService.sendAlarm(alarmDto);
+			}
+
+			log.info("클래스 반려 처리 완료 - 클래스ID: {}, 처리된 캘린더 수: {}", classId, calendars.size());
+
+		} catch (Exception e) {
+			log.error("클래스 반려 처리 중 오류 발생 - 클래스ID: {}, 오류: {}", classId, e.getMessage(), e);
+			throw e;
+		}
+	}
 	@Override
 	public AdminClassDetailDto getClassDetailForAdmin(Integer classId) throws Exception {
 		// 1. 클래스 기본 정보 조회
 		HostClass hostClass = hostClassRepository.findById(classId)
 				.orElseThrow(() -> new RuntimeException("클래스를 찾을 수 없습니다."));
 
-		// 2. 캘린더 정보 조회(상태, 등록 수강생 수) - 단일 결과 반환 메서드 사용
-		ClassCalendar calendar = classCalendarRepository.findFirstByHostClassClassId(classId);
+		// 2. 캘린더 정보 조회 - 해당 클래스의 모든 일정 조회
+		Set<Integer> classIds = Set.of(classId);
+		List<ClassCalendar> calendars = classCalendarRepository.findByHostClassClassIdIn(classIds);
 
-		// 3. 수강생 목록 조회 (등록요청 상태가 아닌 경우만)
-		List<AdminClassDetailDto.StudentDto> students = new ArrayList<>();
-		if(calendar != null && !"승인대기".equals(calendar.getStatus())){
+		ClassCalendar mainCalendar = calendars.isEmpty() ? null : calendars.get(0); // 기본 정보용
+
+		// 3. 스케줄 목록 생성 (일정 id, 클래스일자, 상태, 등록수)
+		List<AdminClassDetailDto.ScheduleDto> schedules = calendars.stream()
+				.map(calendar -> AdminClassDetailDto.ScheduleDto.builder()
+						.calendarId(calendar.getCalendarId())
+						.startDate(calendar.getStartDate())
+						.endDate(calendar.getEndDate())
+						.status(calendar.getStatus())
+						.registeredCount(calendar.getRegisteredCount())
+						.build())
+				.collect(Collectors.toList());
+
+		// 디버깅용 로그 추가
+		log.info("=== 클래스 상세 조회 시작 ===");
+		log.info("classId: {}, calendars size: {}, schedules size: {}",
+				classId, calendars.size(), schedules.size());
+
+		// 4. 모든 캘린더의 수강생 조회 (캘린더별로 다른 수강생이 있을 수 있음)
+		List<AdminClassDetailDto.StudentDto> allStudents = new ArrayList<>();
+
+		log.info("=== 수강생 조회 시작 ===");
+		log.info("전체 캘린더 수: {}", calendars.size());
+
+		for (ClassCalendar calendar : calendars) {
+			log.info("캘린더 ID: {}, 상태: {}, 등록수: {}",
+					calendar.getCalendarId(), calendar.getStatus(), calendar.getRegisteredCount());
+
 			List<ClassRegist> registList = classRegistRepository.findByClassCalendarCalendarId(calendar.getCalendarId());
-			students = registList.stream()
+			log.info("캘린더 ID {} 의 실제 등록자 수: {}", calendar.getCalendarId(), registList.size());
+
+			// 해당 캘린더의 수강생들을 StudentDto로 변환
+			List<AdminClassDetailDto.StudentDto> calendarStudents = registList.stream()
 					.map(regist -> {
 						User user = userRepository.findById(regist.getStudentId()).orElse(null);
+						log.info("등록자 정보: studentId={}, user={}, calendarId={}",
+								regist.getStudentId(),
+								user != null ? user.getName() : "null",
+								calendar.getCalendarId());
+
 						return AdminClassDetailDto.StudentDto.builder()
 								.userId(user != null && user.getUserId() != null ? String.valueOf(user.getUserId()) : "")
 								.name(user != null ? user.getName() : "")
 								.phone(user != null ? user.getTel() : "")
 								.email(user != null ? user.getEmail() : "")
-								.regDate(user != null ? user.getRegDate() : null) // user에서 가져오기
-								.status(calendar.getStatus())
+								.regDate(user != null ? user.getRegDate() : null)
+								.status(calendar.getStatus()) // 해당 캘린더의 상태
 								.build();
 					})
+					.filter(student -> !student.getUserId().isEmpty()) // 유효한 사용자만 필터링
 					.collect(Collectors.toList());
+
+			log.info("캘린더 ID {} 에서 변환된 수강생 수: {}", calendar.getCalendarId(), calendarStudents.size());
+			allStudents.addAll(calendarStudents);
 		}
 
-		// 4. DTO 생성 및 반환
-		return AdminClassDetailDto.builder()
+		log.info("중복 제거 전 전체 수강생 수: {}", allStudents.size());
+
+		// 5. 중복 제거 (같은 사용자가 여러 일정에 등록된 경우, 첫 번째 등록 정보 유지)
+		List<AdminClassDetailDto.StudentDto> uniqueStudents = allStudents.stream()
+				.collect(Collectors.toMap(
+						student -> student.getUserId(),
+						student -> student,
+						(existing, replacement) -> existing // 첫 번째 등록 정보 유지
+				))
+				.values()
+				.stream()
+				.collect(Collectors.toList());
+
+		log.info("중복 제거 후 최종 수강생 수: {}", uniqueStudents.size());
+
+		// 6. DTO 생성 및 반환
+		AdminClassDetailDto result = AdminClassDetailDto.builder()
 				.classId(hostClass.getClassId())
-				.calendarId(calendar != null ? calendar.getCalendarId() : null)
 				.className(hostClass.getName())
 				.hostName(hostClass.getHost() != null ? hostClass.getHost().getName() : "")
-				.processStatus(calendar != null ? calendar.getStatus() : "")
-				.currentCount(calendar != null ? calendar.getRegisteredCount() : 0)
+				.processStatus(mainCalendar != null ? mainCalendar.getStatus() : "")
+				.currentCount(mainCalendar != null ? mainCalendar.getRegisteredCount() : 0)
 				.recruitMax(hostClass.getRecruitMax())
 				.recruitMin(hostClass.getRecruitMin())
 				.firstCategory(hostClass.getSubCategory() != null && hostClass.getSubCategory().getFirstCategory() != null ?
 						hostClass.getSubCategory().getFirstCategory().getCategoryName() : "")
 				.secondCategory(hostClass.getSubCategory() != null ? hostClass.getSubCategory().getSubCategoryName() : "")
 				.price(hostClass.getPrice())
-				.startDate(calendar != null ? calendar.getStartDate() : null)
-				.endDate(calendar != null ? calendar.getEndDate() : null)
+				.startDate(mainCalendar != null ? mainCalendar.getStartDate() : null)
+				.endDate(mainCalendar != null ? mainCalendar.getEndDate() : null)
 				.scheduleStart(hostClass.getScheduleStart())
 				.scheduleEnd(hostClass.getScheduleEnd())
 				.location(hostClass.getAddr())
@@ -522,9 +607,17 @@ public class HostClassServiceImpl implements HostClassService {
 				.imgName3(hostClass.getImg3())
 				.imgName4(hostClass.getImg4())
 				.imgName5(hostClass.getImg5())
-				.students(students)
+				.calendarId(mainCalendar != null ? mainCalendar.getCalendarId() : null)
+				.schedules(schedules)  // 스케줄 목록 추가
+				.students(uniqueStudents) // 모든 캘린더의 수강생 목록
 				.build();
+
+		log.info("=== 클래스 상세 조회 완료 ===");
+		log.info("반환할 수강생 수: {}", uniqueStudents.size());
+
+		return result;
 	}
+
 	@Override
 	public Integer updateClass(HostClassDto hostClassDto) throws Exception {
 		HostClassDto classDto = hostClassRepository.findByClassId(hostClassDto.getClassId()).toDto();

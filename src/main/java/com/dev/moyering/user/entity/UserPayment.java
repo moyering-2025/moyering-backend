@@ -108,6 +108,10 @@ public class UserPayment {
         this.discountType=discountType;
         this.platformFee = platformFee;
     }
+    
+    public void setPaymentStatus(String status) {
+    	this.status = status;
+    }
 }
 
 
