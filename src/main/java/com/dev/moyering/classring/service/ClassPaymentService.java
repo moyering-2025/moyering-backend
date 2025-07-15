@@ -13,4 +13,5 @@ public interface ClassPaymentService {
 	void approvePayment(PaymentApproveRequestDto dto, User user) throws Exception;
 	void initPayment(PaymentInitRequestDto dto, User user) throws Exception;
 	PageResponseDto<UserPaymentHistoryDto> getUserPaymentHistory(UtilSearchDto dto) throws Exception;
+	void cancelClass(Integer paymentId, Integer userId) throws Exception;
 }

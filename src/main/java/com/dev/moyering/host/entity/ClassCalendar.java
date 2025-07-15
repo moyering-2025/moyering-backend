@@ -72,5 +72,9 @@ public class ClassCalendar {
 //	    }
 		this.status=status;
 	}
+	//등록인원 1차감
+	public void decrementRegisteredCount() {
+		this.registeredCount--;
+	}
 	
 }
