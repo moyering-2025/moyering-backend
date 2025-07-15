@@ -238,5 +238,4 @@ public class UserPaymentRepositoryImpl implements UserPaymentRepositoryCustom {
 
 	    return new PageImpl<>(content, pageable, total);
 	   }
-
 }
