@@ -30,6 +30,9 @@ public interface AdminSettlementService {
 
     /*** 특정 정산의 수강생 목록 조회 */
     List <AdminPaymentDto> getPaymentListBySettlementId(Integer settlementId);
+    
+    /*** 강사 정산요청 */
+    void settelementRequest(Integer settlementId)throws Exception;
 
 }
 

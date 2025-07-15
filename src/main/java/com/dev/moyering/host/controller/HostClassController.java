@@ -285,6 +285,19 @@ public class HostClassController {
 		}
 	}
 	
+	
+	@PostMapping("/host/settlementRequest")
+	public ResponseEntity<Boolean> settlementRequest(@RequestParam Integer settlementId){
+		try {
+			settlementService.settelementRequest(settlementId);
+			System.out.println(settlementId);
+			return new ResponseEntity<>(true,HttpStatus.OK);
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(false,HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@GetMapping("/host/hostRateCount")
 	public ResponseEntity<Map<String,Object>> hostRateCount(@RequestParam Integer hostId){
 		try {
