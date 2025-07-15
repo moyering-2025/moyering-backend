@@ -10,6 +10,7 @@ import lombok.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@AllArgsConstructor
 @ToString(of = {"couponId", "couponType", "couponCode", "discountType", "discount", "issueCount",
 "validFrom", "validUntil", "createdAt"})
 @Builder
@@ -31,7 +32,7 @@ public class AdminCoupon {
     @Column(nullable = false)
     private Integer discount; // 예: 10 (%), 5000 (금액)
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "INT DEFAULT 0")
     private Integer issueCount; // 발급매수
 
     private LocalDateTime validFrom; //쿠폰 시작일
@@ -45,18 +46,6 @@ public class AdminCoupon {
     private Integer usedCount = 0; //사용량 (기본값 0으로 설정)
 
 
-    public AdminCoupon(Integer couponId, String couponType, String couponCode, String discountType, Integer discount, Integer issueCount, LocalDateTime validFrom, LocalDateTime validUntil, LocalDateTime createdAt, Integer usedCount) {
-        this.couponId = couponId;
-        this.couponType = couponType;
-        this.couponCode = couponCode;
-        this.discountType = discountType;
-        this.discount = discount;
-        this.issueCount = issueCount;
-        this.validFrom = validFrom;
-        this.validUntil = validUntil;
-        this.createdAt = createdAt;
-        this.usedCount = usedCount;
-    }
 
     // Entity -> DTO 변환
     public AdminCouponDto toDto() {
@@ -70,7 +59,7 @@ public class AdminCoupon {
                 .validFrom(this.validFrom)
                 .validUntil(this.validUntil)
                 .createdAt(this.createdAt)
-                .usedCount(0)
+                .usedCount(this.usedCount)
                 .build();
     }
 
