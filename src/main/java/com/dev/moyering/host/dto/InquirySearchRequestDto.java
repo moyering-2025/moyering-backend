@@ -17,7 +17,7 @@ public class InquirySearchRequestDto {
 	private String searchQuery;
 	private String startDate;
 	private String endDate;
-	private int replyStatus;
+	private Integer replyStatus;
 	private int page;
 	private int size;
 }

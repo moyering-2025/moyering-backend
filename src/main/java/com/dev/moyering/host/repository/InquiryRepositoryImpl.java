@@ -82,19 +82,20 @@ public class InquiryRepositoryImpl implements InquiryRepositoryCustom {
 	    //답변상태 숫자로 변환
 	    
 	    // 답변 상태 필터
-	    if (1 == dto.getReplyStatus()) {
-	        builder.and(inquiry.state.eq(1));  // 답변완료
-	    } else if (0 == dto.getReplyStatus()) {
-	        builder.and(inquiry.state.eq(0));  // 답변대기
+	    if (dto.getReplyStatus() != null) {
+	        if (dto.getReplyStatus() == 1) {
+	            builder.and(inquiry.state.eq(1));
+	        } else if (dto.getReplyStatus() == 0) {
+	            builder.and(inquiry.state.eq(0));
+	        }
 	    }
-
 	    // 🔥 join 설정
 	    List<Inquiry> content = jpaQueryFactory.selectFrom(inquiry)
 	            .join(inquiry.classCalendar, classCalendar)
 	            .join(classCalendar.hostClass, hostClass)
 	            .join(hostClass.host, host)
 	            .where(builder)
-	            .orderBy(inquiry.inquiryDate.desc())
+	            .orderBy(inquiry.state.asc(), inquiry.inquiryDate.desc())
 	            .offset(pageable.getOffset())
 	            .limit(pageable.getPageSize())
 	            .fetch();

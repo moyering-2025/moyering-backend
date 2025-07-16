@@ -84,7 +84,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 		
 		List<Review> content = jpaQueryFactory.selectFrom(review).join(review.classCalendar,calendar)
 				.join(calendar.hostClass,hostClass).join(hostClass.host,host).join(review.user,user)
-				.where(builder).orderBy(review.reviewDate.desc()).offset(pageable.getOffset())
+				.where(builder).orderBy(review.state.asc(),review.reviewDate.desc()).offset(pageable.getOffset())
 				.limit(pageable.getPageSize()).fetch();
 		
 		long total = jpaQueryFactory.selectFrom(review).join(review.classCalendar,calendar)
