@@ -87,10 +87,10 @@ public class GatheringController {
 				UserBadge b = userService.getUserFirstBadge(gaMember.getUserId());
 				if(b !=null) {
 				gaMember.setUserBadgeId(b.getUserBadgeId() != null ? b.getUserBadgeId() : 1);
-				gaMember.setUserBadgeImg(b.getBadge_img() != null ? b.getBadge_img() : "badge_moyasessak.png");
+				gaMember.setUserBadgeImg(b.getBadge_img() != null ? b.getBadge_img() : "moyasessak");
 				}else {
 					gaMember.setUserBadgeId(1);
-					gaMember.setUserBadgeImg("badge_moyasessak.png");
+					gaMember.setUserBadgeImg("moyasessak");
 				}
 			}
 			List<GatheringDto> recommendations = gatheringService.findGatheringWithCategory(nGatheringDto.getGatheringId(), nGatheringDto.getSubCategoryId(), nGatheringDto.getCategoryId());
