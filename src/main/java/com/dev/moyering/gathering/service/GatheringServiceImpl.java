@@ -183,6 +183,7 @@ public class GatheringServiceImpl implements GatheringService {
 				.select(gathering)
 				.from(gathering)
 				.where(builder)
+				.orderBy(gathering.meetingDate.asc())
 	            .offset(pageable.getOffset())
 	            .limit(pageable.getPageSize())
 	            .fetch();
