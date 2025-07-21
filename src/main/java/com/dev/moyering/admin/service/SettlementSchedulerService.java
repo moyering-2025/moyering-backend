@@ -32,8 +32,7 @@ public class SettlementSchedulerService {
     @Transactional
     public void processAutoSettlement() {
         log.info("=== 정산 자동 처리 스케줄러 시작 ===");
-        System.out.println("sdfsdf");
-        Date sevenDaysAgo = Date.valueOf(LocalDate.now().minusDays(1));
+        Date oneDaysAgo = Date.valueOf(LocalDate.now().minusDays(1));
 
         // 7일 전 종료된 클래스 중 정산 미처리된 것들 조회
         List<SettlementProcessDto> targetClasses = queryFactory
@@ -55,7 +54,7 @@ public class SettlementSchedulerService {
                         adminSettlement.classCalendar.calendarId.eq(classCalendar.calendarId)
                 )
                 .where(
-                        classCalendar.endDate.eq(sevenDaysAgo) // 7일 전 종료
+                        classCalendar.endDate.eq(oneDaysAgo) // 7일 전 종료
                                 .and(classCalendar.status.eq("종료")) // 클래스 완료 상태
                                 .and(adminSettlement.settlementId.isNull()) // 정산 테이블에 없는 것만
                 )
@@ -80,8 +79,8 @@ public class SettlementSchedulerService {
 
         for (SettlementProcessDto dto : targetClasses) {
             try {
-                // 정산 예정일 = 클래스 종료일 + 7일
-                LocalDate settlementDate = sevenDaysAgo.toLocalDate().plusDays(1);
+                // 정산 예정일 = 클래스 종료일 + 1일
+                LocalDate settlementDate = oneDaysAgo.toLocalDate().plusDays(1);
 
                 AdminSettlement settlement = AdminSettlement.builder()
                         .classCalendar(getClassCalendarById(dto.getCalendarId()))
@@ -97,8 +96,7 @@ public class SettlementSchedulerService {
                 adminSettlementRepository.save(settlement);
 
                 successCount++;
-                log.info("클래스 캘린더 ID: {}, 정산 예정 금액: {}원 - 정산 등록 완료",
-                        dto.getCalendarId(), dto.getSettleAmountToDo());
+
 
             } catch (Exception e) {
                 failCount++;

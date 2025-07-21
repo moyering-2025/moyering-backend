@@ -26,16 +26,10 @@ public class AdminPaymentController {
     public ResponseEntity<Page<AdminPaymentDto>> getPaymentList (
             AdminPaymentSearchCond cond,
             @PageableDefault(size = 20, sort = "paidAt", direction = Sort.Direction.DESC) Pageable pageable){
-
-        log.info("결제 내역 조회 요청 : keyword ={}, page={}", cond, pageable);
-        log.info(cond.getKeyword());
-        log.info(cond.getStatus());
-
         try {
             Page<AdminPaymentDto> payments = userPaymentService.getPaymentList(cond, pageable);
             return ResponseEntity.ok(payments);
         } catch(Exception e) {
-            log.error("결제 목록 조회 요청 오류 : {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
